@@ -105,3 +105,4 @@ dist
 .vscode
 status.json
 conf.json
+webdav_conf.json
