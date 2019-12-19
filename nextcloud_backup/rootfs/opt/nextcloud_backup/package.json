@@ -1,0 +1,23 @@
+{
+  "name": "nexcloud-backup",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node --inspect=0.0.0.0:9226 ./bin/www "
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "moment": "^2.24.0",
+    "morgan": "~1.9.1",
+    "superagent": "^5.1.2",
+    "webdav": "^2.10.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.7.2",
+    "eslint-config-google": "^0.14.0"
+  }
+}

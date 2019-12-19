@@ -1,0 +1,61 @@
+<% if (locals.snaps) { %>
+<div class="collection">
+    <% for(const index in snaps) { %>
+    <a class="collection-item local-snap-listener modal-trigger" href="#modal-<%=snaps[index].slug%>"
+        data-id="<%= snaps[index].slug %>">
+        <div><%= snaps[index].name ? snaps[index].name : 'No name' %><div class="secondary-content">
+                <%= moment(snaps[index].date).format('lll')  %></div>
+        </div>
+    </a>
+
+    <div id="modal-<%=snaps[index].slug%>" class="modal modal-fixed-footer blue-grey darken-4 white-text">
+        <div class="modal-content">
+            <div class="row">
+                <div class="col s12 center">
+                    <h4>Snapshot Detail</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 center divider">
+                </div>
+            </div>
+            <div class="row">
+                 
+                <div class="input-field col s12">
+                    <input disabled type="text" id="name-<%=snaps[index].slug%>" value="<%= snaps[index].name ? snaps[index].name : 'No name' %>" />
+                    <label for="name-<%=snaps[index].slug%>" class="white-text active">Name</label>
+                </div>
+
+
+                <div class="input-field col s12">
+                    <input disabled type="text" id="date-<%=snaps[index].slug%>"
+                        value="<%=moment(snaps[index].date).format('lll')%>" />
+                    <label for="date-<%=snaps[index].slug%>" class="white-text active">Date</label>
+                </div>
+
+                <div class="input-field col s12">
+                    <input disabled type="text" id="protected-<%=snaps[index].slug%>"
+                        value="<%=snaps[index].protected%>" />
+                    <label for="protected-<%=snaps[index].slug%>" class="white-text active">Protected</label>
+                </div>
+
+                <div class="input-field col s12">
+                    <input disabled type="text" id="type-<%=snaps[index].slug%>" value="<%=snaps[index].type%>" />
+                    <label for="type-<%=snaps[index].slug%>" class="white-text active">Type</label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer blue-grey darken-4">
+            <a href="#!" class="waves-effect waves-green btn light-blue accent-4">Backup now</a>
+            <a href="#!" class="modal-close waves-effect waves-green btn red">Close</a>
+
+        </div>
+    </div>
+
+
+    <% } %>
+</div>
+
+
+
+<% } %>

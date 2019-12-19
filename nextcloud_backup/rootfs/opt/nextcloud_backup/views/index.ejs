@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Nextcloud Backup</title>
+
+  <!-- <link rel='stylesheet' href='/stylesheets/style.css' /> -->
+  <link rel="stylesheet" href="./css/materialize.min.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    .modal input[disabled] {
+      color: #757575 !important;
+      border-color: #616161 !important;
+    }
+
+    .modal .input-field span.helper-text {
+      color: #9e9e9e;
+
+    }
+
+    .modal div.row:last-child {
+      margin-bottom: 0;
+    }
+
+    .modal div.col:last-child {
+      margin-bottom: 0;
+    }
+
+    .header-box {
+      height: 150px;
+    }
+
+    .header-box .col {
+      height: 100%;
+    }
+
+    .header-box .col .card {
+      height: 100%;
+    }
+
+    .header-box .card-content {
+      padding-top: 10px;
+    }
+
+    .header-box .card-content h5 {
+      margin-top: 10px;
+    }
+
+    ul.dropdown-content a:hover {
+      background-color: #101619 !important;
+    }
+
+    ul.dropdown-content li:hover {
+      background-color: #101619 !important;
+    }
+
+    /* change autocomplete color */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 30px #263238 inset !important;
+      -webkit-text-fill-color: white !important;
+    }
+  </style>
+
+
+</head>
+
+<body class="blue-grey darken-4">
+  <nav class=" light-blue accent-4">
+    <div class="nav-wrapper container">
+      <a href="#" class="brand-logo"><img src="https://cloud.seb6596.ovh/svg/core/logo/logo?color=fff&v=1" height="54"
+          style="margin: 5px"></a>
+      <ul class="right">
+        <li id="setting-trigger"><a class="dropdown-trigger" href="#" data-target="dropdown-settings"><i
+              class="material-icons">settings</i></a></li>
+      </ul>
+      <div style="height: 64px; display: table; margin-left: 130px;">
+        <h4 style="display: table-cell; vertical-align: middle;">Nextcloud Backup</h2>
+      </div>
+    </div>
+  </nav>
+  <ul id="dropdown-settings" class="dropdown-content blue-grey darken-4">
+    <li><a href="#modal-settings-nextcloud" class="modal-trigger center">Nextcloud</a></li>
+    <li><a href="#modal-settings-backup" class="modal-trigger center">Backup</a></li>
+  </ul>
+  <div class="container ">
+
+    <div class="row header-box">
+      <div class="col s12 m3">
+        <div class="card cyan darken-3">
+          <div class="card-content">
+            <span class="card-title white-text" style="font-weight: bold;">Status </span>
+            <div class="divider"></div>
+            <h5 id="status" class="white-text"></h5>
+            <div id="status-second-line" class="truncate tooltipped" data-position="bottom" data-tooltip=""></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col s12 m3">
+        <div class="card cyan darken-3">
+          <div class="card-content">
+            <span class="card-title white-text" style="font-weight: bold;">Last Backup</span>
+            <div class="divider"></div>
+            <h5 id="last_back_status"></h5>
+          </div>
+        </div>
+      </div>
+      <div class="col s12 m3">
+        <div class="card cyan darken-3 ">
+          <div class="card-content">
+            <span class="card-title white-text" style="font-weight: bold;">Next Backup </span>
+            <div class="divider"></div>
+            <h5 id="next_back_status"></h5>
+          </div>
+        </div>
+      </div>
+      <div class="col s12 m3">
+        <div class="card cyan darken-3">
+          <div class="card-content center">
+            <a class="btn green">Backup Now</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col s12 m12 l6 ">
+        <div class="card cyan darken-3">
+          <div class="card-content">
+            <span class="card-title center white-text">Local Snapshots</span>
+            <div id="local_snaps"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <div id="modal-settings-nextcloud" class="modal modal-fixed-footer blue-grey darken-4 white-text">
+    <div class="modal-content">
+      <div class="row">
+        <div class="col s12 center">
+          <h4>Nextcloud Settings</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s12 center divider">
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <input id="hostname" type="text" class="white-text">
+          <label for="hostname">Hostname</label>
+          <span class="helper-text">exemple.com:8080</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s6">
+          <input id="username" type="text" class="white-text">
+          <label for="username">Username</label>
+        </div>
+        <div class="input-field col s6">
+          <input id="password" type="password" class="white-text">
+          <label for="password">Password</label>
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="modal-footer blue-grey darken-4">
+      <a href="#" class="modal-close waves-effect btn red"><b>Cancel</b></a>
+      <a href="#" class="btn green waves-effect" style="margin-left: 5px;" id="save-nextcloud-settings"><b>Save</b></a>
+
+    </div>
+  </div>
+
+
+  <div id="modal-loading" class="modal blue-grey darken-4 white-text">
+    <div class="modal-content">
+      
+    </div>
+  </div>
+
+</body>
+<script src="./js/materialize.min.js"></script>
+<script src="./js/jquery-3.4.1.min.js"></script>
+<script src="./js/index.js"></script>
+<script>
+  var last_status = "";
+
+  var loadingModal = null;
+  document.addEventListener('DOMContentLoaded', function() {
+    updateLocalSnaps();
+    update_status();
+    let tooltips = document.querySelectorAll('.tooltipped');
+    M.Tooltip.init(tooltips, {});
+    let drops = document.querySelectorAll('.dropdown-trigger');
+    M.Dropdown.init(drops, { constrainWidth: false, coverTrigger: false, alignment: 'right', onOpenStart: () => $('#setting-trigger').addClass('active'), onCloseEnd: () => $('#setting-trigger').removeClass('active') });
+    setInterval(update_status, 500);
+    listeners();
+
+  });
+
+  function updateLocalSnaps() {
+    $.get('./api/formated-local-snap', (data) => {
+      $('#local_snaps').empty();
+      $('#local_snaps').html(data);
+
+      var elems = document.querySelectorAll('.collapsible');
+      M.Collapsible.init(elems, { accordion: true });
+      var modals = document.querySelectorAll('.modal:not(#modal-loading)');
+      M.Modal.init(modals, {});
+
+      let loadingModals = document.querySelectorAll('#modal-loading');
+      M.Modal.init( loadingModals, {dismissible: false});
+
+      loadingModal = M.Modal.getInstance(document.querySelector('#modal-loading'));
+      debugger;
+      $('.local-snap-listener').click(function() {
+        let id = this.getAttribute('data-id');
+        console.log(id);
+      });
+
+    });
+  }
+
+  function update_status() {
+    $.get('./api/status', (data) => {
+      if (JSON.stringify(data) !== last_status) {
+        last_status = JSON.stringify(data);
+        switch (data.status) {
+          case "error":
+            printStatus('Error', data.message);
+            break;
+          case "idle":
+            printStatus('Idle', "Waiting for next backup.")
+        }
+      }
+
+
+    });
+  }
+
+
+  function printStatus(status, secondLine) {
+    $('#status').empty();
+    $('#status').html(status);
+    $('#status-second-line').empty();
+    $('#status-second-line').html(secondLine);
+    $('#status-second-line').attr('data-tooltip', secondLine)
+  }
+
+  function listeners() {
+    $('#save-nextcloud-settings').click(sendNextcloudSettings);
+  }
+
+
+  function sendNextcloudSettings() {
+    loadingModal.open();
+    let hostname = $('#hostname').val();
+    let username = $('#username').val();
+    let password = $('#password').val();
+    $.post('./api/nextcloud-settings', { hostname: hostname, username: username, password: password })
+      .done((data) => {
+        console.log('Saved');
+      }).fail((data) => {
+        console.log('Fail');
+      }).always(()=>{
+        loadingModal.close();
+      })
+  }
+</script>
+
+</html>

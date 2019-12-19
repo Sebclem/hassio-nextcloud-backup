@@ -1,0 +1,10 @@
+#!/usr/bin/with-contenv bashio
+# ==============================================================================
+# Community Hass.io Add-ons: Example
+# Runs example1 script
+# ==============================================================================
+
+
+bashio::log.info "Starting Node..."
+
+exec /usr/bin/nextcloud_backup.sh
