@@ -1,4 +1,4 @@
-# Community Hass.io Add-ons: Log Viewer
+# Community Hass.io Add-ons: Nextcloud Backup
 
 [![GitHub Release][releases-shield]][releases]
 ![Project Stage][project-stage-shield]
@@ -17,7 +17,7 @@
 
 [![Buy me a coffee][buymeacoffee-shield]][buymeacoffee]
 
-Browser-based log utility for Hass.io.
+Hass.io snapshot backup to Nextcloud
 
 ![Nextcloud Backup Screenshot](images/screenshot.gif)
 
