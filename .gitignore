@@ -104,5 +104,4 @@ dist
 .tern-port
 .vscode
 status.json
-nextcloud_config.json
-auto_backup_config.json
+conf.json
