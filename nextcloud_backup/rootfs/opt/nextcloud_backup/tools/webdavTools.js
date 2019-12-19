@@ -11,6 +11,7 @@ class WebdavTools {
 
     init(ssl, host, username, password) {
         return new Promise((resolve, reject) => {
+            let status = statusTools.getStatus();
             console.log("Initilizing and checking webdav client...")
             let url = (ssl ? "https" : "http") + "://" + host + endpoint;
             try {
@@ -22,21 +23,24 @@ class WebdavTools {
                         status.error_code = null;
                         statusTools.setStatus(status);
                     }
+                    console.log("Nextcloud connection:  \x1b[32mSuccess !\x1b[0m");
                     resolve();
                 }).catch((error) => {
-                    status.status = "Error";
+                    status.status = "error";
                     status.error_code = 3;
                     status.message = "Can't connect to Nextcloud (" + error + ") !"
                     statusTools.setStatus(status);
                     this.client = null;
+                    console.error("Can't connect to Nextcloud (" + error + ") !");
                     reject("Can't connect to Nextcloud (" + error + ") !");
                 });
             } catch (err) {
-                status.status = "Error";
+                status.status = "error";
                 status.error_code = 3;
                 status.message = "Can't connect to Nextcloud (" + err + ") !"
                 statusTools.setStatus(status);
                 this.client = null;
+                console.error("Can't connect to Nextcloud (" + err + ") !");
                 reject("Can't connect to Nextcloud (" + err + ") !");
             }
 
@@ -46,20 +50,24 @@ class WebdavTools {
     confIsValid() {
         return new Promise((resolve, reject) => {
             let status = statusTools.getStatus();
-            let conf = this.loadConf();
+            let conf = this.getConf();
             if (conf !== null) {
-                if (conf.ssl !== null && conf.host !== null && conf !== null && conf !== null) {
+                if (conf.ssl !== null && conf.host !== null && conf.username !== null && conf.password !== null) {
                     if (status.error_code == 2) {
                         status.status = "idle";
                         status.message = null;
                         status.error_code = null;
                         statusTools.setStatus(status);
                     }
-                    //TODO init connection
-                    resolve();
+                    this.init(conf.ssl, conf.host, conf.username, conf.password).then(() => {
+                        resolve();
+                    }).catch((err) => {
+                        reject(err);
+                    });
+
                 }
                 else {
-                    status.status = "Error";
+                    status.status = "error";
                     status.error_code = 2;
                     status.message = "Nextcloud config invalid !"
                     statusTools.setStatus(status);
@@ -67,7 +75,7 @@ class WebdavTools {
                 }
             }
             else {
-                status.status = "Error";
+                status.status = "error";
                 status.error_code = 2;
                 status.message = "Nextcloud config not found !"
                 statusTools.setStatus(status);
@@ -77,7 +85,7 @@ class WebdavTools {
         });
     }
 
-    loadConf() {
+    getConf() {
         if (fs.existsSync(configPath)) {
             let content = JSON.parse(fs.readFileSync(configPath));
             return content;
@@ -85,6 +93,11 @@ class WebdavTools {
         else
             return null;
     }
+
+    setConf(conf){
+        fs.writeFileSync(configPath, JSON.stringify(conf));
+    }
+    
 }
 
 

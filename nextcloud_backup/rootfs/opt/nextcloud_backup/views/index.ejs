@@ -86,7 +86,8 @@
     </div>
   </nav>
   <ul id="dropdown-settings" class="dropdown-content blue-grey darken-4">
-    <li><a href="#modal-settings-nextcloud" class="modal-trigger center">Nextcloud</a></li>
+    <li><a href="#modal-settings-nextcloud" id="trigger-nextcloud-settings" class="modal-trigger center">Nextcloud</a>
+    </li>
     <li><a href="#modal-settings-backup" class="modal-trigger center">Backup</a></li>
   </ul>
   <div class="container ">
@@ -156,6 +157,23 @@
         <div class="col s12 center divider">
         </div>
       </div>
+      <div class="row hide">
+        <div class="col s12 center red-text" id="nextcloud_settings_message">
+
+        </div>
+      </div>
+      <div class="row" style="margin-bottom: 10px;">
+        <div class="col s12" style="margin-bottom: 10px;">
+          <div style="color: #9e9e9e; display: inline;">SSL</div>
+          <div class="switch" style="display: inline;">
+            <label>
+              <input id="ssl" type="checkbox">
+              <span class="lever"></span>
+            </label>
+          </div>
+
+        </div>
+      </div>
       <div class="row">
         <div class="input-field col s12">
           <input id="hostname" type="text" class="white-text">
@@ -186,8 +204,65 @@
 
 
   <div id="modal-loading" class="modal blue-grey darken-4 white-text">
-    <div class="modal-content">
-      
+    <div class="modal-content " >
+      <div class="row">
+        <div class="col s12 center">
+          <h4>Loading</h4>
+        </div>
+      </div>
+      <div class="row valign-wrapper" style="height: 150px;">
+        <div class="col s12 center">
+          <div class="preloader-wrapper big active">
+            <div class="spinner-layer spinner-blue">
+              <div class="circle-clipper left">
+                <div class="circle"></div>
+              </div>
+              <div class="gap-patch">
+                <div class="circle"></div>
+              </div>
+              <div class="circle-clipper right">
+                <div class="circle"></div>
+              </div>
+            </div>
+
+            <div class="spinner-layer spinner-red">
+              <div class="circle-clipper left">
+                <div class="circle"></div>
+              </div>
+              <div class="gap-patch">
+                <div class="circle"></div>
+              </div>
+              <div class="circle-clipper right">
+                <div class="circle"></div>
+              </div>
+            </div>
+
+            <div class="spinner-layer spinner-yellow">
+              <div class="circle-clipper left">
+                <div class="circle"></div>
+              </div>
+              <div class="gap-patch">
+                <div class="circle"></div>
+              </div>
+              <div class="circle-clipper right">
+                <div class="circle"></div>
+              </div>
+            </div>
+
+            <div class="spinner-layer spinner-green">
+              <div class="circle-clipper left">
+                <div class="circle"></div>
+              </div>
+              <div class="gap-patch">
+                <div class="circle"></div>
+              </div>
+              <div class="circle-clipper right">
+                <div class="circle"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -222,10 +297,9 @@
       M.Modal.init(modals, {});
 
       let loadingModals = document.querySelectorAll('#modal-loading');
-      M.Modal.init( loadingModals, {dismissible: false});
+      M.Modal.init(loadingModals, { dismissible: false });
 
       loadingModal = M.Modal.getInstance(document.querySelector('#modal-loading'));
-      debugger;
       $('.local-snap-listener').click(function() {
         let id = this.getAttribute('data-id');
         console.log(id);
@@ -262,23 +336,60 @@
 
   function listeners() {
     $('#save-nextcloud-settings').click(sendNextcloudSettings);
+    $('#trigger-nextcloud-settings').click(getNextcloudSettings)
   }
 
 
   function sendNextcloudSettings() {
     loadingModal.open();
+    let ssl = $('#ssl').is(':checked')
     let hostname = $('#hostname').val();
     let username = $('#username').val();
     let password = $('#password').val();
-    $.post('./api/nextcloud-settings', { hostname: hostname, username: username, password: password })
+    $.post('./api/nextcloud-settings', { ssl: ssl, host: hostname, username: username, password: password })
       .done((data) => {
         console.log('Saved');
+        $('#nextcloud_settings_message').parent().addClass("hide");
+        M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Nextcloud settings saved !', classes: "green" });
+        M.Modal.getInstance(document.querySelector('#modal-settings-nextcloud')).close();
+
       }).fail((data) => {
+        debugger;
+        if (data.status == 406) {
+          console.log(data.responseJSON.message);
+          $('#nextcloud_settings_message').html(data.responseJSON.message);
+
+        }
+        else {
+          $('#nextcloud_settings_message').html("Invalid Settings.");
+
+        }
+        $('#nextcloud_settings_message').parent().removeClass("hide");
+        M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Invalid Nextcloud settings !', classes: "red" });
         console.log('Fail');
-      }).always(()=>{
+      }).always(() => {
         loadingModal.close();
       })
   }
+
+
+  function getNextcloudSettings() {
+    loadingModal.open();
+    $.get('./api/nextcloud-settings', (data) => {
+      $('#ssl').prop('checked', ssl);
+      $('#hostname').val(data.host);
+      $('#hostname + label').removeClass("active");
+      $('#hostname + label').addClass("active");
+      $('#username').val(data.username);
+      $('#username + label').removeClass("active");
+      $('#username + label').addClass("active");
+      $('#password').val(data.password);
+      $('#password + label').removeClass("active");
+      $('#password + label').addClass("active");
+      loadingModal.close();
+    });
+  }
+
 </script>
 
 </html>

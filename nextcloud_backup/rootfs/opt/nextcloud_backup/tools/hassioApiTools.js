@@ -3,7 +3,7 @@ const statusTools = require('./status');
 
 // !!! FOR DEV PURPOSE ONLY !!!
 //put token here for dev (ssh port tunelling 'sudo ssh -L 80:hassio:80 root@`hassoi_ip`' + put 127.0.0.1 hassio into host)
-const fallbackToken = "75c7a712290f47a7513ee75a24072f2a5f44745d9b9c4e1f9fe6d44e55da2715e7c4341de239ec1c79a5f7178dd4376e27a98ebb7b4b029a" 
+const fallbackToken = "3afd4f8440830816e32fd490bd4f98b2423c4d9dff1432a0d57f581c43ec2bf1d1fa9468fc162732f8e95ae524c59ceed0f8e2b8a948d170" 
 
 
 function getSnapshots() {
