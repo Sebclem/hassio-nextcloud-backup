@@ -1,9 +1,12 @@
-const superagent = require('superagent');
+const request = require('request');
+const progress = require('request-progress');
 const statusTools = require('./status');
+const fs = require('fs');
+
 
 // !!! FOR DEV PURPOSE ONLY !!!
 //put token here for dev (ssh port tunelling 'sudo ssh -L 80:hassio:80 root@`hassoi_ip`' + put 127.0.0.1 hassio into host)
-const fallbackToken = "3afd4f8440830816e32fd490bd4f98b2423c4d9dff1432a0d57f581c43ec2bf1d1fa9468fc162732f8e95ae524c59ceed0f8e2b8a948d170" 
+const fallbackToken = "3afd4f8440830816e32fd490bd4f98b2423c4d9dff1432a0d57f581c43ec2bf1d1fa9468fc162732f8e95ae524c59ceed0f8e2b8a948d170"
 
 
 function getSnapshots() {
@@ -13,29 +16,67 @@ function getSnapshots() {
             token = fallbackToken
         }
         let status = statusTools.getStatus();
-        superagent.get('http://hassio/snapshots')
-            .set('X-HASSIO-KEY', token)
-            .then(data => {
+        let option = {
+            url: "http://hassio/snapshots",
+            headers: { 'X-HASSIO-KEY': token },
+            json : true
+        }
+        request(option, (error, response, body) => {
+            if (!error && response.statusCode == 200) {
                 if (status.error_code == 1) {
                     status.status = "idle";
                     status.message = null;
                     status.error_code = null;
                     statusTools.setStatus(status);
                 }
-                let snaps = data.body.data.snapshots;
+                let snaps = body.data.snapshots;
                 // console.log(snaps);
                 resolve(snaps);
-
-            })
-            .catch(err => {
+            }
+            else {
                 status.status = "error";
-                status.message = "Fail to fetch Hassio snapshot (" + err + ")";
+                status.message = "Fail to fetch Hassio snapshot (" + error + ")";
                 status.error_code = 1;
                 statusTools.setStatus(status);
-                reject(err);
-            });
+                reject(error);
+            }
+        })
     });
 
 }
 
+function downloadSnapshot(id) {
+    return new Promise((resolve, reject) => {
+
+        let stream = fs.createWriteStream('./' + id + '.tar');
+        let token = process.env.HASSIO_TOKEN;
+        if (token == null) {
+            token = fallbackToken
+        }
+        let status = statusTools.getStatus();
+        status.status = "download";
+        status.progress = 0;
+        statusTools.setStatus(status);
+        let option = {
+            url: 'http://hassio/snapshots/' + id + '/download',
+            headers: { 'X-HASSIO-KEY': token },
+        }
+        progress(request(option))
+        .on('progress', (state) => {
+            status.progress = state.percent;
+            statusTools.setStatus(status);
+        })
+        .on('error', (error)=>{
+            console.log("error")
+        })
+        .on('end', ()=>{
+            console.log('end')
+            status.progress = 1;
+            statusTools.setStatus(status);
+        })
+        .pipe(stream);
+    })
+}
+
 exports.getSnapshots = getSnapshots;
+exports.downloadSnapshot = downloadSnapshot;

@@ -317,7 +317,10 @@
             printStatus('Error', data.message);
             break;
           case "idle":
-            printStatus('Idle', "Waiting for next backup.")
+            printStatus('Idle', "Waiting for next backup.");
+            break;
+          case "download":
+            printStatus('DL Snap...', data.progress);
         }
       }
 

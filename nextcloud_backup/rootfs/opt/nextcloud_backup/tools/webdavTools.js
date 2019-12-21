@@ -23,8 +23,11 @@ class WebdavTools {
                         status.error_code = null;
                         statusTools.setStatus(status);
                     }
-                    console.log("Nextcloud connection:  \x1b[32mSuccess !\x1b[0m");
-                    resolve();
+                    console.debug("Nextcloud connection:  \x1b[32mSuccess !\x1b[0m");
+                    this.initFolder().then(() => {
+                        resolve();
+                    });
+                    
                 }).catch((error) => {
                     status.status = "error";
                     status.error_code = 3;
@@ -45,6 +48,19 @@ class WebdavTools {
             }
 
         });
+    }
+
+    initFolder(){
+        return new Promise((resolve, reject) =>{
+            this.client.createDirectory("/Hassio Backup").catch(()=>{}).then(()=>{
+                this.client.createDirectory("/Hassio Backup/Auto").catch(()=>{}).then(()=>{
+                    this.client.createDirectory("/Hassio Backup/Manual").catch(()=>{}).then(()=>{
+                        resolve();
+                    })
+                })
+            });
+        });
+        
     }
 
     confIsValid() {
@@ -97,6 +113,8 @@ class WebdavTools {
     setConf(conf){
         fs.writeFileSync(configPath, JSON.stringify(conf));
     }
+
+    
     
 }
 

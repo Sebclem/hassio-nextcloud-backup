@@ -76,4 +76,10 @@ router.get('/nextcloud-settings', function(req, res, next){
 });
 
 
+
+router.post('/manual-backup', function(req, res, next){
+    hassioApiTools.downloadSnapshot('e058caf6');
+    res.send(200);
+});
+
 module.exports = router;
