@@ -45,41 +45,48 @@ router.get('/formated-remote-manual', function(req, res, next) {
 });
 
 
-router.post('/nextcloud-settings', function(req, res, next){
+router.post('/nextcloud-settings', function(req, res, next) {
     let settings = req.body;
-    if(settings.ssl != null && settings.host != null && settings.host != "" && settings.username != null && settings.password != null){
+    if (settings.ssl != null && settings.host != null && settings.host != "" && settings.username != null && settings.password != null) {
         webdav.setConf(settings);
-        webdav.confIsValid().then(()=>{
+        webdav.confIsValid().then(() => {
             res.status(201);
             res.send();
-        }).catch((err)=>{
+        }).catch((err) => {
             res.status(406);
-            res.json({message: err});
+            res.json({ message: err });
         });
-        
+
     }
-    else{
+    else {
         res.status(400);
         res.send();
     }
 });
 
-router.get('/nextcloud-settings', function(req, res, next){
+router.get('/nextcloud-settings', function(req, res, next) {
     let conf = webdav.getConf();
-    if(conf == null){
+    if (conf == null) {
         res.status(404);
         res.send();
     }
-    else{
+    else {
         res.json(conf);
     }
 });
 
 
 
-router.post('/manual-backup', function(req, res, next){
-    hassioApiTools.downloadSnapshot('e058caf6');
-    res.send(200);
+router.post('/manual-backup', function(req, res, next) {
+    let id = req.query.id;
+    hassioApiTools.downloadSnapshot(id)
+        .then(() => {
+            res.send(200);
+        })
+        .catch(() => {
+            res.send(500);
+        })
+
 });
 
 module.exports = router;

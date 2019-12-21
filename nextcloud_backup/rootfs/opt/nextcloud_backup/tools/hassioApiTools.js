@@ -19,7 +19,7 @@ function getSnapshots() {
         let option = {
             url: "http://hassio/snapshots",
             headers: { 'X-HASSIO-KEY': token },
-            json : true
+            json: true
         }
         request(option, (error, response, body) => {
             if (!error && response.statusCode == 200) {
@@ -54,28 +54,63 @@ function downloadSnapshot(id) {
             token = fallbackToken
         }
         let status = statusTools.getStatus();
-        status.status = "download";
-        status.progress = 0;
-        statusTools.setStatus(status);
-        let option = {
-            url: 'http://hassio/snapshots/' + id + '/download',
-            headers: { 'X-HASSIO-KEY': token },
+        checkSnap(id).then(() => {
+            status.status = "download";
+            status.progress = 0;
+            statusTools.setStatus(status);
+            let option = {
+                url: 'http://hassio/snapshots/' + id + '/download',
+                headers: { 'X-HASSIO-KEY': token },
+            }
+            progress(request(option))
+                .on('progress', (state) => {
+                    status.progress = state.percent;
+                    statusTools.setStatus(status);
+                })
+                .on('error', (error) => {
+                    status.status = "error";
+                    status.message = "Fail to downloadw Hassio snapshot (" + error + ")";
+                    status.error_code = 4;
+                    statusTools.setStatus(status);
+                    reject(error);
+                })
+                .on('end', () => {
+                    console.log('end')
+                    status.progress = 1;
+                    statusTools.setStatus(status);
+                })
+                .pipe(stream);
+        }).catch(() => {
+            status.status = "error";
+            status.message = "Fail to downloadw Hassio snapshot";
+            status.error_code = 4;
+            statusTools.setStatus(status);
+            reject();
+        });
+
+    });
+}
+
+
+function checkSnap(id) {
+    return new Promise((resolve, reject) => {
+        let token = process.env.HASSIO_TOKEN;
+        if (token == null) {
+            token = fallbackToken
         }
-        progress(request(option))
-        .on('progress', (state) => {
-            status.progress = state.percent;
-            statusTools.setStatus(status);
+        let option = {
+            url: 'http://hassio/snapshots/' + id + '/info',
+            headers: { 'X-HASSIO-KEY': token },
+            json: true
+        }
+        request(option, (error, response, body) => {
+            if (error  || response.statusCode != 200)
+                reject();
+            else
+                resolve();
         })
-        .on('error', (error)=>{
-            console.log("error")
-        })
-        .on('end', ()=>{
-            console.log('end')
-            status.progress = 1;
-            statusTools.setStatus(status);
-        })
-        .pipe(stream);
-    })
+    });
+
 }
 
 exports.getSnapshots = getSnapshots;

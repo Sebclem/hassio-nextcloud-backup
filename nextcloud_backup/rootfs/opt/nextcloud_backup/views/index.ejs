@@ -98,8 +98,11 @@
           <div class="card-content">
             <span class="card-title white-text" style="font-weight: bold;">Status </span>
             <div class="divider"></div>
-            <h5 id="status" class="white-text"></h5>
+            <h6 id="status" class="white-text"></h6>
             <div id="status-second-line" class="truncate tooltipped" data-position="bottom" data-tooltip=""></div>
+            <div class="progress hide" id="progress">
+              <div class="determinate  light-green darken-2" style="width: 0%"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -204,7 +207,7 @@
 
 
   <div id="modal-loading" class="modal blue-grey darken-4 white-text">
-    <div class="modal-content " >
+    <div class="modal-content ">
       <div class="row">
         <div class="col s12 center">
           <h4>Loading</h4>
@@ -305,6 +308,11 @@
         console.log(id);
       });
 
+      $('.manual-back-list').click(function(){
+        let id = this.getAttribute('data-id');
+        manualBackup(id);
+      })
+
     });
   }
 
@@ -320,7 +328,7 @@
             printStatus('Idle', "Waiting for next backup.");
             break;
           case "download":
-            printStatus('DL Snap...', data.progress);
+            printStatusWithBar('Downloading Snapshot', data.progress);
         }
       }
 
@@ -333,8 +341,33 @@
     $('#status').empty();
     $('#status').html(status);
     $('#status-second-line').empty();
+    $('#status-second-line').removeClass('center');
     $('#status-second-line').html(secondLine);
     $('#status-second-line').attr('data-tooltip', secondLine)
+    $('#progress').addClass("hide");
+  }
+
+  function printStatusWithBar(status, progress){
+    $('#status').empty();
+    $('#status').html(status);
+    let secondLine = $('#status-second-line')
+    secondLine.empty();
+    secondLine.html(progress == -1 ? "Waiting..." : (Math.round(progress*100) + "%"));
+    secondLine.addClass("center");
+    secondLine.attr('data-tooltip', Math.round(progress*100) + "%");
+
+    let progressDiv = $('#progress');
+    progressDiv.removeClass("hide");
+    if(progress == -1){
+      progressDiv.children().removeClass('determinate');
+      progressDiv.children().addClass('indeterminate');
+    }
+    else{
+      progressDiv.children().removeClass('indeterminate');
+      progressDiv.children().addClass('determinate');
+      progressDiv.children().css('width', (progress*100) + "%");
+    }
+    
   }
 
   function listeners() {
@@ -373,6 +406,11 @@
       }).always(() => {
         loadingModal.close();
       })
+  }
+
+  function manualBackup(id){
+    $.post('./api/manual-backup?id=' + id);
+
   }
 
 
