@@ -80,14 +80,17 @@ router.get('/nextcloud-settings', function(req, res, next) {
 router.post('/manual-backup', function(req, res, next) {
     let id = req.query.id;
     let name = req.query.name;
-    // hassioApiTools.downloadSnapshot(id)
-        // .then(() => {
-            webdav.uploadFile('8afb4728', '/Hassio Backup/Manual/' + '8afb4728' + '.tar');
+    hassioApiTools.downloadSnapshot(id)
+        .then(() => {
+            webdav.uploadFile(id, '/Hassio Backup/Manual/' + name + '.tar');
             res.send(200);
-        // })
-        // .catch(() => {
-            // res.send(500);
-        // })
+        })
+        .catch(() => {
+            res.send(500);
+        })
+
+});
+
 
 });
 

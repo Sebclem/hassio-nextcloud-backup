@@ -1,5 +1,6 @@
 const { createClient } = require("webdav");
 const fs = require("fs");
+const moment = require('moment');
 
 const statusTools = require('./status');
 const endpoint = "/remote.php/webdav"
@@ -148,6 +149,8 @@ class WebdavTools {
                 status.status = "idle";
                 status.message = null;
                 status.error_code = null;
+                status.last_backup = moment().format("lll")
+                
                 statusTools.setStatus(status);
                 resolve();
             }).catch((err) => {

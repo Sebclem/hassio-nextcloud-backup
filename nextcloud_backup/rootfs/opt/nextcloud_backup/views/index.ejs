@@ -112,7 +112,7 @@
           <div class="card-content">
             <span class="card-title white-text" style="font-weight: bold;">Last Backup</span>
             <div class="divider"></div>
-            <h5 id="last_back_status"></h5>
+            <h6 class="white-text" id="last_back_status"></h6>
           </div>
         </div>
       </div>
@@ -308,7 +308,7 @@
         console.log(id);
       });
 
-      $('.manual-back-list').click(function(){
+      $('.manual-back-list').click(function() {
         let id = this.getAttribute('data-id');
         let name = this.getAttribute('data-name');
         manualBackup(id, name);
@@ -333,6 +333,10 @@
           case "upload":
             printStatusWithBar('Uploading Snapshot', data.progress);
         }
+        if (data.last_backup != null) {
+          if ($('#last_back_status').html() != data.last_backup)
+            $('#last_back_status').html(data.last_backup);
+        }
       }
 
 
@@ -350,27 +354,27 @@
     $('#progress').addClass("hide");
   }
 
-  function printStatusWithBar(status, progress){
+  function printStatusWithBar(status, progress) {
     $('#status').empty();
     $('#status').html(status);
     let secondLine = $('#status-second-line')
     secondLine.empty();
-    secondLine.html(progress == -1 ? "Waiting..." : (Math.round(progress*100) + "%"));
+    secondLine.html(progress == -1 ? "Waiting..." : (Math.round(progress * 100) + "%"));
     secondLine.addClass("center");
-    secondLine.attr('data-tooltip', Math.round(progress*100) + "%");
+    secondLine.attr('data-tooltip', Math.round(progress * 100) + "%");
 
     let progressDiv = $('#progress');
     progressDiv.removeClass("hide");
-    if(progress == -1){
+    if (progress == -1) {
       progressDiv.children().removeClass('determinate');
       progressDiv.children().addClass('indeterminate');
     }
-    else{
+    else {
       progressDiv.children().removeClass('indeterminate');
       progressDiv.children().addClass('determinate');
-      progressDiv.children().css('width', (progress*100) + "%");
+      progressDiv.children().css('width', (progress * 100) + "%");
     }
-    
+
   }
 
   function listeners() {
@@ -411,7 +415,7 @@
       })
   }
 
-  function manualBackup(id, name){
+  function manualBackup(id, name) {
     $.post('./api/manual-backup?id=' + id + '&name=' + name);
 
   }
