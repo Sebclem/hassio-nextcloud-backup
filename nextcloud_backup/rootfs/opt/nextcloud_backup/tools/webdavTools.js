@@ -152,6 +152,7 @@ class WebdavTools {
                 status.last_backup = moment().format("lll")
                 
                 statusTools.setStatus(status);
+                fs.unlinkSync('./temp/' + id + '.tar')
                 resolve();
             }).catch((err) => {
                 status.status = "error";
