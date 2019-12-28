@@ -4,7 +4,7 @@
     <a class="collection-item local-snap-listener modal-trigger" href="#modal-<%=snaps[index].slug%>"
         data-id="<%= snaps[index].slug %>">
         <div><%= snaps[index].name ? snaps[index].name : snaps[index].slug %><div class="secondary-content">
-                <%= moment(snaps[index].date).format('lll')  %></div>
+                <%= moment(snaps[index].date).format('MMM D, YYYY HH:mm')  %></div>
         </div>
     </a>
 
@@ -29,7 +29,7 @@
 
                 <div class="input-field col s12">
                     <input disabled type="text" id="date-<%=snaps[index].slug%>"
-                        value="<%=moment(snaps[index].date).format('lll')%>" />
+                        value="<%=moment(snaps[index].date).format('MMM D, YYYY HH:mm')%>" />
                     <label for="date-<%=snaps[index].slug%>" class="white-text active">Date</label>
                 </div>
 
