@@ -310,7 +310,8 @@
 
       $('.manual-back-list').click(function(){
         let id = this.getAttribute('data-id');
-        manualBackup(id);
+        let name = this.getAttribute('data-name');
+        manualBackup(id, name);
       })
 
     });
@@ -329,6 +330,8 @@
             break;
           case "download":
             printStatusWithBar('Downloading Snapshot', data.progress);
+          case "upload":
+            printStatusWithBar('Uploading Snapshot', data.progress);
         }
       }
 
@@ -408,8 +411,8 @@
       })
   }
 
-  function manualBackup(id){
-    $.post('./api/manual-backup?id=' + id);
+  function manualBackup(id, name){
+    $.post('./api/manual-backup?id=' + id + '&name=' + name);
 
   }
 

@@ -3,7 +3,7 @@
     <% for(const index in snaps) { %>
     <a class="collection-item local-snap-listener modal-trigger" href="#modal-<%=snaps[index].slug%>"
         data-id="<%= snaps[index].slug %>">
-        <div><%= snaps[index].name ? snaps[index].name : 'No name' %><div class="secondary-content">
+        <div><%= snaps[index].name ? snaps[index].name : snaps[index].slug %><div class="secondary-content">
                 <%= moment(snaps[index].date).format('lll')  %></div>
         </div>
     </a>
@@ -22,7 +22,7 @@
             <div class="row">
                  
                 <div class="input-field col s12">
-                    <input disabled type="text" id="name-<%=snaps[index].slug%>" value="<%= snaps[index].name ? snaps[index].name : 'No name' %>" />
+                    <input disabled type="text" id="name-<%=snaps[index].slug%>" value="<%= snaps[index].name ? snaps[index].name : snaps[index].slug %>" />
                     <label for="name-<%=snaps[index].slug%>" class="white-text active">Name</label>
                 </div>
 
@@ -46,7 +46,7 @@
             </div>
         </div>
         <div class="modal-footer blue-grey darken-4">
-            <a href="#!" class="waves-effect waves-green btn light-blue accent-4 manual-back-list modal-close" data-id="<%=snaps[index].slug%>">Backup now</a>
+            <a href="#!" class="waves-effect waves-green btn light-blue accent-4 manual-back-list modal-close" data-id="<%=snaps[index].slug%>" data-name='<%= snaps[index].name ? snaps[index].name : snaps[index].slug %>'</a>Backup now</a>
             <a href="#!" class="modal-close waves-effect waves-green btn red">Close</a>
 
         </div>

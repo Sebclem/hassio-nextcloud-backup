@@ -38,6 +38,7 @@ function getSnapshots() {
                 status.message = "Fail to fetch Hassio snapshot (" + error + ")";
                 status.error_code = 1;
                 statusTools.setStatus(status);
+                console.error(status.message);
                 reject(error);
             }
         })
@@ -47,8 +48,10 @@ function getSnapshots() {
 
 function downloadSnapshot(id) {
     return new Promise((resolve, reject) => {
-
-        let stream = fs.createWriteStream('./' + id + '.tar');
+        console.log('Downloading snapshot ' + id + '...')
+        if(!fs.existsSync('./temp/'))
+            fs.mkdirSync('./temp/');
+        let stream = fs.createWriteStream('./temp/' + id + '.tar');
         let token = process.env.HASSIO_TOKEN;
         if (token == null) {
             token = fallbackToken
@@ -64,27 +67,31 @@ function downloadSnapshot(id) {
             }
             progress(request(option))
                 .on('progress', (state) => {
+                    // TODO Don't write progress to disk, preseve disk IO time
                     status.progress = state.percent;
                     statusTools.setStatus(status);
                 })
                 .on('error', (error) => {
                     status.status = "error";
-                    status.message = "Fail to downloadw Hassio snapshot (" + error + ")";
+                    status.message = "Fail to download Hassio snapshot (" + error + ")";
                     status.error_code = 4;
                     statusTools.setStatus(status);
+                    console.error(status.message);
                     reject(error);
                 })
                 .on('end', () => {
-                    console.log('end')
+                    console.log('Download success !')
                     status.progress = 1;
                     statusTools.setStatus(status);
+                    resolve();
                 })
                 .pipe(stream);
         }).catch(() => {
             status.status = "error";
-            status.message = "Fail to downloadw Hassio snapshot";
+            status.message = "Fail to download Hassio snapshot. Not found ?";
             status.error_code = 4;
             statusTools.setStatus(status);
+            console.error(status.message);
             reject();
         });
 

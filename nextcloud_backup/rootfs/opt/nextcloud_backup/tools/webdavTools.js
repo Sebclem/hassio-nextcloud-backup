@@ -1,5 +1,6 @@
 const { createClient } = require("webdav");
 const fs = require("fs");
+
 const statusTools = require('./status');
 const endpoint = "/remote.php/webdav"
 const configPath = "./webdav_conf.json"
@@ -16,6 +17,7 @@ class WebdavTools {
             let url = (ssl ? "https" : "http") + "://" + host + endpoint;
             try {
                 this.client = createClient(url, { username: username, password: password });
+
                 this.client.getDirectoryContents("/").then(() => {
                     if (status.error_code == 3) {
                         status.status = "idle";
@@ -27,7 +29,7 @@ class WebdavTools {
                     this.initFolder().then(() => {
                         resolve();
                     });
-                    
+
                 }).catch((error) => {
                     status.status = "error";
                     status.error_code = 3;
@@ -50,17 +52,17 @@ class WebdavTools {
         });
     }
 
-    initFolder(){
-        return new Promise((resolve, reject) =>{
-            this.client.createDirectory("/Hassio Backup").catch(()=>{}).then(()=>{
-                this.client.createDirectory("/Hassio Backup/Auto").catch(()=>{}).then(()=>{
-                    this.client.createDirectory("/Hassio Backup/Manual").catch(()=>{}).then(()=>{
+    initFolder() {
+        return new Promise((resolve, reject) => {
+            this.client.createDirectory("/Hassio Backup").catch(() => { }).then(() => {
+                this.client.createDirectory("/Hassio Backup/Auto").catch(() => { }).then(() => {
+                    this.client.createDirectory("/Hassio Backup/Manual").catch(() => { }).then(() => {
                         resolve();
                     })
                 })
             });
         });
-        
+
     }
 
     confIsValid() {
@@ -87,6 +89,7 @@ class WebdavTools {
                     status.error_code = 2;
                     status.message = "Nextcloud config invalid !"
                     statusTools.setStatus(status);
+                    console.error(status.message);
                     reject("Nextcloud config invalid !");
                 }
             }
@@ -95,6 +98,7 @@ class WebdavTools {
                 status.error_code = 2;
                 status.message = "Nextcloud config not found !"
                 statusTools.setStatus(status);
+                console.error(status.message);
                 reject("Nextcloud config not found !");
             }
 
@@ -110,12 +114,54 @@ class WebdavTools {
             return null;
     }
 
-    setConf(conf){
+    setConf(conf) {
         fs.writeFileSync(configPath, JSON.stringify(conf));
     }
 
-    
-    
+
+    uploadFile(id, path) {
+        return new Promise((resolve, reject) => {
+            if (this.client == null) {
+                this.confIsValid().then(() => {
+                    this._startUpload(id, path);
+                }).catch((err) => {
+                    reject(err);
+                })
+            }
+            else
+                this._startUpload(id, path);
+        });
+    }
+
+    _startUpload(id, path) {
+        return new Promise((resolve, reject) => {
+            let status = statusTools.getStatus();
+            status.status = "upload";
+            status.progress = -1;
+            status.message = null;
+            status.error_code = null;
+            statusTools.setStatus(status);
+            console.log('Uploading snap...');
+            //TODO Change this, try with request (buid the webdav request manualy) to track progress (https://stackoverflow.com/questions/12098713/upload-progress-request)
+            this.client.putFileContents(path, fs.readFileSync('./temp/' + id + '.tar'), { maxContentLength: 1024 ** 3 }).then((result) => {
+                console.log("...Upload finish !");
+                status.status = "idle";
+                status.message = null;
+                status.error_code = null;
+                statusTools.setStatus(status);
+                resolve();
+            }).catch((err) => {
+                status.status = "error";
+                status.error_code = 4;
+                status.message = "Fail to upload snapshot to nextcloud (" + err + ") !"
+                statusTools.setStatus(status);
+                console.error(status.message);
+                reject(status.message);
+            });
+        });
+    }
+
+
 }
 
 
