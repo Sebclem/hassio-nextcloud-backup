@@ -24,6 +24,13 @@ router.get('/status', (req, res, next) => {
 router.get('/formated-local-snap', function(req, res, next) {
     hassioApiTools.getSnapshots().then(
         (snaps) => {
+            // TODO sort snaps by date
+            snaps.sort((a, b) =>{
+                if(moment(a.date).isBefore(moment(b.date)))
+                    return 1;
+                else
+                    return -1;
+            })
             res.render('localSnaps', { snaps: snaps, moment: moment });
         },
         (err) => {
@@ -83,15 +90,31 @@ router.post('/manual-backup', function(req, res, next) {
     hassioApiTools.downloadSnapshot(id)
         .then(() => {
             webdav.uploadFile(id, '/Hassio Backup/Manual/' + name + '.tar');
-            res.send(200);
+            res.status(201);
+            res.send();
         })
         .catch(() => {
-            res.send(500);
+            res.status(500)
+            res.send();
         })
 
 });
 
+router.post('/new-backup', function(req, res, next) {
+    
+    let name = 'Manual-' + moment().format('YYYY-MM-DD_HH:mm');
+    hassioApiTools.createNewBackup(name).then((id) => {
+        hassioApiTools.downloadSnapshot(id)
+            .then(() => {
+                webdav.uploadFile(id, '/Hassio Backup/Manual/' + name + '.tar');
+            }).catch(() => {
 
+            })
+    }).catch(() => {
+
+    })
+    res.status(201);
+    res.send();
 });
 
 module.exports = router;

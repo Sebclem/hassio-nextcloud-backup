@@ -128,7 +128,7 @@
       <div class="col s12 m3">
         <div class="card cyan darken-3">
           <div class="card-content center">
-            <a class="btn green">Backup Now</a>
+            <a class="btn green" id="btn-backup-now">Backup Now</a>
           </div>
         </div>
       </div>
@@ -330,8 +330,13 @@
             break;
           case "download":
             printStatusWithBar('Downloading Snapshot', data.progress);
+            break;
           case "upload":
             printStatusWithBar('Uploading Snapshot', data.progress);
+            break;
+          case "creating":
+            printStatusWithBar('Creating Snapshot', data.progress);
+            break;
         }
         if (data.last_backup != null) {
           if ($('#last_back_status').html() != data.last_backup)
@@ -380,6 +385,7 @@
   function listeners() {
     $('#save-nextcloud-settings').click(sendNextcloudSettings);
     $('#trigger-nextcloud-settings').click(getNextcloudSettings)
+    $('#btn-backup-now').click(backupNow)
   }
 
 
@@ -436,6 +442,20 @@
       $('#password + label').addClass("active");
       loadingModal.close();
     });
+  }
+
+  function backupNow() {
+    loadingModal.open();
+    $.post('./api/new-backup')
+      .done(() => {
+        M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Command send !', classes: "green" });
+      }).fail((error)=>{
+        console.log(error);
+        M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t send command !', classes: "red" });
+      })
+      .always(() => {
+        loadingModal.close();
+      })
   }
 
 </script>

@@ -49,7 +49,7 @@ function getSnapshots() {
 function downloadSnapshot(id) {
     return new Promise((resolve, reject) => {
         console.log('Downloading snapshot ' + id + '...')
-        if(!fs.existsSync('./temp/'))
+        if (!fs.existsSync('./temp/'))
             fs.mkdirSync('./temp/');
         let stream = fs.createWriteStream('./temp/' + id + '.tar');
         let token = process.env.HASSIO_TOKEN;
@@ -74,7 +74,7 @@ function downloadSnapshot(id) {
                 .on('error', (error) => {
                     status.status = "error";
                     status.message = "Fail to download Hassio snapshot (" + error + ")";
-                    status.error_code = 4;
+                    status.error_code = 1;
                     statusTools.setStatus(status);
                     console.error(status.message);
                     reject(error);
@@ -89,7 +89,7 @@ function downloadSnapshot(id) {
         }).catch(() => {
             status.status = "error";
             status.message = "Fail to download Hassio snapshot. Not found ?";
-            status.error_code = 4;
+            status.error_code = 1;
             statusTools.setStatus(status);
             console.error(status.message);
             reject();
@@ -111,7 +111,7 @@ function checkSnap(id) {
             json: true
         }
         request(option, (error, response, body) => {
-            if (error  || response.statusCode != 200)
+            if (error || response.statusCode != 200)
                 reject();
             else
                 resolve();
@@ -120,5 +120,43 @@ function checkSnap(id) {
 
 }
 
+
+function createNewBackup(name) {
+    return new Promise((resolve, reject) => {
+        let status = statusTools.getStatus();
+        status.status = "creating";
+        status.progress = -1;
+        statusTools.setStatus(status);
+        console.log("Creating new snapshot...")
+        let token = process.env.HASSIO_TOKEN;
+        if (token == null) {
+            token = fallbackToken
+        }
+        let option = {
+            url: 'http://hassio/snapshots/new/full',
+            headers: { 'X-HASSIO-KEY': token },
+            json: true,
+            body: { name: name },
+            timeout: 1200000
+        }
+        request.post(option, (error, response, body) => {
+            if (response.statusCode != 200) {
+                status.status = "error";
+                status.message = "Can't create new snapshot ("+ error + ")";
+                status.error_code = 5;
+                statusTools.setStatus(status);
+                console.error(status.message);
+                reject(status.message);
+            }
+            else{
+                body.data.slug
+                console.log('Snapshot created with id ' + body.data.slug);
+                resolve(body.data.slug);
+            }
+        });
+    });
+}
+
 exports.getSnapshots = getSnapshots;
 exports.downloadSnapshot = downloadSnapshot;
+exports.createNewBackup = createNewBackup;
