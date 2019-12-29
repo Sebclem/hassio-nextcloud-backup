@@ -1,4 +1,4 @@
-# Community Hass.io Add-ons: Nextcloud Backup
+# Hass.io Add-ons: Nextcloud Backup
 
 [![GitHub Release][releases-shield]][releases]
 ![Project Stage][project-stage-shield]
@@ -12,7 +12,6 @@
 
 ![Project Maintenance][maintenance-shield]
 
-[![Discord][discord-shield]][discord]
 [![Community Forum][forum-shield]][forum]
 
 [![Buy me a coffee][buymeacoffee-shield]][buymeacoffee]
@@ -107,19 +106,6 @@ username and password empty.
 **Note**: _We STRONGLY suggest, not to use this, even if this add-on is
 only exposed to your internal network. USE AT YOUR OWN RISK!_
 
-## Changelog & Releases
-
-This repository keeps a change log using [GitHub's releases][releases]
-functionality. The format of the log is based on
-[Keep a Changelog][keepchangelog].
-
-Releases are based on [Semantic Versioning][semver], and use the format
-of ``MAJOR.MINOR.PATCH``. In a nutshell, the version will be incremented
-based on the following:
-
-- ``MAJOR``: Incompatible or major changes.
-- ``MINOR``: Backwards-compatible new features and enhancements.
-- ``PATCH``: Backwards-compatible bugfixes and package updates.
 
 ## Support
 
@@ -127,8 +113,6 @@ Got questions?
 
 You have several options to get them answered:
 
-- The [Community Hass.io Add-ons Discord chat server][discord] for add-on
-  support and feature requests.
 - The [Home Assistant Discord chat server][discord-ha] for general Home
   Assistant discussions and questions.
 - The Home Assistant [Community Forum][forum].
@@ -136,7 +120,7 @@ You have several options to get them answered:
 
 You could also [open an issue here][issue] GitHub.
 
-## Contributing
+<!-- ## Contributing
 
 This is an active open-source project. We are always open to people who want to
 use the code or contribute to it.
@@ -144,7 +128,7 @@ use the code or contribute to it.
 We have set up a separate document containing our
 [contribution guidelines](CONTRIBUTING.md).
 
-Thank you for being involved! :heart_eyes:
+Thank you for being involved! :heart_eyes: -->
 
 ## Authors & contributors
 
@@ -153,12 +137,6 @@ The original setup of this repository is by [Sebastien Clement][Sebclem].
 For a full list of all authors and contributors,
 check [the contributor's page][contributors].
 
-## We have got some Hass.io add-ons for you
-
-Want some more functionality to your Hass.io Home Assistant instance?
-
-We have created multiple add-ons for Hass.io. For a full list, check out
-our [GitHub Repository][repository].
 
 ## License
 
@@ -192,20 +170,15 @@ SOFTWARE.
 [buymeacoffee]: https://www.buymeacoffee.com/seb6596
 [Sebclem]: https://github.com/Sebclem
 [discord-ha]: https://discord.gg/c5DvZ4e
-[discord-shield]: https://img.shields.io/discord/478094546522079232.svg
-[discord]: https://discord.me/hassioaddons
-[dockerhub]: https://hub.docker.com/r/hassioaddons/log-viewer
 [forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg
 [forum]: https://community.home-assistant.io/
 [i386-shield]: https://img.shields.io/badge/i386-yes-green.svg
 [issue]: https://github.com/hassio-addons/addon-log-viewer/issues
-[keepchangelog]: https://keepachangelog.com/en/1.0.0/
 [license-shield]: https://img.shields.io/github/license/Sebclem/hassio-nextcloud-backup.svg
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2019.svg
-[microbadger]: https://microbadger.com/images/hassioaddons/log-viewer
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-experimental-yellow.svg
 [reddit]: https://reddit.com/r/homeassistant
-[releases-shield]: https://img.shields.io/github/release/hassio-addons/addon-log-viewer.svg
+[releases-shield]: https://img.shields.io/github/release/Sebclem/hassio-nextcloud-backup.svg
 [releases]: https://github.com/Sebclem/hassio-nextcloud-backup/releases
 [repository]: https://github.com/hassio-addons/repository
 [version-shield]: https://images.microbadger.com/badges/version/hassioaddons/log-viewer.svg
