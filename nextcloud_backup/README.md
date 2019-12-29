@@ -18,7 +18,7 @@ Auto backup can be configure with the web interface.
 
 [buymeacoffee-shield]: https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-2.svg
 [buymeacoffee]: https://www.buymeacoffee.com/seb6596
-[docs]: https://github.com/Sebclem/hassio-nextcloud-backup/README.md
+[docs]: https://github.com/Sebclem/hassio-nextcloud-backup/blob/master/README.md
 [forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg
 [forum]: https://community.home-assistant.io/
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2019.svg
