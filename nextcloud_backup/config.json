@@ -24,14 +24,15 @@
         "keyfile": "privkey.pem"
     },
     "schema": {
-      "log_level": "match(^(trace|debug|info|notice|warning|error|fatal)$)?",
-      "ssl": "bool",
-      "certfile": "str",
-      "keyfile": "str",
-      "leave_front_door_open": "bool?"
+        "log_level": "match(^(trace|debug|info|notice|warning|error|fatal)$)?",
+        "ssl": "bool",
+        "certfile": "str",
+        "keyfile": "str",
+        "leave_front_door_open": "bool?"
     },
     "ports": {
         "3000/tcp": 3000,
         "9226/tcp": 9226
-      }
-  }
+    },
+    "image" : "sebclemhassaddon/{arch}-hassio-nextcloud-backup"
+}
