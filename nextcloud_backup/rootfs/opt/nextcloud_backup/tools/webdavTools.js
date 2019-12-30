@@ -149,7 +149,7 @@ class WebdavTools {
                 status.status = "idle";
                 status.message = null;
                 status.error_code = null;
-                status.last_backup = moment().format("lll")
+                status.last_backup = moment().format('MMM D, YYYY HH:mm')
                 
                 statusTools.setStatus(status);
                 fs.unlinkSync('./temp/' + id + '.tar')
@@ -164,6 +164,8 @@ class WebdavTools {
             });
         });
     }
+
+    
 
 
 }
