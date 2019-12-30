@@ -18,7 +18,7 @@
 
 Hass.io snapshot backup to Nextcloud
 
-![Nextcloud Backup Screenshot](images/screenshot.gif)
+![Nextcloud Backup Screenshot](images/screenshot.png)
 
 ## About
 
