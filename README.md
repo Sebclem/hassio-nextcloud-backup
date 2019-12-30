@@ -27,20 +27,18 @@ Auto backup can be configure with the web interface.
 
 ## Installation
 
-`Coming soon`
+The installation of this add-on is pretty straightforward and not different in
+comparison to installing any other Hass.io add-on.
 
-~~The installation of this add-on is pretty straightforward and not different in
-comparison to installing any other Hass.io add-on.~~
-
-~~1. [Add our Hass.io add-ons repository][repository] to your Hass.io instance.~~
-~~1. Install the "Nextcloud Backup" add-on.~~
-~~1. Start the "Nextcloud Backup" add-on~~
-~~1. Check the logs of the "Nextcloud Backup" add-on to see if everything went well.~~
-~~1. Open the web UI for the "Nextcloud Backup" to configure the add-on.~~
+1. [Add our Hass.io add-ons repository][repository] to your Hass.io instance.
+1. Install the "Nextcloud Backup" add-on.
+1. Start the "Nextcloud Backup" add-on
+1. Check the logs of the "Nextcloud Backup" add-on to see if everything went well.
+1. Open the web UI for the "Nextcloud Backup" to configure the add-on.
 
 
-~~**NOTE**: Do not add this repository to Hass.io, please use:
-`https://github.com/hassio-addons/repository`.~~
+**NOTE**: Do not add this repository to Hass.io, please use:
+`https://github.com/Sebclem/sebclem-hassio-addon-repository`.
 
 ## Configuration
 
@@ -178,9 +176,9 @@ SOFTWARE.
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2019.svg
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-Beta-red.svg
 [reddit]: https://reddit.com/r/homeassistant
-[releases-shield]: https://img.shields.io/github/release/Sebclem/hassio-nextcloud-backup.svg
+[releases-shield]: https://img.shields.io/github/release/Sebclem/hassio-nextcloud-backup.svg?include_prereleases
 [releases]: https://github.com/Sebclem/hassio-nextcloud-backup/releases
-[repository]: https://github.com/hassio-addons/repository
+[repository]: https://github.com/Sebclem/sebclem-hassio-addon-repository
 [version-shield]: https://images.microbadger.com/badges/version/hassioaddons/log-viewer.svg
 [contributors]: https://github.com/Sebclem/hassio-nextcloud-backup/graphs/contributors
 [semver]: https://semver.org/spec/v2.0.0.htm
