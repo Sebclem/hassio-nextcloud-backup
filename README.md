@@ -176,7 +176,7 @@ SOFTWARE.
 [issue]: https://github.com/hassio-addons/addon-log-viewer/issues
 [license-shield]: https://img.shields.io/github/license/Sebclem/hassio-nextcloud-backup.svg
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2019.svg
-[project-stage-shield]: https://img.shields.io/badge/project%20stage-experimental-yellow.svg
+[project-stage-shield]: https://img.shields.io/badge/project%20stage-Beta-red.svg
 [reddit]: https://reddit.com/r/homeassistant
 [releases-shield]: https://img.shields.io/github/release/Sebclem/hassio-nextcloud-backup.svg
 [releases]: https://github.com/Sebclem/hassio-nextcloud-backup/releases
