@@ -1,6 +1,6 @@
 {
     "name": "Nextcloud Backup",
-    "version": "dev",
+    "version": "0.5.0",
     "slug": "nextcloud_backup",
     "description": "Hass.io snapshot backup to Nextcloud",
     "url": "https://github.com/Sebclem/hassio-nextcloud-backup",
@@ -33,6 +33,5 @@
     "ports": {
         "3000/tcp": 3000,
         "9226/tcp": 9226
-    },
-    "image" : "sebclemhassaddon/{arch}-hassio-nextcloud-backup"
+    }
 }
