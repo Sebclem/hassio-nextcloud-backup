@@ -8,6 +8,8 @@ const settingsTools = require('../tools/settingsTools');
 
 const hassioApiTools = require('../tools/hassioApiTools');
 
+const cronTools = require('../tools/cronTools');
+
 
 
 
@@ -123,8 +125,17 @@ router.get('/backup-settings', function(req, res, next){
 
 router.post('/backup-settings', function(req, res, next){
     //TODO check if config is valid
-    settingsTools.setSettings(req.body);
-    res.send(200);
+    if(cronTools.checkConfig(req.body)){
+        settingsTools.setSettings(req.body);
+        res.send();
+    }
+    else{
+        res.status(400);
+        res.send();
+    }
+        
+
+    
 });
 
 
