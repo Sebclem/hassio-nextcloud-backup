@@ -64,6 +64,8 @@ webdav.confIsValid().then(
   }
 )
 
+const cronTools = require('./tools/cronTools');
+cronTools.startCron();
 
 
 module.exports = app;

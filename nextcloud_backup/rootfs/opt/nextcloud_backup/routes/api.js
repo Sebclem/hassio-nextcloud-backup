@@ -15,6 +15,7 @@ const cronTools = require('../tools/cronTools');
 
 
 router.get('/status', (req, res, next) => {
+    cronTools.updatetNextDate();
     let status = statusTools.getStatus();
     res.json(status);
 });
@@ -26,8 +27,8 @@ router.get('/status', (req, res, next) => {
 router.get('/formated-local-snap', function(req, res, next) {
     hassioApiTools.getSnapshots().then(
         (snaps) => {
-            snaps.sort((a, b) =>{
-                if(moment(a.date).isBefore(moment(b.date)))
+            snaps.sort((a, b) => {
+                if (moment(a.date).isBefore(moment(b.date)))
                     return 1;
                 else
                     return -1;
@@ -88,6 +89,13 @@ router.get('/nextcloud-settings', function(req, res, next) {
 router.post('/manual-backup', function(req, res, next) {
     let id = req.query.id;
     let name = req.query.name;
+    let status = statusTools.getStatus();
+    if (status.status == "creating" && status.status == "upload" && status.status == "download"){
+        res.status(503);
+        res.send();
+        return;
+    }
+        
     hassioApiTools.downloadSnapshot(id)
         .then(() => {
             webdav.uploadFile(id, '/Hassio Backup/Manual/' + name + '.tar');
@@ -102,7 +110,13 @@ router.post('/manual-backup', function(req, res, next) {
 });
 
 router.post('/new-backup', function(req, res, next) {
-    
+
+    let status = statusTools.getStatus();
+    if (status.status == "creating" && status.status == "upload" && status.status == "download"){
+        res.status(503);
+        res.send();
+        return;
+    }
     let name = 'Manual-' + moment().format('YYYY-MM-DD_HH:mm');
     hassioApiTools.createNewBackup(name).then((id) => {
         hassioApiTools.downloadSnapshot(id)
@@ -119,23 +133,23 @@ router.post('/new-backup', function(req, res, next) {
 });
 
 
-router.get('/backup-settings', function(req, res, next){
+router.get('/backup-settings', function(req, res, next) {
     res.send(settingsTools.getSettings());
 });
 
-router.post('/backup-settings', function(req, res, next){
-    //TODO check if config is valid
-    if(cronTools.checkConfig(req.body)){
+router.post('/backup-settings', function(req, res, next) {
+    if (cronTools.checkConfig(req.body)) {
         settingsTools.setSettings(req.body);
+        cronTools.startCron();
         res.send();
     }
-    else{
+    else {
         res.status(400);
         res.send();
     }
-        
 
-    
+
+
 });
 
 

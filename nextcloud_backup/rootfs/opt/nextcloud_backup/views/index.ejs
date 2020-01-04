@@ -125,7 +125,7 @@
           <div class="card-content">
             <span class="card-title white-text" style="font-weight: bold;">Next Backup </span>
             <div class="divider"></div>
-            <h5 id="next_back_status"></h5>
+            <h6 class="white-text" id="next_back_status"></h6>
           </div>
         </div>
       </div>
@@ -241,13 +241,13 @@
       <div class="row hide">
         <div class="input-field col s12">
           <select id="cron-drop-day">
-            <option value="0">Monday</option>
-            <option value="1">Tuesday</option>
-            <option value="2">Wednesday</option>
-            <option value="3">Thursday</option>
-            <option value="4">Friday</option>
-            <option value="5">Saturday</option>
-            <option value="6">Sunday</option>
+            <option value="1">Monday</option>
+            <option value="2">Tuesday</option>
+            <option value="3">Wednesday</option>
+            <option value="4">Thursday</option>
+            <option value="5">Friday</option>
+            <option value="6">Saturday</option>
+            <option value="0">Sunday</option>
           </select>
           <label>Day</label>
         </div>
@@ -413,6 +413,10 @@
         if (data.last_backup != null) {
           if ($('#last_back_status').html() != data.last_backup)
             $('#last_back_status').html(data.last_backup);
+        }
+        if (data.next_backup != null) {
+          if ($('#next_back_status').html() != data.next_backup)
+            $('#next_back_status').html(data.next_backup);
         }
       }
 
