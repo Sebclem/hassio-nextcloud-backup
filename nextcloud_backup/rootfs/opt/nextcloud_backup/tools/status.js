@@ -4,8 +4,8 @@ const statusPath = './status.json'
 
 let baseStatus = {
     status: "idle",
-    last_upload: null,
-    next_upload: null
+    last_backup: null,
+    next_backup: null
 }
 
 
