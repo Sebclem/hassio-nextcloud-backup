@@ -66,6 +66,10 @@
       -webkit-box-shadow: 0 0 0 30px #263238 inset !important;
       -webkit-text-fill-color: white !important;
     }
+
+    .select-dropdown {
+      color: white;
+    }
   </style>
 
 
@@ -81,14 +85,14 @@
               class="material-icons">settings</i></a></li>
       </ul>
       <div style="height: 64px; display: table; margin-left: 130px;">
-        <h4 style="display: table-cell; vertical-align: middle;">Nextcloud Backup</h2>
+        <h4 style="display: table-cell; vertical-align: middle;">Nextcloud Backup</h4>
       </div>
     </div>
   </nav>
   <ul id="dropdown-settings" class="dropdown-content blue-grey darken-4">
     <li><a href="#modal-settings-nextcloud" id="trigger-nextcloud-settings" class="modal-trigger center">Nextcloud</a>
     </li>
-    <li><a href="#modal-settings-backup" class="modal-trigger center">Backup</a></li>
+    <li><a href="#modal-settings-backup" id="trigger-backup-settings" class="modal-trigger center">Backup</a></li>
   </ul>
   <div class="container ">
 
@@ -153,7 +157,7 @@
     <div class="modal-content">
       <div class="row">
         <div class="col s12 center">
-          <h4>Nextcloud Settings</h2>
+          <h4>Nextcloud Settings</h4>
         </div>
       </div>
       <div class="row">
@@ -201,6 +205,73 @@
     <div class="modal-footer blue-grey darken-4">
       <a href="#" class="modal-close waves-effect btn red"><b>Cancel</b></a>
       <a href="#" class="btn green waves-effect" style="margin-left: 5px;" id="save-nextcloud-settings"><b>Save</b></a>
+
+    </div>
+  </div>
+
+  <div id="modal-settings-backup" class="modal modal-fixed-footer blue-grey darken-4 white-text">
+    <div class="modal-content">
+      <div class="row">
+        <div class="col s12 center">
+          <h4>Backup Settings</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s12 center divider">
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <select id="cron-drop-settings">
+            <option value="0">Disable</option>
+            <option value="1">Dayly</option>
+            <option value="2">Weekly</option>
+            <option value="3">Monthly</option>
+          </select>
+          <label>Auto Backup</label>
+        </div>
+      </div>
+      <div class="row hide">
+        <div class="input-field col s12">
+          <input type="text" class="timepicker white-text" readonly="true" id="timepicker">
+          <label>Hour </label>
+        </div>
+      </div>
+
+      <div class="row hide">
+        <div class="input-field col s12">
+          <select id="cron-drop-day">
+            <option value="0">Monday</option>
+            <option value="1">Tuesday</option>
+            <option value="2">Wednesday</option>
+            <option value="3">Thursday</option>
+            <option value="4">Friday</option>
+            <option value="5">Saturday</option>
+            <option value="6">Sunday</option>
+          </select>
+          <label>Day</label>
+        </div>
+      </div>
+
+      <div class="row hide">
+        <div class="input-field col s2">
+          <input type="text" class="white-text" disabled readonly="true" id="cron-drop-day-month-read">
+          <label class="white-text active">Day of month</label>
+        </div>
+        <div class="input-field col s10">
+          <p class="range-field">
+            <input type="range" id="cron-drop-day-month" min="1" max="28" style="border: none;" />
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="modal-footer blue-grey darken-4">
+      <a href="#" class="modal-close waves-effect btn red"><b>Cancel</b></a>
+      <a href="#" class="btn green waves-effect" style="margin-left: 5px;" id="save-backup-settings"><b>Save</b></a>
 
     </div>
   </div>
@@ -284,6 +355,7 @@
     M.Tooltip.init(tooltips, {});
     let drops = document.querySelectorAll('.dropdown-trigger');
     M.Dropdown.init(drops, { constrainWidth: false, coverTrigger: false, alignment: 'right', onOpenStart: () => $('#setting-trigger').addClass('active'), onCloseEnd: () => $('#setting-trigger').removeClass('active') });
+
     setInterval(update_status, 500);
     listeners();
 
@@ -297,7 +369,7 @@
       var elems = document.querySelectorAll('.collapsible');
       M.Collapsible.init(elems, { accordion: true });
       var modals = document.querySelectorAll('.modal:not(#modal-loading)');
-      M.Modal.init(modals, {});
+      M.Modal.init(modals, { dismissible: false });
 
       let loadingModals = document.querySelectorAll('#modal-loading');
       M.Modal.init(loadingModals, { dismissible: false });
@@ -385,7 +457,14 @@
   function listeners() {
     $('#save-nextcloud-settings').click(sendNextcloudSettings);
     $('#trigger-nextcloud-settings').click(getNextcloudSettings)
+    $('#trigger-backup-settings').click(getBackupSettings)
     $('#btn-backup-now').click(backupNow)
+
+    $('#save-backup-settings').click(sendBackupSettings);
+    $('#cron-drop-day-month').on('input', function() {
+      $('#cron-drop-day-month-read').val($(this).val());
+    });
+
   }
 
 
@@ -449,7 +528,7 @@
     $.post('./api/new-backup')
       .done(() => {
         M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Command send !', classes: "green" });
-      }).fail((error)=>{
+      }).fail((error) => {
         console.log(error);
         M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t send command !', classes: "red" });
       })
@@ -458,6 +537,94 @@
       })
   }
 
+  function getBackupSettings() {
+    loadingModal.open();
+    $.get('./api/backup-settings', (data) => {
+      if (data == {}) {
+        data = {
+          cron_base: "0",
+          cron_hour: "00:00",
+          cron_weekday: "0",
+          cron_month_day: "1"
+        }
+      }
+
+      changeSelect('#cron-drop-settings', data.cron_base);
+      $('#cron-drop-settings').change(updateDropVisibility);
+
+      let timepicker = document.querySelector('#timepicker');
+      $('#timepicker').val(data.cron_hour);
+      $('#timepicker + label').removeClass("active");
+      $('#timepicker + label').addClass("active");
+      if (M.Timepicker.getInstance(timepicker) != null)
+        M.Timepicker.getInstance(timepicker).destroy();
+      M.Timepicker.init(timepicker, { defaultTime: data.cron_hour, twelveHour: false, container: 'body' });
+      $('#cron-drop-day-month-read').val(data.cron_month_day);
+      $('#cron-drop-day-month').val(data.cron_month_day);
+      $('#cron-drop-day-month-read + label').removeClass("active");
+      $('#cron-drop-day-month-read + label').addClass("active");
+
+      changeSelect('#cron-drop-day', data.cron_weekday);
+      updateDropVisibility();
+      loadingModal.close();
+    });
+
+  }
+
+  function updateDropVisibility() {
+    let cronBase = $("#cron-drop-settings").val();
+
+    switch (cronBase) {
+      case "3":
+        $('#timepicker').parent().parent().removeClass("hide");
+        $('#cron-drop-day').parent().parent().parent().addClass("hide");
+        $('#cron-drop-day-month').parent().parent().parent().removeClass("hide");
+
+        break;
+      case "2":
+        $('#timepicker').parent().parent().removeClass("hide");
+        $('#cron-drop-day').parent().parent().parent().removeClass("hide");
+        $('#cron-drop-day-month').parent().parent().parent().addClass("hide");
+        break;
+      case "1":
+        $('#timepicker').parent().parent().removeClass("hide");
+        $('#cron-drop-day').parent().parent().parent().addClass("hide");
+        $('#cron-drop-day-month').parent().parent().parent().addClass("hide");
+        break;
+      case "0":
+        $('#timepicker').parent().parent().addClass("hide");
+        $('#cron-drop-day').parent().parent().parent().addClass("hide");
+        $('#cron-drop-day-month').parent().parent().parent().addClass("hide");
+        break;
+    }
+  }
+
+  function sendBackupSettings() {
+    let cron_month_day = $('#cron-drop-day-month').val();
+    let cron_weekday = $('#cron-drop-day').val();
+    let cron_hour = $('#timepicker').val();
+    let cron_base = $('#cron-drop-settings').val();
+    loadingModal.open();
+    $.post('./api/backup-settings', { cron_base: cron_base, cron_hour: cron_hour, cron_weekday: cron_weekday, cron_month_day: cron_month_day })
+      .done(() => {
+        M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Backup settings saved !', classes: "green" });
+        M.Modal.getInstance(document.querySelector('#modal-settings-backup')).close();
+      }).fail(()=>{
+        M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t save backup settings !', classes: "red" });
+      }).always(()=>{
+        loadingModal.close();
+      });
+  }
+
+  function changeSelect(selector, value) {
+    let selectBaseRaw = document.querySelector(selector);
+
+    if (M.FormSelect.getInstance(selectBaseRaw) != null)
+      M.FormSelect.getInstance(selectBaseRaw).destroy();
+    $(selector + ' option[selected]').removeAttr('selected');
+    $(selector + ' option[value=' + value + ']').attr('selected', "true");
+    M.FormSelect.init(selectBaseRaw, {});
+  }
 </script>
 
 </html>

@@ -4,9 +4,9 @@ const moment = require('moment');
 const statusTools = require('../tools/status');
 const WebdavTools = require('../tools/webdavTools')
 const webdav = new WebdavTools().getInstance();
+const settingsTools = require('../tools/settingsTools');
 
 const hassioApiTools = require('../tools/hassioApiTools');
-const settingsTools = require('../tools/settingsTools');
 
 
 
@@ -24,7 +24,6 @@ router.get('/status', (req, res, next) => {
 router.get('/formated-local-snap', function(req, res, next) {
     hassioApiTools.getSnapshots().then(
         (snaps) => {
-            // TODO sort snaps by date
             snaps.sort((a, b) =>{
                 if(moment(a.date).isBefore(moment(b.date)))
                     return 1;
@@ -116,5 +115,20 @@ router.post('/new-backup', function(req, res, next) {
     res.status(201);
     res.send();
 });
+
+
+router.get('/backup-settings', function(req, res, next){
+    res.send(settingsTools.getSettings());
+});
+
+router.post('/backup-settings', function(req, res, next){
+    //TODO check if config is valid
+    settingsTools.setSettings(req.body);
+    res.send(200);
+});
+
+
+
+
 
 module.exports = router;
