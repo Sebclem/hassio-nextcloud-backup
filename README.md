@@ -140,7 +140,7 @@ check [the contributor's page][contributors].
 
 MIT License
 
-Copyright (c) 2019 Sébastien Clément
+Copyright (c) 2020 Sébastien Clément
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
