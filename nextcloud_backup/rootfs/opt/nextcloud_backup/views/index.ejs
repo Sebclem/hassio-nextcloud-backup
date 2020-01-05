@@ -346,6 +346,7 @@
 <script src="./js/index.js"></script>
 <script>
   var last_status = "";
+  var last_local_snap = "";
 
   var loadingModal = null;
   document.addEventListener('DOMContentLoaded', function() {
@@ -357,12 +358,16 @@
     M.Dropdown.init(drops, { constrainWidth: false, coverTrigger: false, alignment: 'right', onOpenStart: () => $('#setting-trigger').addClass('active'), onCloseEnd: () => $('#setting-trigger').removeClass('active') });
 
     setInterval(update_status, 500);
+    setInterval(updateLocalSnaps, 2000);
     listeners();
 
   });
 
   function updateLocalSnaps() {
     $.get('./api/formated-local-snap', (data) => {
+      if (JSON.stringify(data) === last_local_snap) 
+        return;
+      last_local_snap = JSON.stringify(data);
       $('#local_snaps').empty();
       $('#local_snaps').html(data);
 
