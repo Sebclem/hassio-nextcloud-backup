@@ -396,18 +396,23 @@
         switch (data.status) {
           case "error":
             printStatus('Error', data.message);
+            $('#btn-backup-now').removeClass("disabled");
             break;
           case "idle":
             printStatus('Idle', "Waiting for next backup.");
+            $('#btn-backup-now').removeClass("disabled");
             break;
           case "download":
             printStatusWithBar('Downloading Snapshot', data.progress);
+            $('#btn-backup-now').addClass("disabled");
             break;
           case "upload":
             printStatusWithBar('Uploading Snapshot', data.progress);
+            $('#btn-backup-now').addClass("disabled");
             break;
           case "creating":
             printStatusWithBar('Creating Snapshot', data.progress);
+            $('#btn-backup-now').addClass("disabled");
             break;
         }
         if (data.last_backup != null) {
