@@ -135,7 +135,8 @@
             <span class="card-title white-text" style="font-weight: bold;">Manual </span>
             <div class="divider"></div>
             <div style="width: 100%;" class="center">
-              <a class="btn green center waves-effect waves-light" id="btn-backup-now" style="margin-top: 7px; display: block;">Backup
+              <a class="btn green center waves-effect waves-light" id="btn-backup-now"
+                style="margin-top: 7px; display: block;">Backup
                 Now</a>
               <a class="btn center teal darken-4 waves-effect waves-light" id="btn-clean-now"
                 style="margin-top: 7px; display: block;">Clean Now</a>
@@ -217,7 +218,9 @@
         <div class="input-field col s6">
           <input id="password" type="password" class="white-text">
           <label for="password">Password</label>
-          <span class="helper-text">!!! Use App Password !!! See <a target="_blank" href="https://github.com/Sebclem/hassio-nextcloud-backup/blob/master/README.md">doc</a> for more information.</span>
+          <span class="helper-text">!!! Use App Password !!! See <a target="_blank"
+              href="https://github.com/Sebclem/hassio-nextcloud-backup/blob/master/README.md">doc</a> for more
+            information.</span>
         </div>
       </div>
 
@@ -287,8 +290,75 @@
         </div>
 
       </div>
+      <div class="row">
+        <div class="col s12">
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s12 center">
+          <h4>Auto Clean Settings</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s12 divider">
+
+        </div>
+      </div>
+
+      <div class="row" style="margin-bottom: 10px;">
+        <div class="col s12" style="margin-bottom: 10px;">
+          <div style="color: #9e9e9e; display: inline;">Auto Clean Local Snapshots</div>
+          <div class="switch" style="display: inline;">
+            <label>
+              <input id="auto_clean_local" type="checkbox">
+              <span class="lever"></span>
+            </label>
+          </div>
+
+        </div>
+      </div>
+      <div class="row hide">
+        <div class="input-field col s3">
+          <input type="text" class="white-text" disabled readonly="true" id="local-snap-keep-read">
+          <label class="white-text active">Local snapshot to keep</label>
+        </div>
+        <div class="input-field col s9">
+          <p class="range-field">
+            <input type="range" id="local-snap-keep" min="1" max="20" style="border: none;" />
+          </p>
+        </div>
+
+      </div>
+
+      <div class="row" style="margin-bottom: 10px;">
+        <div class="col s12" style="margin-bottom: 10px;">
+          <div style="color: #9e9e9e; display: inline;">Auto Clean Nextcloud Snapshots</div>
+          <div class="switch" style="display: inline;">
+            <label>
+              <input id="auto_clean_backup" type="checkbox">
+              <span class="lever"></span>
+            </label>
+          </div>
+
+        </div>
+      </div>
+      <div class="row hide">
+        <div class="input-field col s3">
+          <input type="text" class="white-text" disabled readonly="true" id="backup-snap-keep-read">
+          <label class="white-text active">Nextcloud snapshot to keep</label>
+        </div>
+        <div class="input-field col s9">
+          <p class="range-field">
+            <input type="range" id="backup-snap-keep" min="1" max="20" style="border: none;" />
+          </p>
+        </div>
+
+      </div>
 
     </div>
+
+
 
 
     <div class="modal-footer blue-grey darken-4">
@@ -538,6 +608,28 @@
       $('#cron-drop-day-month-read').val($(this).val());
     });
 
+    $('#local-snap-keep').on('input', function() {
+      $('#local-snap-keep-read').val($(this).val());
+    });
+    $("#auto_clean_local").change(() => {
+      if ($("#auto_clean_local").is(':checked'))
+        $('#local-snap-keep').parent().parent().parent().removeClass("hide");
+      else
+        $('#local-snap-keep').parent().parent().parent().addClass("hide");
+    });
+
+    $('#backup-snap-keep').on('input', function() {
+      $('#backup-snap-keep-read').val($(this).val());
+    });
+    $("#auto_clean_backup").change(() => {
+      if ($("#auto_clean_backup").is(':checked'))
+        $('#backup-snap-keep').parent().parent().parent().removeClass("hide");
+      else
+        $('#backup-snap-keep').parent().parent().parent().addClass("hide");
+    });
+
+
+
   }
 
 
@@ -613,12 +705,16 @@
   function getBackupSettings() {
     loadingModal.open();
     $.get('./api/backup-settings', (data) => {
-      if (data == {}) {
+      if (JSON.stringify(data) == "{}") {
         data = {
           cron_base: "0",
           cron_hour: "00:00",
           cron_weekday: "0",
-          cron_month_day: "1"
+          cron_month_day: "1",
+          auto_clean_local: false,
+          auto_clean_local_keep: 1,
+          auto_clean_backup: false,
+          auto_clean_backup_keep: 1,
         }
       }
 
@@ -634,8 +730,29 @@
       M.Timepicker.init(timepicker, { defaultTime: data.cron_hour, twelveHour: false, container: 'body' });
       $('#cron-drop-day-month-read').val(data.cron_month_day);
       $('#cron-drop-day-month').val(data.cron_month_day);
+
       $('#cron-drop-day-month-read + label').removeClass("active");
       $('#cron-drop-day-month-read + label').addClass("active");
+
+      $('#auto_clean_local').prop('checked', data.auto_clean_local);
+      $('#local-snap-keep-read, #local-snap-keep').val(data.auto_clean_local_keep);
+      $('#auto_clean_backup').prop('checked', data.auto_clean_backup);
+      $('#backup-snap-keep-read, #backup-snap-keep').val(data.auto_clean_backup_keep);
+
+      if ($("#auto_clean_backup").is(':checked'))
+        $('#backup-snap-keep').parent().parent().parent().removeClass("hide");
+      else
+        $('#backup-snap-keep').parent().parent().parent().addClass("hide");
+
+      if ($("#auto_clean_local").is(':checked'))
+        $('#local-snap-keep').parent().parent().parent().removeClass("hide");
+      else
+        $('#local-snap-keep').parent().parent().parent().addClass("hide");
+
+      $('#backup-snap-keep-read + label').removeClass("active");
+      $('#backup-snap-keep-read + label').addClass("active");
+      $('#local-snap-keep-read + label').removeClass("active");
+      $('#local-snap-keep-read + label').addClass("active");
 
       changeSelect('#cron-drop-day', data.cron_weekday);
       updateDropVisibility();
@@ -677,8 +794,22 @@
     let cron_weekday = $('#cron-drop-day').val();
     let cron_hour = $('#timepicker').val();
     let cron_base = $('#cron-drop-settings').val();
+    let auto_clean_local = $("#auto_clean_local").is(':checked');
+    let auto_clean_backup = $("#auto_clean_backup").is(':checked');
+    let auto_clean_local_keep = $("#local-snap-keep").val();
+    let auto_clean_backup_keep = $("#backup-snap-keep").val();
     loadingModal.open();
-    $.post('./api/backup-settings', { cron_base: cron_base, cron_hour: cron_hour, cron_weekday: cron_weekday, cron_month_day: cron_month_day })
+    $.post('./api/backup-settings',
+      {
+        cron_base: cron_base,
+        cron_hour: cron_hour,
+        cron_weekday: cron_weekday,
+        cron_month_day: cron_month_day,
+        auto_clean_local: auto_clean_local,
+        auto_clean_local_keep: auto_clean_local_keep,
+        auto_clean_backup: auto_clean_backup,
+        auto_clean_backup_keep: auto_clean_backup_keep,
+      })
       .done(() => {
         M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Backup settings saved !', classes: "green" });
         M.Modal.getInstance(document.querySelector('#modal-settings-backup')).close();
