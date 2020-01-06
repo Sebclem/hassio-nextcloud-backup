@@ -163,10 +163,10 @@ class WebdavTools {
             let lastPercent = 0;
             let req = request.put(option)
                 .on('drain', () => {
-                    let percent = Math.floor((req.req.connection.bytesWritten / fileSize)*100);
-                    if(lastPercent != percent){
+                    let percent = Math.floor((req.req.connection.bytesWritten / fileSize) * 100);
+                    if (lastPercent != percent) {
                         lastPercent = percent;
-                        status.progress = percent/100;
+                        status.progress = percent / 100;
                         statusTools.setStatus(status);
                     }
 
@@ -180,7 +180,7 @@ class WebdavTools {
                     reject(status.message);
 
                 }).on('response', (res) => {
-                    if (res.statusCode != 204) {
+                    if (res.statusCode != 201) {
                         status.status = "error";
                         status.error_code = 4;
                         status.message = "Fail to upload snapshot to nextcloud (Status code: " + res.statusCode + ") !"
@@ -201,6 +201,17 @@ class WebdavTools {
                         fs.unlinkSync('./temp/' + id + '.tar')
                         resolve();
                     }
+                })
+        });
+    }
+
+    getFolderContent(path) {
+        return new Promise((resolve, reject) => {
+            this.client.getDirectoryContents(path)
+                .then((contents)=>{
+                    resolve(contents);
+                }).catch((error)=>{
+                    reject(error);
                 })
         });
     }

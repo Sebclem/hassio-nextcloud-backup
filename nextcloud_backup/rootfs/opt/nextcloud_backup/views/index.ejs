@@ -131,14 +131,16 @@
       </div>
       <div class="col s12 m3">
         <div class="card cyan darken-3">
-          <div class="card-content" >
+          <div class="card-content">
             <span class="card-title white-text" style="font-weight: bold;">Manual </span>
             <div class="divider"></div>
             <div style="width: 100%;" class="center">
-              <a class="btn green center waves-effect waves-light" id="btn-backup-now" style="margin-top: 7px;">Backup Now</a>
-              <a class="btn center teal darken-4 waves-effect waves-light" id="btn-clean-now" style="margin-top: 7px;">Clean Now</a>
+              <a class="btn green center waves-effect waves-light" id="btn-backup-now" style="margin-top: 7px;">Backup
+                Now</a>
+              <a class="btn center teal darken-4 waves-effect waves-light" id="btn-clean-now"
+                style="margin-top: 7px;">Clean Now</a>
             </div>
-            
+
           </div>
         </div>
       </div>
@@ -151,6 +153,19 @@
           <div class="card-content">
             <span class="card-title center white-text">Local Snapshots</span>
             <div id="local_snaps"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col s12 m12 l6 ">
+        <div class="card cyan darken-3">
+          <div class="card-content">
+            <span class="card-title center white-text">Nextcloud Backups</span>
+            <span class="card-title center white-text">Auto</span>
+            <span class="card-title center white-text divider"></span>
+            <div id="auto_backups"></div>
+            <span class="card-title center white-text">Manu</span>
+            <span class="card-title center white-text divider"></span>
+            <div id="manual_backups"></div>
           </div>
         </div>
       </div>
@@ -353,6 +368,8 @@
 <script>
   var last_status = "";
   var last_local_snap = "";
+  var last_manu_back = "";
+  var last_auto_back = "";
 
   var loadingModal = null;
   document.addEventListener('DOMContentLoaded', function() {
@@ -369,34 +386,69 @@
 
   });
 
+  function updateDynamicListeners() {
+    var elems = document.querySelectorAll('.collapsible');
+    M.Collapsible.init(elems, { accordion: true });
+    var modals = document.querySelectorAll('.modal:not(#modal-loading)');
+    M.Modal.init(modals, { dismissible: false });
+
+    let loadingModals = document.querySelectorAll('#modal-loading');
+    M.Modal.init(loadingModals, { dismissible: false });
+
+    loadingModal = M.Modal.getInstance(document.querySelector('#modal-loading'));
+    $('.local-snap-listener').click(function() {
+      let id = this.getAttribute('data-id');
+      console.log(id);
+    });
+
+    $('.manual-back-list').click(function() {
+      let id = this.getAttribute('data-id');
+      let name = this.getAttribute('data-name');
+      manualBackup(id, name);
+    })
+  }
+
   function updateLocalSnaps() {
+    let needUpdate = false;
     $.get('./api/formated-local-snap', (data) => {
-      if (JSON.stringify(data) === last_local_snap) 
+      if (JSON.stringify(data) === last_local_snap)
         return;
       last_local_snap = JSON.stringify(data);
+      needUpdate = true;
       $('#local_snaps').empty();
       $('#local_snaps').html(data);
+    }).always(() => {
+      updateManuBackup(needUpdate);
+    });
+  }
 
-      var elems = document.querySelectorAll('.collapsible');
-      M.Collapsible.init(elems, { accordion: true });
-      var modals = document.querySelectorAll('.modal:not(#modal-loading)');
-      M.Modal.init(modals, { dismissible: false });
+  function updateManuBackup(prevUpdate) {
+    let needUpdate = false;
+    $.get('./api/formated-backup-manual', (data) => {
+      if (JSON.stringify(data) === last_manu_back)
+        return;
+      last_manu_back = JSON.stringify(data);
+      needUpdate = true;
+      $('#manual_backups').empty();
+      $('#manual_backups').html(data);
 
-      let loadingModals = document.querySelectorAll('#modal-loading');
-      M.Modal.init(loadingModals, { dismissible: false });
+    }).always(() => {
+      updateAutoBackup(prevUpdate || needUpdate);
+    });
+  }
+  function updateAutoBackup(prevUpdate) {
+    let needUpdate = false;
+    $.get('./api/formated-backup-auto', (data) => {
+      if (JSON.stringify(data) === last_auto_back)
+        return;
+      needUpdate = true;
+      last_auto_back = JSON.stringify(data);
+      $('#auto_backups').empty();
+      $('#auto_backups').html(data);
 
-      loadingModal = M.Modal.getInstance(document.querySelector('#modal-loading'));
-      $('.local-snap-listener').click(function() {
-        let id = this.getAttribute('data-id');
-        console.log(id);
-      });
-
-      $('.manual-back-list').click(function() {
-        let id = this.getAttribute('data-id');
-        let name = this.getAttribute('data-name');
-        manualBackup(id, name);
-      })
-
+    }).always(() => {
+      if (prevUpdate || needUpdate)
+        updateDynamicListeners();
     });
   }
 
@@ -407,23 +459,23 @@
         switch (data.status) {
           case "error":
             printStatus('Error', data.message);
-            $('#btn-backup-now').removeClass("disabled");
+            $('#btn-backup-now, #btn-clean-now').removeClass("disabled");
             break;
           case "idle":
             printStatus('Idle', "Waiting for next backup.");
-            $('#btn-backup-now').removeClass("disabled");
+            $('#btn-backup-now, #btn-clean-now').removeClass("disabled");
             break;
           case "download":
             printStatusWithBar('Downloading Snapshot', data.progress);
-            $('#btn-backup-now').addClass("disabled");
+            $('#btn-backup-now, #btn-clean-now').addClass("disabled");
             break;
           case "upload":
             printStatusWithBar('Uploading Snapshot', data.progress);
-            $('#btn-backup-now').addClass("disabled");
+            $('#btn-backup-now, #btn-clean-now').addClass("disabled");
             break;
           case "creating":
             printStatusWithBar('Creating Snapshot', data.progress);
-            $('#btn-backup-now').addClass("disabled");
+            $('#btn-backup-now, #btn-clean-now').addClass("disabled");
             break;
         }
         if (data.last_backup != null) {
@@ -629,9 +681,9 @@
       .done(() => {
         M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Backup settings saved !', classes: "green" });
         M.Modal.getInstance(document.querySelector('#modal-settings-backup')).close();
-      }).fail(()=>{
+      }).fail(() => {
         M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t save backup settings !', classes: "red" });
-      }).always(()=>{
+      }).always(() => {
         loadingModal.close();
       });
   }

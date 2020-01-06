@@ -1,0 +1,48 @@
+<% if (locals.backups) { %>
+<div class="collection">
+    <% for(const index in backups) { %>
+    <a class="collection-item local-snap-listener modal-trigger" href="#modal-<%=backups[index].etag%>"
+        data-id="<%= backups[index].etag %>">
+        <div><%= backups[index].basename%><div class="secondary-content">
+                <%= moment(backups[index].lastmod).format('MMM D, YYYY HH:mm')  %></div>
+        </div>
+    </a>
+
+    <div id="modal-<%=backups[index].etag%>" class="modal modal-fixed-footer blue-grey darken-4 white-text">
+        <div class="modal-content">
+            <div class="row">
+                <div class="col s12 center">
+                    <h4>Backup Detail</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12 center divider">
+                </div>
+            </div>
+            <div class="row">
+                 
+                <div class="input-field col s12">
+                    <input disabled type="text" id="name-<%=backups[index].etag%>" value="<%= backups[index].basename %>" />
+                    <label for="name-<%=backups[index].etag%>" class="white-text active">Name</label>
+                </div>
+
+
+                <div class="input-field col s12">
+                    <input disabled type="text" id="date-<%=backups[index].etag%>"
+                        value="<%=moment(backups[index].lastmod).format('MMM D, YYYY HH:mm')%>" />
+                    <label for="date-<%=backups[index].etag%>" class="white-text active">Date</label>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer blue-grey darken-4">
+            <a href="#!" class="modal-close waves-effect waves-green btn red">Close</a>
+        </div>
+    </div>
+
+
+    <% } %>
+</div>
+
+
+
+<% } %>

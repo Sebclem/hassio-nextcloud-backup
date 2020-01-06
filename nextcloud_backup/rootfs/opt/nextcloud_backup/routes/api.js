@@ -43,15 +43,28 @@ router.get('/formated-local-snap', function(req, res, next) {
 
 });
 
-router.get('/formated-remote-manual', function(req, res, next) {
-    webdav.init(true, 'cloud.seb6596.ovh', 'admin', 'WPHRG-4jwCw-i8eqg-mtiao-Kmwrw').then(() => {
-        console.log('success');
-    }, (err) => {
-        console.log('failure');
-        console.log(err);
-    })
+router.get('/formated-backup-manual', function(req, res, next) {
+    webdav.getFolderContent('/Hassio Backup/Manual/')
+        .then((contents) => {
+            contents.sort((a, b) => {
+                if (moment(a.lastmod).isBefore(moment(b.lastmod)))
+                    return 1;
+                else
+                    return -1;
+            })
+            res.render('backupSnaps',{backups: contents, moment: moment});
+        });
 
 });
+
+router.get('/formated-backup-auto', function(req, res, next) {
+    webdav.getFolderContent('/Hassio Backup/Auto/')
+        .then((contents) => {
+            res.render('backupSnaps',{backups: contents, moment: moment});
+        });
+
+});
+
 
 
 router.post('/nextcloud-settings', function(req, res, next) {
@@ -90,12 +103,12 @@ router.post('/manual-backup', function(req, res, next) {
     let id = req.query.id;
     let name = req.query.name;
     let status = statusTools.getStatus();
-    if (status.status == "creating" && status.status == "upload" && status.status == "download"){
+    if (status.status == "creating" && status.status == "upload" && status.status == "download") {
         res.status(503);
         res.send();
         return;
     }
-        
+
     hassioApiTools.downloadSnapshot(id)
         .then(() => {
             webdav.uploadFile(id, '/Hassio Backup/Manual/' + name + '.tar');
@@ -112,7 +125,7 @@ router.post('/manual-backup', function(req, res, next) {
 router.post('/new-backup', function(req, res, next) {
 
     let status = statusTools.getStatus();
-    if (status.status == "creating" && status.status == "upload" && status.status == "download"){
+    if (status.status == "creating" && status.status == "upload" && status.status == "download") {
         res.status(503);
         res.send();
         return;
@@ -147,9 +160,6 @@ router.post('/backup-settings', function(req, res, next) {
         res.status(400);
         res.send();
     }
-
-
-
 });
 
 
