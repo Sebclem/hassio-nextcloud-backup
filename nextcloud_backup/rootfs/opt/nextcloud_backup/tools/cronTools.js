@@ -68,6 +68,11 @@ class CronContainer {
             this.cronJob.stop();
             this.cronJob = null;
         }
+        if(!checkConfig(settingsTools.getSettings())){
+            console.log("No Cron settings available.")
+            return;
+        }
+        
         switch (settings.cron_base) {
             case '0':
                 console.log("No Cron settings available.")
