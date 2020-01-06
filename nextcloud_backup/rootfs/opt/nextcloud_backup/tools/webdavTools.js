@@ -6,18 +6,25 @@ const statusTools = require('./status');
 const endpoint = "/remote.php/webdav"
 const configPath = "./webdav_conf.json"
 
+const request = require('request');
+
 class WebdavTools {
     constructor() {
         this.client = null;
+        this.baseUrl = null;
+        this.username = null;
+        this.password = null;
     }
 
     init(ssl, host, username, password) {
         return new Promise((resolve, reject) => {
             let status = statusTools.getStatus();
             console.log("Initilizing and checking webdav client...")
-            let url = (ssl ? "https" : "http") + "://" + host + endpoint;
+            this.baseUrl = (ssl ? "https" : "http") + "://" + host + endpoint;
+            this.username = username;
+            this.password = password;
             try {
-                this.client = createClient(url, { username: username, password: password });
+                this.client = createClient(this.baseUrl, { username: username, password: password });
 
                 this.client.getDirectoryContents("/").then(() => {
                     if (status.error_code == 3) {
@@ -138,34 +145,67 @@ class WebdavTools {
         return new Promise((resolve, reject) => {
             let status = statusTools.getStatus();
             status.status = "upload";
-            status.progress = -1;
+            status.progress = 0;
             status.message = null;
             status.error_code = null;
             statusTools.setStatus(status);
             console.log('Uploading snap...');
-            //TODO Change this, try with request (buid the webdav request manualy) to track progress (https://stackoverflow.com/questions/12098713/upload-progress-request)
-            this.client.putFileContents(path, fs.readFileSync('./temp/' + id + '.tar'), { maxContentLength: 1024 ** 3 }).then((result) => {
-                console.log("...Upload finish !");
-                status.status = "idle";
-                status.message = null;
-                status.error_code = null;
-                status.last_backup = moment().format('MMM D, YYYY HH:mm')
-                
-                statusTools.setStatus(status);
-                fs.unlinkSync('./temp/' + id + '.tar')
-                resolve();
-            }).catch((err) => {
-                status.status = "error";
-                status.error_code = 4;
-                status.message = "Fail to upload snapshot to nextcloud (" + err + ") !"
-                statusTools.setStatus(status);
-                console.error(status.message);
-                reject(status.message);
-            });
+            let fileSize = fs.statSync('./temp/' + id + '.tar').size;
+            let option = {
+                url: this.baseUrl + encodeURI(path),
+                auth: {
+                    user: this.username,
+                    pass: this.password
+                },
+                body: fs.createReadStream('./temp/' + id + '.tar')
+
+            }
+            let lastPercent = 0;
+            let req = request.put(option)
+                .on('drain', () => {
+                    let percent = Math.floor((req.req.connection.bytesWritten / fileSize)*100);
+                    if(lastPercent != percent){
+                        lastPercent = percent;
+                        status.progress = percent/100;
+                        statusTools.setStatus(status);
+                    }
+
+                }).on('error', function(err) {
+                    fs.unlinkSync('./temp/' + id + '.tar');
+                    status.status = "error";
+                    status.error_code = 4;
+                    status.message = "Fail to upload snapshot to nextcloud (" + err + ") !"
+                    statusTools.setStatus(status);
+                    console.error(status.message);
+                    reject(status.message);
+
+                }).on('response', (res) => {
+                    if (res.statusCode != 204) {
+                        status.status = "error";
+                        status.error_code = 4;
+                        status.message = "Fail to upload snapshot to nextcloud (Status code: " + res.statusCode + ") !"
+                        statusTools.setStatus(status);
+                        console.error(status.message);
+                        fs.unlinkSync('./temp/' + id + '.tar')
+                        reject(status.message);
+                    }
+                    else {
+                        console.log("...Upload finish !");
+                        status.status = "idle";
+                        status.progress = -1;
+                        status.message = null;
+                        status.error_code = null;
+                        status.last_backup = moment().format('MMM D, YYYY HH:mm')
+
+                        statusTools.setStatus(status);
+                        fs.unlinkSync('./temp/' + id + '.tar')
+                        resolve();
+                    }
+                })
         });
     }
 
-    
+
 
 
 }
