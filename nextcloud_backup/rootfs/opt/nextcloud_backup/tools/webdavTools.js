@@ -8,6 +8,7 @@ const configPath = "./webdav_conf.json"
 const path = require('path');
 const settingsTools = require('./settingsTools');
 const pathTools = require('./pathTools');
+const hassioApiTools = require('./hassioApiTools');
 
 const request = require('request');
 
@@ -202,7 +203,17 @@ class WebdavTools {
 
                         statusTools.setStatus(status);
                         cleanTempFolder();
+                        let autoCleanCloud = settingsTools.getSettings().auto_clean_backup;
+                        if (autoCleanCloud != null && autoCleanCloud == "true") {
+                            this.clean().catch();
+                        }
+                        let autoCleanlocal = settingsTools.getSettings().auto_clean_local;
+                        if (autoCleanlocal != null && autoCleanlocal == "true") {
+                            hassioApiTools.clean();
+                        }
                         resolve();
+
+                        
                     }
                 })
         });
@@ -221,7 +232,7 @@ class WebdavTools {
 
     clean() {
         let limit = settingsTools.getSettings().auto_clean_local_keep;
-        if(limit == null)
+        if (limit == null)
             limit = 5;
         return new Promise((resolve, reject) => {
             this.getFolderContent(pathTools.auto).then(async (contents) => {
@@ -246,7 +257,7 @@ class WebdavTools {
             }).catch((error) => {
                 status.status = "error";
                 status.error_code = 6;
-                status.message = "Fail to clean Nexcloud ("+ error + ") !"
+                status.message = "Fail to clean Nexcloud (" + error + ") !"
                 statusTools.setStatus(status);
                 console.error(status.message);
                 reject(status.message);
