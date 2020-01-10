@@ -61,7 +61,7 @@ To do this:
 1. For password, we highly recommend to use `App Password`.<br>
     >To generate a `App Password`, go into your personal setting into Nextcloud, Security page. You can generate one via the `Devices & sessions` section. Simply entre a name and hit `Create new app password`
 
-## HassIO Configuration
+## Hass.io Configuration
 
 **Note**: _Remember to restart the add-on when the configuration is changed._
 
