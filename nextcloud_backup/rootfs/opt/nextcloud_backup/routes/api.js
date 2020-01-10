@@ -5,7 +5,7 @@ const statusTools = require('../tools/status');
 const WebdavTools = require('../tools/webdavTools')
 const webdav = new WebdavTools().getInstance();
 const settingsTools = require('../tools/settingsTools');
-
+const pathTools = require('../tools/pathTools');
 const hassioApiTools = require('../tools/hassioApiTools');
 
 const cronTools = require('../tools/cronTools');
@@ -44,7 +44,7 @@ router.get('/formated-local-snap', function(req, res, next) {
 });
 
 router.get('/formated-backup-manual', function(req, res, next) {
-    webdav.getFolderContent('/Hassio Backup/Manual/')
+    webdav.getFolderContent(pathTools.manual)
         .then((contents) => {
             contents.sort((a, b) => {
                 if (moment(a.lastmod).isBefore(moment(b.lastmod)))
@@ -58,8 +58,14 @@ router.get('/formated-backup-manual', function(req, res, next) {
 });
 
 router.get('/formated-backup-auto', function(req, res, next) {
-    webdav.getFolderContent('/Hassio Backup/Auto/')
+    webdav.getFolderContent(pathTools.auto)
         .then((contents) => {
+            contents.sort((a, b) => {
+                if (moment(a.lastmod).isBefore(moment(b.lastmod)))
+                    return 1;
+                else
+                    return -1;
+            })
             res.render('backupSnaps',{backups: contents, moment: moment});
         });
 
@@ -111,7 +117,7 @@ router.post('/manual-backup', function(req, res, next) {
 
     hassioApiTools.downloadSnapshot(id)
         .then(() => {
-            webdav.uploadFile(id, '/Hassio Backup/Manual/' + name + '.tar');
+            webdav.uploadFile(id, pathTools.manual + name + '.tar');
             res.status(201);
             res.send();
         })
@@ -134,7 +140,7 @@ router.post('/new-backup', function(req, res, next) {
     hassioApiTools.createNewBackup(name).then((id) => {
         hassioApiTools.downloadSnapshot(id)
             .then(() => {
-                webdav.uploadFile(id, '/Hassio Backup/Manual/' + name + '.tar');
+                webdav.uploadFile(id, pathTools.manual + name + '.tar');
             }).catch(() => {
 
             })
@@ -162,7 +168,11 @@ router.post('/backup-settings', function(req, res, next) {
     }
 });
 
-
+router.post('/clean-now', function(req, res, next){
+    webdav.clean();
+    res.status(201);
+    res.send()
+});
 
 
 

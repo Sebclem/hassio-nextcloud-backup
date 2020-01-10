@@ -5,6 +5,9 @@ const moment = require('moment');
 const statusTools = require('./status');
 const endpoint = "/remote.php/webdav"
 const configPath = "./webdav_conf.json"
+const path = require('path');
+const settingsTools = require('./settingsTools');
+const pathTools = require('./pathTools');
 
 const request = require('request');
 
@@ -62,9 +65,9 @@ class WebdavTools {
 
     initFolder() {
         return new Promise((resolve, reject) => {
-            this.client.createDirectory("/Hassio Backup").catch(() => { }).then(() => {
-                this.client.createDirectory("/Hassio Backup/Auto").catch(() => { }).then(() => {
-                    this.client.createDirectory("/Hassio Backup/Manual").catch(() => { }).then(() => {
+            this.client.createDirectory(pathTools.root).catch(() => { }).then(() => {
+                this.client.createDirectory(pathTools.auto).catch(() => { }).then(() => {
+                    this.client.createDirectory(pathTools.manual).catch(() => { }).then(() => {
                         resolve();
                     })
                 })
@@ -208,27 +211,65 @@ class WebdavTools {
     getFolderContent(path) {
         return new Promise((resolve, reject) => {
             this.client.getDirectoryContents(path)
-                .then((contents)=>{
+                .then((contents) => {
                     resolve(contents);
-                }).catch((error)=>{
+                }).catch((error) => {
                     reject(error);
                 })
         });
     }
 
+    clean() {
+        let limit = settingsTools.getSettings().auto_clean_local_keep;
+        if(limit == null)
+            limit = 5;
+        return new Promise((resolve, reject) => {
+            this.getFolderContent(pathTools.auto).then(async (contents) => {
+                if (contents.length < limit) {
+                    resolve();
+                    return;
+                }
+                contents.sort((a, b) => {
+                    if (moment(a.lastmod).isBefore(moment(b.lastmod)))
+                        return 1;
+                    else
+                        return -1;
+                });
+
+                let toDel = contents.slice(limit);
+                for (let i in toDel) {
+                    await this.client.deleteFile(toDel[i].filename);
+                }
+                console.log('Cloud clean done.')
+                resolve();
+
+            }).catch((error) => {
+                status.status = "error";
+                status.error_code = 6;
+                status.message = "Fail to clean Nexcloud ("+ error + ") !"
+                statusTools.setStatus(status);
+                console.error(status.message);
+                reject(status.message);
+            });
+        })
+
+    }
 
 
 
-function cleanTempFolder(){
+
+}
+
+function cleanTempFolder() {
     fs.readdir("./temp/", (err, files) => {
         if (err) throw err;
-      
+
         for (const file of files) {
-          fs.unlink(path.join("./temp/", file), err => {
-            if (err) throw err;
-          });
+            fs.unlink(path.join("./temp/", file), err => {
+                if (err) throw err;
+            });
         }
-      });
+    });
 }
 
 

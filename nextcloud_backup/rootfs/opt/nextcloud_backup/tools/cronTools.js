@@ -7,6 +7,8 @@ const hassioApiTools = require('./hassioApiTools');
 
 const statusTools = require('./status');
 
+const pathTools = require('./pathTools');
+
 var CronJob = require('cron').CronJob;
 const moment = require('moment');
 
@@ -49,7 +51,7 @@ function startCron() {
     cronContainer.init();
 }
 
-function updatetNextDate(){
+function updatetNextDate() {
     let cronContainer = new Singleton().getInstance();
     cronContainer.updatetNextDate();
 }
@@ -68,11 +70,11 @@ class CronContainer {
             this.cronJob.stop();
             this.cronJob = null;
         }
-        if(!checkConfig(settingsTools.getSettings())){
+        if (!checkConfig(settingsTools.getSettings())) {
             console.log("No Cron settings available.")
             return;
         }
-        
+
         switch (settings.cron_base) {
             case '0':
                 console.log("No Cron settings available.")
@@ -105,7 +107,7 @@ class CronContainer {
 
     updatetNextDate() {
         let date;
-        if( this.cronJob == null)
+        if (this.cronJob == null)
             date = "Not configured";
         else
             date = this.cronJob.nextDate().format('MMM D, YYYY HH:mm');
@@ -116,20 +118,24 @@ class CronContainer {
 
     _createBackup() {
         let status = statusTools.getStatus();
-        if(status.status == "creating" &&  status.status == "upload" &&  status.status == "download")
+        if (status.status == "creating" && status.status == "upload" && status.status == "download")
             return;
-        
+
         let name = 'Auto-' + moment().format('YYYY-MM-DD_HH:mm');
         hassioApiTools.createNewBackup(name).then((id) => {
             hassioApiTools.downloadSnapshot(id)
                 .then(() => {
-                    webdav.uploadFile(id, '/Hassio Backup/Auto/' + name + '.tar');
+                    webdav.uploadFile(id, pathTools.auto + name + '.tar');
                 }).catch(() => {
 
                 })
         }).catch(() => {
 
         })
+    }
+
+    clean() {
+
     }
 }
 

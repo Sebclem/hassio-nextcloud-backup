@@ -318,7 +318,7 @@
 
         </div>
       </div>
-      <div class="row hide">
+      <div class="row">
         <div class="input-field col s3">
           <input type="text" class="white-text" disabled readonly="true" id="local-snap-keep-read">
           <label class="white-text active">Local snapshot to keep</label>
@@ -343,7 +343,7 @@
 
         </div>
       </div>
-      <div class="row hide">
+      <div class="row">
         <div class="input-field col s3">
           <input type="text" class="white-text" disabled readonly="true" id="backup-snap-keep-read">
           <label class="white-text active">Nextcloud snapshot to keep</label>
@@ -599,9 +599,11 @@
 
   function listeners() {
     $('#save-nextcloud-settings').click(sendNextcloudSettings);
-    $('#trigger-nextcloud-settings').click(getNextcloudSettings)
-    $('#trigger-backup-settings').click(getBackupSettings)
-    $('#btn-backup-now').click(backupNow)
+    $('#trigger-nextcloud-settings').click(getNextcloudSettings);
+    $('#trigger-backup-settings').click(getBackupSettings);
+    $('#btn-backup-now').click(backupNow);
+    $('#btn-clean-now').click(cleanNow);
+
 
     $('#save-backup-settings').click(sendBackupSettings);
     $('#cron-drop-day-month').on('input', function() {
@@ -611,21 +613,9 @@
     $('#local-snap-keep').on('input', function() {
       $('#local-snap-keep-read').val($(this).val());
     });
-    $("#auto_clean_local").change(() => {
-      if ($("#auto_clean_local").is(':checked'))
-        $('#local-snap-keep').parent().parent().parent().removeClass("hide");
-      else
-        $('#local-snap-keep').parent().parent().parent().addClass("hide");
-    });
 
     $('#backup-snap-keep').on('input', function() {
       $('#backup-snap-keep-read').val($(this).val());
-    });
-    $("#auto_clean_backup").change(() => {
-      if ($("#auto_clean_backup").is(':checked'))
-        $('#backup-snap-keep').parent().parent().parent().removeClass("hide");
-      else
-        $('#backup-snap-keep').parent().parent().parent().addClass("hide");
     });
 
 
@@ -702,6 +692,19 @@
       })
   }
 
+  function cleanNow(){
+    loadingModal.open();
+    $.post('./api/clean-now')
+      .done(() => {
+        M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Command send !', classes: "green" });
+      }).fail((error) => {
+        console.log(error);
+        M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t send command !', classes: "red" });
+      })
+      .always(() => {
+        loadingModal.close();
+      })
+  }
   function getBackupSettings() {
     loadingModal.open();
     $.get('./api/backup-settings', (data) => {
@@ -712,9 +715,9 @@
           cron_weekday: "0",
           cron_month_day: "1",
           auto_clean_local: false,
-          auto_clean_local_keep: 1,
+          auto_clean_local_keep: 5,
           auto_clean_backup: false,
-          auto_clean_backup_keep: 1,
+          auto_clean_backup_keep: 5,
         }
       }
 
@@ -739,15 +742,6 @@
       $('#auto_clean_backup').prop('checked', data.auto_clean_backup);
       $('#backup-snap-keep-read, #backup-snap-keep').val(data.auto_clean_backup_keep);
 
-      if ($("#auto_clean_backup").is(':checked'))
-        $('#backup-snap-keep').parent().parent().parent().removeClass("hide");
-      else
-        $('#backup-snap-keep').parent().parent().parent().addClass("hide");
-
-      if ($("#auto_clean_local").is(':checked'))
-        $('#local-snap-keep').parent().parent().parent().removeClass("hide");
-      else
-        $('#local-snap-keep').parent().parent().parent().addClass("hide");
 
       $('#backup-snap-keep-read + label').removeClass("active");
       $('#backup-snap-keep-read + label').addClass("active");
