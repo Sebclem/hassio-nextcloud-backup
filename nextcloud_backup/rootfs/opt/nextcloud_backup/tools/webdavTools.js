@@ -180,7 +180,7 @@ class WebdavTools {
                     reject(status.message);
 
                 }).on('response', (res) => {
-                    if (res.statusCode != 201) {
+                    if (res.statusCode != 201 && res.statusCode != 204) {
                         status.status = "error";
                         status.error_code = 4;
                         status.message = "Fail to upload snapshot to nextcloud (Status code: " + res.statusCode + ") !"
