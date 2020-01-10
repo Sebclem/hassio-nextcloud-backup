@@ -53,6 +53,8 @@ router.get('/formated-backup-manual', function(req, res, next) {
                     return -1;
             })
             res.render('backupSnaps',{backups: contents, moment: moment});
+        }).catch(()=>{
+            res.send();
         });
 
 });
@@ -67,8 +69,9 @@ router.get('/formated-backup-auto', function(req, res, next) {
                     return -1;
             })
             res.render('backupSnaps',{backups: contents, moment: moment});
+        }).catch(()=>{
+            res.send();
         });
-
 });
 
 

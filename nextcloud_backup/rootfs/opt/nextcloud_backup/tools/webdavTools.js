@@ -4,7 +4,7 @@ const moment = require('moment');
 
 const statusTools = require('./status');
 const endpoint = "/remote.php/webdav"
-const configPath = "./webdav_conf.json"
+const configPath = "/data/webdav_conf.json"
 const path = require('path');
 const settingsTools = require('./settingsTools');
 const pathTools = require('./pathTools');
@@ -221,6 +221,10 @@ class WebdavTools {
 
     getFolderContent(path) {
         return new Promise((resolve, reject) => {
+            if(this.client == null){
+                reject();
+                return;
+            }
             this.client.getDirectoryContents(path)
                 .then((contents) => {
                     resolve(contents);

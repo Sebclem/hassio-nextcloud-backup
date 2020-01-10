@@ -38,7 +38,9 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-
+const fs = require('fs');
+if (!fs.existsSync('/data'))
+  fs.mkdirSync('/data');
 const statusTools = require('./tools/status');
 statusTools.init();
 console.log("Satus : \x1b[32mGo !\x1b[0m")
@@ -66,6 +68,8 @@ webdav.confIsValid().then(
 
 const cronTools = require('./tools/cronTools');
 cronTools.startCron();
+
+
 
 
 module.exports = app;

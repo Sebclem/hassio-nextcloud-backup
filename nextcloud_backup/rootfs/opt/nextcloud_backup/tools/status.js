@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const statusPath = './status.json'
+const statusPath = '/data/status.json'
 
 let baseStatus = {
     status: "idle",

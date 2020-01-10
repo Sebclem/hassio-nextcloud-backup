@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const settingsPath = "./backup_conf.json"
+const settingsPath = "/data/backup_conf.json"
 
 
 function getSettings(){
