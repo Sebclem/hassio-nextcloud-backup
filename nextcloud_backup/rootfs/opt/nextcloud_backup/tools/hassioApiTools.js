@@ -2,6 +2,8 @@ const request = require('request');
 const progress = require('request-progress');
 const statusTools = require('./status');
 const fs = require('fs');
+const settingsTools = require('./settingsTools');
+const moment = require('moment');
 
 
 // !!! FOR DEV PURPOSE ONLY !!!
@@ -98,6 +100,30 @@ function downloadSnapshot(id) {
     });
 }
 
+function dellSnap(id) {
+    return new Promise((resolve, reject) => {
+        checkSnap(id).then(() => {
+            let token = process.env.HASSIO_TOKEN;
+            if (token == null) {
+                token = fallbackToken
+            }
+            let option = {
+                url: 'http://hassio/snapshots/' + id + '/remove',
+                headers: { 'X-HASSIO-KEY': token },
+                json: true
+            }
+            request.post(option, (error, response, body) => {
+                if (error || (response.statusCode != 200 && response.statusCode != 204))
+                    reject();
+                else
+                    resolve();
+            })
+        }).catch(() => {
+            reject();
+        })
+    })
+
+}
 
 function checkSnap(id) {
     return new Promise((resolve, reject) => {
@@ -142,13 +168,13 @@ function createNewBackup(name) {
         request.post(option, (error, response, body) => {
             if (response.statusCode != 200) {
                 status.status = "error";
-                status.message = "Can't create new snapshot ("+ error + ")";
+                status.message = "Can't create new snapshot (" + error + ")";
                 status.error_code = 5;
                 statusTools.setStatus(status);
                 console.error(status.message);
                 reject(status.message);
             }
-            else{
+            else {
                 body.data.slug
                 console.log('Snapshot created with id ' + body.data.slug);
                 resolve(body.data.slug);
@@ -157,6 +183,35 @@ function createNewBackup(name) {
     });
 }
 
+function clean() {
+    let limit = settingsTools.getSettings().auto_clean_backup_keep;
+    if (limit == null)
+        limit = 5;
+    return new Promise((resolve, reject) => {
+        getSnapshots().then(async (snaps) => {
+            if (snaps.length < limit) {
+                resolve();
+                return;
+            }
+            snaps.sort((a, b) => {
+                if (moment(a.date).isBefore(moment(b.date)))
+                    return 1;
+                else
+                    return -1;
+            });
+            let toDel = snaps.slice(limit);
+            for (let i in toDel) {
+                await dellSnap(toDel[i].slug)
+            }
+            console.log('Local clean done.')
+            resolve();
+        }).catch(() => {
+            reject();
+        });
+    })
+}
+
 exports.getSnapshots = getSnapshots;
 exports.downloadSnapshot = downloadSnapshot;
 exports.createNewBackup = createNewBackup;
+exports.clean = clean;

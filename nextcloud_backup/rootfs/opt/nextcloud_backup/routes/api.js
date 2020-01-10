@@ -169,7 +169,11 @@ router.post('/backup-settings', function(req, res, next) {
 });
 
 router.post('/clean-now', function(req, res, next){
-    webdav.clean();
+    webdav.clean().then(()=>{
+        hassioApiTools.clean().catch();
+    }).catch(()=>{
+        hassioApiTools.clean().catch();
+    });
     res.status(201);
     res.send()
 });
