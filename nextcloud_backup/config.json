@@ -1,12 +1,15 @@
 {
     "name": "Nextcloud Backup",
-    "version": "0.7.0",
+    "version": "0.7.1",
     "slug": "nextcloud_backup",
     "description": "Hass.io snapshot backup to Nextcloud",
     "url": "https://github.com/Sebclem/hassio-nextcloud-backup",
     "webui": "[PROTO:ssl]://[HOST]:[PORT:3000]/",
     "ingress": true,
     "ingress_port": 3000,
+    "panel_icon": "mdi:cloud-upload",
+    "panel_title": "NC Backup",
+    "panel_admin": true,
     "startup": "application",
     "arch": [
         "aarch64",
@@ -31,7 +34,11 @@
         "leave_front_door_open": "bool?"
     },
     "ports": {
-        "3000/tcp": 3000,
-        "9226/tcp": 9226
-    }
+        "3000/tcp": null,
+        "9226/tcp": null
+    },
+    "ports_description": {
+        "3000/tcp": "Web interface (Not required for Hass.io Ingress)",
+        "9226/tcp": "NodeJS Debuger"
+    },
 }
