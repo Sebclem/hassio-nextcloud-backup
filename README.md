@@ -25,6 +25,13 @@ Hass.io snapshot backup to Nextcloud
 Easily backup your Hass.io snapshots to Nextcloud.
 Auto backup can be configure with the web interface.
 
+### Features
+- Auto Backup : Configure this add-on to automaticly backup your HassIO instance.
+- Auto Clean : You can specify the maximum number of local snapshots and (__ONLY__) auto backuped snapshots.
+- ~~Restore backups.~~ (Coming Soon)
+> __Info:__<br>
+> Auto Clean is executed after every upload and every day at 00h30
+
 ## Installation
 
 The installation of this add-on is pretty straightforward and not different in
@@ -40,7 +47,21 @@ comparison to installing any other Hass.io add-on.
 **NOTE**: Do not add this repository to Hass.io, please use:
 `https://github.com/Sebclem/sebclem-hassio-addon-repository`.
 
-## Configuration
+
+## NextCloud config
+
+Firts, you need to configure all your Nextcloud information.
+
+To do this:
+1. Open the add-on Web UI
+1. Open NextCloud config menu (Top right gear, and Nexcloud)
+1. If your NextCloud instance use `HTTPS`, enable the `SSL` lever
+1. Enter the `hostname` of the NextCloud instance. You can specify a custom port by adding `:[port]` at the end of the hostname (`exemple.com:8080`)
+1. Now enter the Username that you when this add-on use.
+1. For password, we highly recommend to use `App Password`.<br>
+    >To generate a `App Password`, go into your personal setting into Nextcloud, Security page. You can generate one via the `Devices & sessions` section. Simply entre a name and hit `Create new app password`
+
+## HassIO Configuration
 
 **Note**: _Remember to restart the add-on when the configuration is changed._
 
