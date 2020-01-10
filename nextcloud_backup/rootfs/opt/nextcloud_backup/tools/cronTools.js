@@ -60,11 +60,17 @@ function updatetNextDate() {
 class CronContainer {
     constructor() {
         this.cronJob = null;
+        this.cronClean = null
     }
 
     init() {
         let settings = settingsTools.getSettings();
         let cronStr = "";
+        if (this.cronClean == null) {
+            console.log("Starting auto clean cron...")
+            this.cronClean = new CronJob('0 1 * * *', this._clean, null, false, Intl.DateTimeFormat().resolvedOptions().timeZone);
+            this.cronClean.start();
+        }
         if (this.cronJob != null) {
             console.log("Stoping Cron...")
             this.cronJob.stop();
@@ -134,8 +140,15 @@ class CronContainer {
         })
     }
 
-    clean() {
-
+    _clean() {
+        let autoCleanCloud = settingsTools.getSettings().auto_clean_backup;
+        if (autoCleanCloud != null && autoCleanCloud == "true") {
+            this.clean().catch();
+        }
+        let autoCleanlocal = settingsTools.getSettings().auto_clean_local;
+        if (autoCleanlocal != null && autoCleanlocal == "true") {
+            hassioApiTools.clean();
+        }
     }
 }
 
