@@ -198,7 +198,7 @@ class WebdavTools {
                         status.last_backup = moment().format('MMM D, YYYY HH:mm')
 
                         statusTools.setStatus(status);
-                        fs.unlinkSync('./temp/' + id + '.tar')
+                        cleanTempFolder();
                         resolve();
                     }
                 })
@@ -219,6 +219,16 @@ class WebdavTools {
 
 
 
+function cleanTempFolder(){
+    fs.readdir("./temp/", (err, files) => {
+        if (err) throw err;
+      
+        for (const file of files) {
+          fs.unlink(path.join("./temp/", file), err => {
+            if (err) throw err;
+          });
+        }
+      });
 }
 
 
