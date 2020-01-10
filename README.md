@@ -23,7 +23,6 @@ Hass.io snapshot backup to Nextcloud
 ## About
 
 Easily backup your Hass.io snapshots to Nextcloud.
-Auto backup can be configure with the web interface.
 
 ### Features
 - Auto Backup : Configure this add-on to automaticly backup your HassIO instance.
@@ -200,6 +199,5 @@ SOFTWARE.
 [releases-shield]: https://img.shields.io/github/release/Sebclem/hassio-nextcloud-backup.svg?include_prereleases
 [releases]: https://github.com/Sebclem/hassio-nextcloud-backup/releases
 [repository]: https://github.com/Sebclem/sebclem-hassio-addon-repository
-[version-shield]: https://images.microbadger.com/badges/version/hassioaddons/log-viewer.svg
 [contributors]: https://github.com/Sebclem/hassio-nextcloud-backup/graphs/contributors
 [semver]: https://semver.org/spec/v2.0.0.htm
