@@ -692,7 +692,7 @@
       })
   }
 
-  function cleanNow(){
+  function cleanNow() {
     loadingModal.open();
     $.post('./api/clean-now')
       .done(() => {
@@ -737,9 +737,10 @@
       $('#cron-drop-day-month-read + label').removeClass("active");
       $('#cron-drop-day-month-read + label').addClass("active");
 
-      $('#auto_clean_local').prop('checked', data.auto_clean_local);
+
+      $('#auto_clean_local').prop('checked', data.auto_clean_local == "true");
       $('#local-snap-keep-read, #local-snap-keep').val(data.auto_clean_local_keep);
-      $('#auto_clean_backup').prop('checked', data.auto_clean_backup);
+      $('#auto_clean_backup').prop('checked', data.auto_clean_backup == "true");
       $('#backup-snap-keep-read, #backup-snap-keep').val(data.auto_clean_backup_keep);
 
 
