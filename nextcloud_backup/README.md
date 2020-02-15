@@ -1,4 +1,4 @@
-# Community Hass.io Add-ons: Nextcloud Backup
+# Hass.io Add-ons: Nextcloud Backup
 
 [![Release][release-shield]][release] ![Project Stage][project-stage-shield] ![Project Maintenance][maintenance-shield]
 
