@@ -10,6 +10,8 @@ const hassioApiTools = require('../tools/hassioApiTools');
 
 const cronTools = require('../tools/cronTools');
 
+const logger = require('../config/winston');
+
 
 
 
@@ -36,7 +38,7 @@ router.get('/formated-local-snap', function(req, res, next) {
             res.render('localSnaps', { snaps: snaps, moment: moment });
         },
         (err) => {
-            console.log(err);
+            logger.error(err);
             res.status(500);
             res.send('');
         })
@@ -134,7 +136,7 @@ router.post('/manual-backup', function(req, res, next) {
 router.post('/new-backup', function(req, res, next) {
 
     let status = statusTools.getStatus();
-    if (status.status == "creating" && status.status == "upload" && status.status == "download") {
+    if (status.status === "creating" && status.status === "upload" && status.status === "download") {
         res.status(503);
         res.send();
         return;

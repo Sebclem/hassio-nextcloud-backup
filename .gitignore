@@ -106,3 +106,5 @@ dist
 status.json
 conf.json
 webdav_conf.json
+
+.idea

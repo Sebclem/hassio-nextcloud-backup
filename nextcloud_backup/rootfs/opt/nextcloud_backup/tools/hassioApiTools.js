@@ -4,7 +4,7 @@ const statusTools = require('./status');
 const fs = require('fs');
 const settingsTools = require('./settingsTools');
 const moment = require('moment');
-
+const logger = require('../config/winston');
 
 // !!! FOR DEV PURPOSE ONLY !!!
 //put token here for dev (ssh port tunelling 'sudo ssh -L 80:hassio:80 root@`hassoi_ip`' + put 127.0.0.1 hassio into host)
@@ -22,10 +22,10 @@ function getSnapshots() {
             url: "http://hassio/snapshots",
             headers: { 'X-HASSIO-KEY': token },
             json: true
-        }
+        };
         request(option, (error, response, body) => {
-            if (!error && response.statusCode == 200) {
-                if (status.error_code == 1) {
+            if (!error && response.statusCode === 200) {
+                if (status.error_code === 1) {
                     status.status = "idle";
                     status.message = null;
                     status.error_code = null;
@@ -40,7 +40,7 @@ function getSnapshots() {
                 status.message = "Fail to fetch Hassio snapshot (" + error + ")";
                 status.error_code = 1;
                 statusTools.setStatus(status);
-                console.error(status.message);
+                logger.error(status.message);
                 reject(error);
             }
         })
@@ -50,7 +50,7 @@ function getSnapshots() {
 
 function downloadSnapshot(id) {
     return new Promise((resolve, reject) => {
-        console.log('Downloading snapshot ' + id + '...')
+        logger.info('Downloading snapshot ' + id + '...');
         if (!fs.existsSync('./temp/'))
             fs.mkdirSync('./temp/');
         let stream = fs.createWriteStream('./temp/' + id + '.tar');
@@ -66,7 +66,7 @@ function downloadSnapshot(id) {
             let option = {
                 url: 'http://hassio/snapshots/' + id + '/download',
                 headers: { 'X-HASSIO-KEY': token },
-            }
+            };
             progress(request(option))
                 .on('progress', (state) => {
                     // TODO Don't write progress to disk, preseve disk IO time
@@ -78,11 +78,11 @@ function downloadSnapshot(id) {
                     status.message = "Fail to download Hassio snapshot (" + error + ")";
                     status.error_code = 1;
                     statusTools.setStatus(status);
-                    console.error(status.message);
+                    logger.error(status.message);
                     reject(error);
                 })
                 .on('end', () => {
-                    console.log('Download success !')
+                    logger.info('Download success !')
                     status.progress = 1;
                     statusTools.setStatus(status);
                     resolve();
@@ -93,7 +93,7 @@ function downloadSnapshot(id) {
             status.message = "Fail to download Hassio snapshot. Not found ?";
             status.error_code = 1;
             statusTools.setStatus(status);
-            console.error(status.message);
+            logger.error(status.message);
             reject();
         });
 
@@ -113,7 +113,7 @@ function dellSnap(id) {
                 json: true
             }
             request.post(option, (error, response, body) => {
-                if (error || (response.statusCode != 200 && response.statusCode != 204))
+                if (error || (response.statusCode !== 200 && response.statusCode !== 204))
                     reject();
                 else
                     resolve();

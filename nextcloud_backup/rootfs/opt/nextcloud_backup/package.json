@@ -6,6 +6,7 @@
     "start": "node --inspect=0.0.0.0:9226 ./bin/www "
   },
   "dependencies": {
+    "app-root-path": "^3.0.0",
     "cookie-parser": "~1.4.4",
     "cron": "^1.7.2",
     "debug": "~2.6.9",
@@ -16,7 +17,8 @@
     "morgan": "~1.9.1",
     "request": "^2.88.0",
     "request-progress": "^3.0.0",
-    "webdav": "^2.10.0"
+    "webdav": "^2.10.0",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "eslint": "^6.7.2",

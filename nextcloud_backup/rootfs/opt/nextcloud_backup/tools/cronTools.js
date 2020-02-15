@@ -1,6 +1,6 @@
 const settingsTools = require('./settingsTools');
 
-const WebdavTools = require('./webdavTools')
+const WebdavTools = require('./webdavTools');
 const webdav = new WebdavTools().getInstance();
 
 const hassioApiTools = require('./hassioApiTools');
@@ -9,35 +9,31 @@ const statusTools = require('./status');
 
 const pathTools = require('./pathTools');
 
-var CronJob = require('cron').CronJob;
+const CronJob = require('cron').CronJob;
 const moment = require('moment');
+const logger = require('../config/winston');
+
 
 function checkConfig(conf) {
     if (conf.cron_base != null) {
-        if (conf.cron_base == '1' || conf.cron_base == '2' || conf.cron_base == '3') {
+        if (conf.cron_base === '1' || conf.cron_base === '2' || conf.cron_base === '3') {
             if (conf.cron_hour != null && conf.cron_hour.match(/\d\d:\d\d/)) {
-                if (conf.cron_base == '1')
+                if (conf.cron_base === '1')
                     return true;
             }
             else
                 return false;
         }
 
-        if (conf.cron_base == '2') {
-            if (conf.cron_weekday != null && conf.cron_weekday >= 0 && conf.cron_weekday <= 6)
-                return true;
-            else
-                return false;
+        if (conf.cron_base === '2') {
+            return conf.cron_weekday != null && conf.cron_weekday >= 0 && conf.cron_weekday <= 6;
         }
 
-        if (conf.cron_base == '3') {
-            if (conf.cron_month_day != null && conf.cron_month_day >= 1 && conf.cron_month_day <= 28)
-                return true;
-            else
-                return false;
+        if (conf.cron_base === '3') {
+            return conf.cron_month_day != null && conf.cron_month_day >= 1 && conf.cron_month_day <= 28;
         }
 
-        if (conf.cron_base == '0')
+        if (conf.cron_base === '0')
             return true
     }
     else
@@ -67,23 +63,23 @@ class CronContainer {
         let settings = settingsTools.getSettings();
         let cronStr = "";
         if (this.cronClean == null) {
-            console.log("Starting auto clean cron...")
+           logger.info("Starting auto clean cron...");
             this.cronClean = new CronJob('0 1 * * *', this._clean, null, false, Intl.DateTimeFormat().resolvedOptions().timeZone);
             this.cronClean.start();
         }
         if (this.cronJob != null) {
-            console.log("Stoping Cron...")
+            logger.info("Stoping Cron...");
             this.cronJob.stop();
             this.cronJob = null;
         }
         if (!checkConfig(settingsTools.getSettings())) {
-            console.log("No Cron settings available.")
+            logger.warn("No Cron settings available.");
             return;
         }
 
         switch (settings.cron_base) {
             case '0':
-                console.log("No Cron settings available.")
+                logger.warn("No Cron settings available.");
                 return;
             case '1': {
                 let splited = settings.cron_hour.split(':');
@@ -105,7 +101,7 @@ class CronContainer {
 
 
         }
-        console.log("Starting Cron...")
+        logger.info("Starting Cron...");
         this.cronJob = new CronJob(cronStr, this._createBackup, null, false, Intl.DateTimeFormat().resolvedOptions().timeZone);
         this.cronJob.start();
         this.updatetNextDate();
@@ -123,8 +119,9 @@ class CronContainer {
     }
 
     _createBackup() {
+        logger.debug('Cron triggered !');
         let status = statusTools.getStatus();
-        if (status.status == "creating" && status.status == "upload" && status.status == "download")
+        if (status.status === "creating" && status.status === "upload" && status.status === "download")
             return;
 
         let name = 'Auto-' + moment().format('YYYY-MM-DD_HH:mm');
@@ -142,11 +139,11 @@ class CronContainer {
 
     _clean() {
         let autoCleanCloud = settingsTools.getSettings().auto_clean_backup;
-        if (autoCleanCloud != null && autoCleanCloud == "true") {
+        if (autoCleanCloud != null && autoCleanCloud === "true") {
             this.clean().catch();
         }
         let autoCleanlocal = settingsTools.getSettings().auto_clean_local;
-        if (autoCleanlocal != null && autoCleanlocal == "true") {
+        if (autoCleanlocal != null && autoCleanlocal === "true") {
             hassioApiTools.clean();
         }
     }

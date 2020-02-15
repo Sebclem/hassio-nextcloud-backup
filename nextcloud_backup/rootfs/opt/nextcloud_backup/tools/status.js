@@ -1,12 +1,12 @@
 const fs = require('fs');
 
-const statusPath = '/data/status.json'
+const statusPath = '/data/status.json';
 
 let baseStatus = {
     status: "idle",
     last_backup: null,
     next_backup: null
-}
+};
 
 
 

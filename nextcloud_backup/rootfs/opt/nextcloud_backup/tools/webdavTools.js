@@ -3,12 +3,13 @@ const fs = require("fs");
 const moment = require('moment');
 
 const statusTools = require('./status');
-const endpoint = "/remote.php/webdav"
-const configPath = "/data/webdav_conf.json"
+const endpoint = "/remote.php/webdav";
+const configPath = "/data/webdav_conf.json";
 const path = require('path');
 const settingsTools = require('./settingsTools');
 const pathTools = require('./pathTools');
 const hassioApiTools = require('./hassioApiTools');
+const logger = require('../config/winston');
 
 const request = require('request');
 
@@ -23,7 +24,7 @@ class WebdavTools {
     init(ssl, host, username, password) {
         return new Promise((resolve, reject) => {
             let status = statusTools.getStatus();
-            console.log("Initilizing and checking webdav client...")
+            logger.info("Initilizing and checking webdav client...");
             this.baseUrl = (ssl ? "https" : "http") + "://" + host + endpoint;
             this.username = username;
             this.password = password;
@@ -37,7 +38,7 @@ class WebdavTools {
                         status.error_code = null;
                         statusTools.setStatus(status);
                     }
-                    console.debug("Nextcloud connection:  \x1b[32mSuccess !\x1b[0m");
+                    logger.debug("Nextcloud connection:  \x1b[32mSuccess !\x1b[0m");
                     this.initFolder().then(() => {
                         resolve();
                     });
@@ -48,7 +49,7 @@ class WebdavTools {
                     status.message = "Can't connect to Nextcloud (" + error + ") !"
                     statusTools.setStatus(status);
                     this.client = null;
-                    console.error("Can't connect to Nextcloud (" + error + ") !");
+                    logger.error("Can't connect to Nextcloud (" + error + ") !");
                     reject("Can't connect to Nextcloud (" + error + ") !");
                 });
             } catch (err) {
@@ -57,7 +58,7 @@ class WebdavTools {
                 status.message = "Can't connect to Nextcloud (" + err + ") !"
                 statusTools.setStatus(status);
                 this.client = null;
-                console.error("Can't connect to Nextcloud (" + err + ") !");
+                logger.error("Can't connect to Nextcloud (" + err + ") !");
                 reject("Can't connect to Nextcloud (" + err + ") !");
             }
 
@@ -101,7 +102,7 @@ class WebdavTools {
                     status.error_code = 2;
                     status.message = "Nextcloud config invalid !"
                     statusTools.setStatus(status);
-                    console.error(status.message);
+                    logger.error(status.message);
                     reject("Nextcloud config invalid !");
                 }
             }
@@ -110,7 +111,7 @@ class WebdavTools {
                 status.error_code = 2;
                 status.message = "Nextcloud config not found !"
                 statusTools.setStatus(status);
-                console.error(status.message);
+                logger.error(status.message);
                 reject("Nextcloud config not found !");
             }
 
@@ -153,7 +154,7 @@ class WebdavTools {
             status.message = null;
             status.error_code = null;
             statusTools.setStatus(status);
-            console.log('Uploading snap...');
+            logger.info('Uploading snap...');
             let fileSize = fs.statSync('./temp/' + id + '.tar').size;
             let option = {
                 url: this.baseUrl + encodeURI(path),
@@ -180,7 +181,7 @@ class WebdavTools {
                     status.error_code = 4;
                     status.message = "Fail to upload snapshot to nextcloud (" + err + ") !"
                     statusTools.setStatus(status);
-                    console.error(status.message);
+                    logger.error(status.message);
                     reject(status.message);
 
                 }).on('response', (res) => {
@@ -189,12 +190,12 @@ class WebdavTools {
                         status.error_code = 4;
                         status.message = "Fail to upload snapshot to nextcloud (Status code: " + res.statusCode + ") !"
                         statusTools.setStatus(status);
-                        console.error(status.message);
+                        logger.error(status.message);
                         fs.unlinkSync('./temp/' + id + '.tar')
                         reject(status.message);
                     }
                     else {
-                        console.log("...Upload finish !");
+                        logger.log("...Upload finish !");
                         status.status = "idle";
                         status.progress = -1;
                         status.message = null;
@@ -255,7 +256,7 @@ class WebdavTools {
                 for (let i in toDel) {
                     await this.client.deleteFile(toDel[i].filename);
                 }
-                console.log('Cloud clean done.')
+                logger.log('Cloud clean done.')
                 resolve();
 
             }).catch((error) => {
@@ -263,7 +264,7 @@ class WebdavTools {
                 status.error_code = 6;
                 status.message = "Fail to clean Nexcloud (" + error + ") !"
                 statusTools.setStatus(status);
-                console.error(status.message);
+                logger.error(status.message);
                 reject(status.message);
             });
         })
