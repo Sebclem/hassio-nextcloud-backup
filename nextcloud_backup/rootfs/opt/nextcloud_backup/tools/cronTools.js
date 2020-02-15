@@ -121,7 +121,7 @@ class CronContainer {
     _createBackup() {
         logger.debug('Cron triggered !');
         let status = statusTools.getStatus();
-        if (status.status === "creating" && status.status === "upload" && status.status === "download")
+        if (status.status === "creating" || status.status === "upload" || status.status === "download")
             return;
 
         let name = 'Auto-' + moment().format('YYYY-MM-DD_HH:mm');

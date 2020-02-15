@@ -166,7 +166,7 @@ function createNewBackup(name) {
             timeout: 1200000
         }
         request.post(option, (error, response, body) => {
-            if (response.statusCode != 200) {
+            if (response.statusCode !== 200) {
                 status.status = "error";
                 status.message = "Can't create new snapshot (" + error + ")";
                 status.error_code = 5;
@@ -175,7 +175,7 @@ function createNewBackup(name) {
                 reject(status.message);
             }
             else {
-                body.data.slug
+                body.data.slug;
                 console.log('Snapshot created with id ' + body.data.slug);
                 resolve(body.data.slug);
             }
