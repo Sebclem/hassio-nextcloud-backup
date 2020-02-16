@@ -3,7 +3,7 @@
     <% for(const index in snaps) { %>
     <a class="collection-item local-snap-listener modal-trigger" href="#modal-<%=snaps[index].slug%>"
         data-id="<%= snaps[index].slug %>">
-        <div><%= snaps[index].name ? snaps[index].name : snaps[index].slug %><div class="secondary-content">
+        <div><%= snaps[index].name ? snaps[index].name : snaps[index].slug %><div class="secondary-content hide-on-small-and-down">
                 <%= moment(snaps[index].date).format('MMM D, YYYY HH:mm')  %></div>
         </div>
     </a>

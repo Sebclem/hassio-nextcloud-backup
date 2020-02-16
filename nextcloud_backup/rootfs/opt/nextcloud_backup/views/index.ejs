@@ -30,8 +30,10 @@
       margin-bottom: 0;
     }
 
-    .header-box {
-      height: 150px;
+    @media (min-width: 601px) {
+      .header-box {
+        height: 150px;
+      }
     }
 
     .header-box .col {
@@ -84,7 +86,7 @@
         <li id="setting-trigger"><a class="dropdown-trigger" href="#" data-target="dropdown-settings"><i
               class="material-icons">settings</i></a></li>
       </ul>
-      <div style="height: 64px; display: table; margin-left: 130px;">
+      <div style="height: 64px; display: table; margin-left: 130px;" class="hide-on-med-and-down">
         <h4 style="display: table-cell; vertical-align: middle;">Nextcloud Backup</h4>
       </div>
     </div>
