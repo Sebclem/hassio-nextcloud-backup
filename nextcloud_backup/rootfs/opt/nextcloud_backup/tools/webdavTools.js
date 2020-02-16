@@ -195,7 +195,7 @@ class WebdavTools {
                         reject(status.message);
                     }
                     else {
-                        logger.log("...Upload finish !");
+                        logger.info("...Upload finish !");
                         status.status = "idle";
                         status.progress = -1;
                         status.message = null;
@@ -256,7 +256,7 @@ class WebdavTools {
                 for (let i in toDel) {
                     await this.client.deleteFile(toDel[i].filename);
                 }
-                logger.log('Cloud clean done.')
+                logger.info('Cloud clean done.')
                 resolve();
 
             }).catch((error) => {

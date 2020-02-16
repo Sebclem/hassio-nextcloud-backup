@@ -8,7 +8,7 @@ const logger = require('../config/winston');
 
 // !!! FOR DEV PURPOSE ONLY !!!
 //put token here for dev (ssh port tunelling 'sudo ssh -L 80:hassio:80 root@`hassoi_ip`' + put 127.0.0.1 hassio into host)
-const fallbackToken = "3afd4f8440830816e32fd490bd4f98b2423c4d9dff1432a0d57f581c43ec2bf1d1fa9468fc162732f8e95ae524c59ceed0f8e2b8a948d170"
+const fallbackToken = "337c70d10b65879325f87d3082dff5a126692f3047d5a0b93d729c156e48f33052fe888779a7a9ba0ec175cddaae601f26682965ebbfb43e"
 
 
 function getSnapshots() {
@@ -153,7 +153,7 @@ function createNewBackup(name) {
         status.status = "creating";
         status.progress = -1;
         statusTools.setStatus(status);
-        console.log("Creating new snapshot...")
+        logger.info("Creating new snapshot...")
         let token = process.env.HASSIO_TOKEN;
         if (token == null) {
             token = fallbackToken
@@ -171,12 +171,12 @@ function createNewBackup(name) {
                 status.message = "Can't create new snapshot (" + error + ")";
                 status.error_code = 5;
                 statusTools.setStatus(status);
-                console.error(status.message);
+                logger.error(status.message);
                 reject(status.message);
             }
             else {
                 body.data.slug;
-                console.log('Snapshot created with id ' + body.data.slug);
+                logger.info('Snapshot created with id ' + body.data.slug);
                 resolve(body.data.slug);
             }
         });
@@ -203,7 +203,7 @@ function clean() {
             for (let i in toDel) {
                 await dellSnap(toDel[i].slug)
             }
-            console.log('Local clean done.')
+            logger.info('Local clean done.')
             resolve();
         }).catch(() => {
             reject();
