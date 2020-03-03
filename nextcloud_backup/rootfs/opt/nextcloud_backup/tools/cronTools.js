@@ -138,14 +138,15 @@ class CronContainer {
     }
 
     _clean() {
-        let autoCleanCloud = settingsTools.getSettings().auto_clean_backup;
-        if (autoCleanCloud != null && autoCleanCloud === "true") {
-            this.clean().catch();
-        }
         let autoCleanlocal = settingsTools.getSettings().auto_clean_local;
         if (autoCleanlocal != null && autoCleanlocal === "true") {
             hassioApiTools.clean();
         }
+        let autoCleanCloud = settingsTools.getSettings().auto_clean_backup;
+        if (autoCleanCloud != null && autoCleanCloud === "true") {
+            this.clean().catch();
+        }
+        
     }
 }
 
