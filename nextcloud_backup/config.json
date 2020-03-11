@@ -40,5 +40,5 @@
     "ports_description": {
         "3000/tcp": "Web interface (Not required for Hass.io Ingress)",
         "9226/tcp": "NodeJS Debuger"
-    },
+    }
 }
