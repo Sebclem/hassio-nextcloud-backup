@@ -85,6 +85,7 @@ function downloadSnapshot(id) {
                     logger.info('Download success !')
                     status.progress = 1;
                     statusTools.setStatus(status);
+                    logger.debug("Snapshot dl size : " +  (fs.statSync('./temp/' + id + '.tar').size / 1024 / 1024))
                     resolve();
                 })
                 .pipe(stream);
@@ -139,8 +140,11 @@ function checkSnap(id) {
         request(option, (error, response, body) => {
             if (error || response.statusCode != 200)
                 reject();
-            else
+            else{
+                logger.debug("Snapshot size: " + body.data.size)
                 resolve();
+            }
+                
         })
     });
 

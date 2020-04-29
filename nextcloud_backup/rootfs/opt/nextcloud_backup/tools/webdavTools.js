@@ -195,7 +195,7 @@ class WebdavTools {
                         reject(status.message);
                     }
                     else {
-                        logger.info("...Upload finish !");
+                        logger.info("...Upload finish ! (status: " + res.statusCode + ")");
                         status.status = "idle";
                         status.progress = -1;
                         status.message = null;
@@ -213,8 +213,6 @@ class WebdavTools {
                             hassioApiTools.clean();
                         }
                         resolve();
-
-                        
                     }
                 })
         });
