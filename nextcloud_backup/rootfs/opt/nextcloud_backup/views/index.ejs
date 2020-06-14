@@ -666,7 +666,7 @@
   function getNextcloudSettings() {
     loadingModal.open();
     $.get('./api/nextcloud-settings', (data) => {
-      $('#ssl').prop('checked', ssl);
+      $('#ssl').prop("checked", data.ssl == "true");
       $('#hostname').val(data.host);
       $('#hostname + label').removeClass("active");
       $('#hostname + label').addClass("active");
