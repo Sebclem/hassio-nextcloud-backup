@@ -25,7 +25,7 @@ class WebdavTools {
         return new Promise((resolve, reject) => {
             let status = statusTools.getStatus();
             logger.info("Initilizing and checking webdav client...");
-            this.baseUrl = (ssl == true ? "https" : "http") + "://" + host + endpoint;
+            this.baseUrl = (ssl === "true" ? "https" : "http") + "://" + host + endpoint;
             this.username = username;
             this.password = password;
             try {
