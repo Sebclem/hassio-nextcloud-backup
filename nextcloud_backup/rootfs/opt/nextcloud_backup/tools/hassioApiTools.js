@@ -167,7 +167,7 @@ function createNewBackup(name) {
             headers: { 'X-HASSIO-KEY': token },
             json: true,
             body: { name: name },
-            timeout: 1200000
+            timeout: 2400000
         }
         request.post(option, (error, response, body) => {
             if (response.statusCode !== 200) {
