@@ -141,7 +141,7 @@ router.post('/new-backup', function(req, res, next) {
         res.send();
         return;
     }
-    let name = 'Manual-' + moment().format('YYYY-MM-DD_HH:mm');
+    let name = 'Manual-' + moment().format('YYYY-MM-DD_HH-mm');
     hassioApiTools.createNewBackup(name).then((id) => {
         hassioApiTools.downloadSnapshot(id)
             .then(() => {
