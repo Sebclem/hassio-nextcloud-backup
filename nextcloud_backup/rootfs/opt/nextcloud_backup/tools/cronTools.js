@@ -124,7 +124,7 @@ class CronContainer {
         if (status.status === "creating" || status.status === "upload" || status.status === "download")
             return;
 
-        let name = 'Auto-' + moment().format('YYYY-MM-DD_HH:mm');
+        let name = 'Auto-' + moment().format('YYYY-MM-DD_HHmm');
         hassioApiTools.createNewBackup(name).then((id) => {
             hassioApiTools.downloadSnapshot(id)
                 .then(() => {
