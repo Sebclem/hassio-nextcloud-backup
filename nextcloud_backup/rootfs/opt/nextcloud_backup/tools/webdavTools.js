@@ -11,7 +11,7 @@ const pathTools = require('./pathTools');
 const hassioApiTools = require('./hassioApiTools');
 const logger = require('../config/winston');
 
-const request = require('request');
+const got = require ('got');
 
 class WebdavTools {
     constructor() {
@@ -147,74 +147,73 @@ class WebdavTools {
     }
     
     _startUpload(id, path) {
-        return new Promise((resolve, reject) => {
-            let status = statusTools.getStatus();
-            status.status = "upload";
-            status.progress = 0;
-            status.message = null;
-            status.error_code = null;
-            statusTools.setStatus(status);
-            logger.info('Uploading snap...');
-            let fileSize = fs.statSync('./temp/' + id + '.tar').size;
-            let option = {
-                url: this.baseUrl + encodeURI(path),
-                auth: {
-                    user: this.username,
-                    pass: this.password
-                },
-                body: fs.createReadStream('./temp/' + id + '.tar')
-                
-            }
-            let lastPercent = 0;
-            let req = request.put(option)
-            .on('drain', () => {
-                let percent = Math.floor((req.req.connection.bytesWritten / fileSize) * 100);
-                if (lastPercent != percent) {
-                    lastPercent = percent;
-                    status.progress = percent / 100;
-                    statusTools.setStatus(status);
-                }
-                
-            }).on('error', function(err) {
-                fs.unlinkSync('./temp/' + id + '.tar');
-                status.status = "error";
-                status.error_code = 4;
-                status.message = "Fail to upload snapshot to nextcloud (" + err + ") !"
-                statusTools.setStatus(status);
-                logger.error(status.message);
-                reject(status.message);
-                
-            }).on('response', (res) => {
-                if (res.statusCode != 201 && res.statusCode != 204) {
-                    status.status = "error";
-                    status.error_code = 4;
-                    status.message = "Fail to upload snapshot to nextcloud (Status code: " + res.statusCode + ") !"
-                    statusTools.setStatus(status);
-                    logger.error(status.message);
-                    fs.unlinkSync('./temp/' + id + '.tar')
-                    reject(status.message);
-                }
-                else {
-                    logger.info("...Upload finish ! (status: " + res.statusCode + ")");
-                    status.status = "idle";
-                    status.progress = -1;
-                    status.message = null;
-                    status.error_code = null;
-                    status.last_backup = moment().format('MMM D, YYYY HH:mm')
-                    
-                    statusTools.setStatus(status);
-                    cleanTempFolder();
-                    let autoCleanCloud = settingsTools.getSettings().auto_clean_backup;
-                    if (autoCleanCloud != null && autoCleanCloud == "true") {
-                        this.clean().catch();
-                    }
-                    let autoCleanlocal = settingsTools.getSettings().auto_clean_local;
-                    if (autoCleanlocal != null && autoCleanlocal == "true") {
-                        hassioApiTools.clean();
-                    }
-                    resolve();
-                }
-            })
+        return new Promise( async (resolve, reject) => {
+		let status = statusTools.getStatus();
+		status.status = "upload";
+		status.progress = 0;
+		status.message = null;
+		status.error_code = null;
+		statusTools.setStatus(status);
+		logger.info('Uploading snap...');
+		let tmpFile = `./temp/${id}.tar`
+		let fileSize = fs.statSync(tmpFile).size;
+		let stream =  fs.createReadStream(tmpFile);
+
+	    	let options = {
+			body: stream,
+			username: this.username,
+			password: this.password
+		}
+
+		got.stream.put(this.baseUrl + encodeURI(path), options).on('uploadProgress', e => {
+			let percent = e.percent;
+			if (status.progress != percent) {
+				status.progress = percent;
+				statusTools.setStatus(status);
+			}
+			if (percent >= 1) {
+				logger.info('Upload done...');
+			}
+		}).on('response', res => {
+		
+			if (res.statusCode != 201 && res.statusCode != 204) {
+				status.status = "error";
+				status.error_code = 4;
+				status.message = `Fail to upload snapshot to nextcloud (Status code: ${res.statusCode})!`;
+				statusTools.setStatus(status);
+				logger.error(status.message);
+				fs.unlinkSync(tmpFile);
+				reject(status.message);
+			} else {
+				logger.info(`...Upload finish ! (status: ${res.statusCode})`);
+				status.status = "idle";
+				status.progress = -1;
+				status.message = null;
+				status.error_code = null;
+				status.last_backup = moment().format('MMM D, YYYY HH:mm');
+				statusTools.setStatus(status);
+				cleanTempFolder();
+				let autoCleanCloud = settingsTools.getSettings().auto_clean_backup;
+				if (autoCleanCloud != null && autoCleanCloud == "true") {
+					this.clean().catch();
+				}
+				let autoCleanlocal = settingsTools.getSettings().auto_clean_local;
+				if (autoCleanlocal != null && autoCleanlocal == "true") {
+					hassioApiTools.clean();
+				}
+				resolve();
+			}
+		}).on('error', err => {
+
+			fs.unlinkSync(tmpFile);
+			status.status = "error";
+			status.error_code = 4;
+			status.message = `Fail to upload snapshot to nextcloud (${err}) !`;
+			statusTools.setStatus(status);
+			logger.error(status.message);
+			reject(status.message);
+		});
+	
         });
     }
     
