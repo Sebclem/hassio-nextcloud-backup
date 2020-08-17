@@ -1,14 +1,16 @@
-const request = require('request');
-const progress = require('request-progress');
 const statusTools = require('./status');
 const fs = require('fs');
 const settingsTools = require('./settingsTools');
 const moment = require('moment');
 const logger = require('../config/winston');
+const stream = require('stream');
+const {promisify} = require('util');
+const pipeline = promisify(stream.pipeline);
+const got = require ('got');
 
 // !!! FOR DEV PURPOSE ONLY !!!
 //put token here for dev (ssh port tunelling 'sudo ssh -L 80:hassio:80 root@`hassoi_ip`' + put 127.0.0.1 hassio into host)
-const fallbackToken = "337c70d10b65879325f87d3082dff5a126692f3047d5a0b93d729c156e48f33052fe888779a7a9ba0ec175cddaae601f26682965ebbfb43e"
+const fallbackToken = "cf199dd47c09839e8310955246e664c767a05c27f5f03078f3a15b04509c8869321a79eecbe5e8101635a7420c2ba06787823f7d5be4b502"
 
 
 function getSnapshots() {
@@ -19,41 +21,40 @@ function getSnapshots() {
         }
         let status = statusTools.getStatus();
         let option = {
-            url: "http://hassio/snapshots",
             headers: { 'X-HASSIO-KEY': token },
-            json: true
+            responseType: 'json'
         };
-        request(option, (error, response, body) => {
-            if (!error && response.statusCode === 200) {
-                if (status.error_code === 1) {
-                    status.status = "idle";
-                    status.message = null;
-                    status.error_code = null;
-                    statusTools.setStatus(status);
-                }
-                let snaps = body.data.snapshots;
-                // console.log(snaps);
-                resolve(snaps);
-            }
-            else {
-                status.status = "error";
-                status.message = "Fail to fetch Hassio snapshot (" + error + ")";
-                status.error_code = 1;
+        
+        got("http://hassio/snapshots", option)
+        .then((result) => {
+            if (status.error_code === 1) {
+                status.status = "idle";
+                status.message = null;
+                status.error_code = null;
                 statusTools.setStatus(status);
-                logger.error(status.message);
-                reject(error);
             }
+            let snaps = result.body.data.snapshots;
+            resolve(snaps);
         })
+        .catch((error) => {
+            status.status = "error";
+            status.message = "Fail to fetch Hassio snapshots (" + error.message + ")";
+            status.error_code = 1;
+            statusTools.setStatus(status);
+            logger.error(status.message);
+            reject(error.message);
+        });
     });
-
+    
 }
 
 function downloadSnapshot(id) {
     return new Promise((resolve, reject) => {
-        logger.info('Downloading snapshot ' + id + '...');
+        logger.info(`Downloading snapshot ${id}...`);
         if (!fs.existsSync('./temp/'))
-            fs.mkdirSync('./temp/');
-        let stream = fs.createWriteStream('./temp/' + id + '.tar');
+        fs.mkdirSync('./temp/');
+        let tmp_file = `./temp/${id}.tar`
+        let stream = fs.createWriteStream(tmp_file);
         let token = process.env.HASSIO_TOKEN;
         if (token == null) {
             token = fallbackToken
@@ -64,158 +65,166 @@ function downloadSnapshot(id) {
             status.progress = 0;
             statusTools.setStatus(status);
             let option = {
-                url: 'http://hassio/snapshots/' + id + '/download',
                 headers: { 'X-HASSIO-KEY': token },
             };
-            progress(request(option))
-                .on('progress', (state) => {
-                    // TODO Don't write progress to disk, preseve disk IO time
-                    status.progress = state.percent;
-                    statusTools.setStatus(status);
+            
+            pipeline(
+                got.stream.get(`http://hassio/snapshots/${id}/download`, option)
+                .on('downloadProgress', e => {
+                    let percent = Math.round(e.percent * 100) / 100;
+                    if (status.progress != percent) {
+                        status.progress = percent;
+                        statusTools.setStatus(status);
+                    }
                 })
-                .on('error', (error) => {
-                    status.status = "error";
-                    status.message = "Fail to download Hassio snapshot (" + error + ")";
-                    status.error_code = 1;
-                    statusTools.setStatus(status);
-                    logger.error(status.message);
-                    reject(error);
-                })
-                .on('end', () => {
+                ,
+                stream
+                )
+                .then((res)=>{
                     logger.info('Download success !')
                     status.progress = 1;
                     statusTools.setStatus(status);
-                    logger.debug("Snapshot dl size : " +  (fs.statSync('./temp/' + id + '.tar').size / 1024 / 1024))
+                    logger.debug("Snapshot dl size : " +  (fs.statSync(tmp_file).size / 1024 / 1024));
+                    resolve();
+                }).catch((err)=>{
+                    fs.unlinkSync(tmp_file);
+                    status.status = "error";
+                    status.message = "Fail to download Hassio snapshot (" + err.message + ")";
+                    status.error_code = 7;
+                    statusTools.setStatus(status);
+                    logger.error(status.message);
+                    reject(err.message);
+                })
+            }).catch((err) => {
+                status.status = "error";
+                status.message = "Fail to download Hassio snapshot. Not found ?";
+                status.error_code = 7;
+                statusTools.setStatus(status);
+                logger.error(status.message);
+                reject();
+            });
+            
+        });
+    }
+    
+    function dellSnap(id) {
+        return new Promise((resolve, reject) => {
+            checkSnap(id).then(() => {
+                let token = process.env.HASSIO_TOKEN;
+                if (token == null) {
+                    token = fallbackToken
+                }
+                
+                let option = {
+                    headers: { 'X-HASSIO-KEY': token },
+                    responseType: 'json'
+                };
+                
+                got.post(`http://hassio/snapshots/${id}/remove`, option)
+                .then((result) => {
                     resolve();
                 })
-                .pipe(stream);
-        }).catch(() => {
-            status.status = "error";
-            status.message = "Fail to download Hassio snapshot. Not found ?";
-            status.error_code = 1;
-            statusTools.setStatus(status);
-            logger.error(status.message);
-            reject();
-        });
-
-    });
-}
-
-function dellSnap(id) {
-    return new Promise((resolve, reject) => {
-        checkSnap(id).then(() => {
+                .catch((error) => {
+                    reject();
+                });
+            }).catch(() => {
+                reject();
+            })
+        })
+        
+    }
+    
+    function checkSnap(id) {
+        return new Promise((resolve, reject) => {
             let token = process.env.HASSIO_TOKEN;
             if (token == null) {
                 token = fallbackToken
             }
             let option = {
-                url: 'http://hassio/snapshots/' + id + '/remove',
                 headers: { 'X-HASSIO-KEY': token },
-                json: true
-            }
-            request.post(option, (error, response, body) => {
-                if (error || (response.statusCode !== 200 && response.statusCode !== 204))
-                    reject();
-                else
-                    resolve();
-            })
-        }).catch(() => {
-            reject();
-        })
-    })
-
-}
-
-function checkSnap(id) {
-    return new Promise((resolve, reject) => {
-        let token = process.env.HASSIO_TOKEN;
-        if (token == null) {
-            token = fallbackToken
-        }
-        let option = {
-            url: 'http://hassio/snapshots/' + id + '/info',
-            headers: { 'X-HASSIO-KEY': token },
-            json: true
-        }
-        request(option, (error, response, body) => {
-            if (error || response.statusCode != 200)
-                reject();
-            else{
-                logger.debug("Snapshot size: " + body.data.size)
+                responseType: 'json'
+            };
+            
+            got(`http://hassio/snapshots/${id}/info`, option)
+            .then((result) => {
+                logger.debug(`Snapshot size: ${result.body.data.size}`)
                 resolve();
+            })
+            .catch((error) => {
+                reject();
+            });
+        });
+        
+    }
+    
+    
+    function createNewBackup(name) {
+        return new Promise((resolve, reject) => {
+            let status = statusTools.getStatus();
+            status.status = "creating";
+            status.progress = -1;
+            statusTools.setStatus(status);
+            logger.info("Creating new snapshot...")
+            let token = process.env.HASSIO_TOKEN;
+            if (token == null) {
+                token = fallbackToken
             }
+            let option = {
+                headers: { 'X-HASSIO-KEY': token },
+                responseType: 'json',
+                timeout: 2400000,
+                json: { name: name }
                 
-        })
-    });
-
-}
-
-
-function createNewBackup(name) {
-    return new Promise((resolve, reject) => {
-        let status = statusTools.getStatus();
-        status.status = "creating";
-        status.progress = -1;
-        statusTools.setStatus(status);
-        logger.info("Creating new snapshot...")
-        let token = process.env.HASSIO_TOKEN;
-        if (token == null) {
-            token = fallbackToken
-        }
-        let option = {
-            url: 'http://hassio/snapshots/new/full',
-            headers: { 'X-HASSIO-KEY': token },
-            json: true,
-            body: { name: name },
-            timeout: 2400000
-        }
-        request.post(option, (error, response, body) => {
-            if (response.statusCode !== 200) {
+            };
+            
+            got.post(`http://hassio/snapshots/new/full`, option)
+            .then((result) => {
+                logger.info(`Snapshot created with id ${result.body.data.slug}`);
+                resolve(result.body.data.slug);
+            })
+            .catch((error) => {
                 status.status = "error";
-                status.message = "Can't create new snapshot (" + error + ")";
+                status.message = "Can't create new snapshot (" + error.message + ")";
                 status.error_code = 5;
                 statusTools.setStatus(status);
                 logger.error(status.message);
                 reject(status.message);
-            }
-            else {
-                body.data.slug;
-                logger.info('Snapshot created with id ' + body.data.slug);
-                resolve(body.data.slug);
-            }
-        });
-    });
-}
-
-function clean() {
-    let limit = settingsTools.getSettings().auto_clean_backup_keep;
-    if (limit == null)
-        limit = 5;
-    return new Promise((resolve, reject) => {
-        getSnapshots().then(async (snaps) => {
-            if (snaps.length < limit) {
-                resolve();
-                return;
-            }
-            snaps.sort((a, b) => {
-                if (moment(a.date).isBefore(moment(b.date)))
-                    return 1;
-                else
-                    return -1;
             });
-            let toDel = snaps.slice(limit);
-            for (let i in toDel) {
-                await dellSnap(toDel[i].slug)
-            }
-            logger.info('Local clean done.')
-            resolve();
-        }).catch(() => {
-            reject();
-        });
-    })
-}
+            
+            
 
-exports.getSnapshots = getSnapshots;
-exports.downloadSnapshot = downloadSnapshot;
-exports.createNewBackup = createNewBackup;
-exports.clean = clean;
+        });
+    }
+    
+    function clean() {
+        let limit = settingsTools.getSettings().auto_clean_backup_keep;
+        if (limit == null)
+        limit = 5;
+        return new Promise((resolve, reject) => {
+            getSnapshots().then(async (snaps) => {
+                if (snaps.length < limit) {
+                    resolve();
+                    return;
+                }
+                snaps.sort((a, b) => {
+                    if (moment(a.date).isBefore(moment(b.date)))
+                    return 1;
+                    else
+                    return -1;
+                });
+                let toDel = snaps.slice(limit);
+                for (let i in toDel) {
+                    await dellSnap(toDel[i].slug)
+                }
+                logger.info('Local clean done.')
+                resolve();
+            }).catch(() => {
+                reject();
+            });
+        })
+    }
+    
+    exports.getSnapshots = getSnapshots;
+    exports.downloadSnapshot = downloadSnapshot;
+    exports.createNewBackup = createNewBackup;
+    exports.clean = clean;

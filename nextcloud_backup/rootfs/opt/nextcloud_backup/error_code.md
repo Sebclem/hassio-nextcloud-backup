@@ -6,3 +6,4 @@
 - `4` => Upload snap fail
 - `5` => Fail create new snap
 - `6` => Fail to clean
+- `7` => Fail to Download snap
