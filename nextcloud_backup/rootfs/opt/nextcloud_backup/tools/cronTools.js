@@ -140,11 +140,11 @@ class CronContainer {
     _clean() {
         let autoCleanlocal = settingsTools.getSettings().auto_clean_local;
         if (autoCleanlocal != null && autoCleanlocal === "true") {
-            hassioApiTools.clean();
+            hassioApiTools.clean().catch(() => {});
         }
         let autoCleanCloud = settingsTools.getSettings().auto_clean_backup;
         if (autoCleanCloud != null && autoCleanCloud === "true") {
-            this.clean().catch();
+            webdav.clean().catch(() => {});
         }
         
     }
