@@ -1,0 +1,11 @@
+github:
+        release: true
+        draft: true
+        releaseName: "V${version}"
+
+
+git:
+        changelog: "auto-changelog --stdout"
+        push: false
+        tag: false
+        commit: false
