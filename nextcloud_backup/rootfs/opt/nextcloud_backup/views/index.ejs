@@ -177,198 +177,9 @@
   </div>
 
 
-  <div id="modal-settings-nextcloud" class="modal modal-fixed-footer blue-grey darken-4 white-text">
-    <div class="modal-content">
-      <div class="row">
-        <div class="col s12 center">
-          <h4>Nextcloud Settings</h4>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col s12 center divider">
-        </div>
-      </div>
-      <div class="row hide">
-        <div class="col s12 center red-text" id="nextcloud_settings_message">
+  <%- include('modals/nextcloud-settings-modal') %>  
 
-        </div>
-      </div>
-      <div class="row" style="margin-bottom: 10px;">
-        <div class="col s12" style="margin-bottom: 10px;">
-          <div style="color: #9e9e9e; display: inline;">SSL</div>
-          <div class="switch" style="display: inline;">
-            <label>
-              <input id="ssl" type="checkbox">
-              <span class="lever"></span>
-            </label>
-          </div>
-
-        </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s12">
-          <input id="hostname" type="text" class="white-text">
-          <label for="hostname">Hostname</label>
-          <span class="helper-text">exemple.com:8080</span>
-        </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s6">
-          <input id="username" type="text" class="white-text">
-          <label for="username">Username</label>
-        </div>
-        <div class="input-field col s6">
-          <input id="password" type="password" class="white-text">
-          <label for="password">Password</label>
-          <span class="helper-text">!!! Use App Password !!! See <a target="_blank"
-              href="https://github.com/Sebclem/hassio-nextcloud-backup#nextcloud-config">doc</a> for more
-            information.</span>
-        </div>
-      </div>
-
-    </div>
-
-
-    <div class="modal-footer blue-grey darken-4">
-      <a href="#" class="modal-close waves-effect btn red"><b>Cancel</b></a>
-      <a href="#" class="btn green waves-effect" style="margin-left: 5px;" id="save-nextcloud-settings"><b>Save</b></a>
-
-    </div>
-  </div>
-
-  <div id="modal-settings-backup" class="modal modal-fixed-footer blue-grey darken-4 white-text">
-    <div class="modal-content">
-      <div class="row">
-        <div class="col s12 center">
-          <h4>Backup Settings</h2>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col s12 center divider">
-        </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s12">
-          <select id="cron-drop-settings">
-            <option value="0">Disable</option>
-            <option value="1">Daily</option>
-            <option value="2">Weekly</option>
-            <option value="3">Monthly</option>
-          </select>
-          <label>Auto Backup</label>
-        </div>
-      </div>
-      <div class="row hide">
-        <div class="input-field col s12">
-          <input type="text" class="timepicker white-text" readonly="true" id="timepicker">
-          <label>Hour </label>
-        </div>
-      </div>
-
-      <div class="row hide">
-        <div class="input-field col s12">
-          <select id="cron-drop-day">
-            <option value="1">Monday</option>
-            <option value="2">Tuesday</option>
-            <option value="3">Wednesday</option>
-            <option value="4">Thursday</option>
-            <option value="5">Friday</option>
-            <option value="6">Saturday</option>
-            <option value="0">Sunday</option>
-          </select>
-          <label>Day</label>
-        </div>
-      </div>
-
-      <div class="row hide">
-        <div class="input-field col s2">
-          <input type="text" class="white-text" disabled readonly="true" id="cron-drop-day-month-read">
-          <label class="white-text active">Day of month</label>
-        </div>
-        <div class="input-field col s10">
-          <p class="range-field">
-            <input type="range" id="cron-drop-day-month" min="1" max="28" style="border: none;" />
-          </p>
-        </div>
-
-      </div>
-      <div class="row">
-        <div class="col s12">
-
-        </div>
-      </div>
-      <div class="row">
-        <div class="col s12 center">
-          <h4>Auto Clean Settings</h2>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col s12 divider">
-
-        </div>
-      </div>
-
-      <div class="row" style="margin-bottom: 10px;">
-        <div class="col s12" style="margin-bottom: 10px;">
-          <div style="color: #9e9e9e; display: inline;">Auto Clean Local Snapshots</div>
-          <div class="switch" style="display: inline;">
-            <label>
-              <input id="auto_clean_local" type="checkbox">
-              <span class="lever"></span>
-            </label>
-          </div>
-
-        </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s3">
-          <input type="text" class="white-text" disabled readonly="true" id="local-snap-keep-read">
-          <label class="white-text active">Local snapshot to keep</label>
-        </div>
-        <div class="input-field col s9">
-          <p class="range-field">
-            <input type="range" id="local-snap-keep" min="1" max="20" style="border: none;" />
-          </p>
-        </div>
-
-      </div>
-
-      <div class="row" style="margin-bottom: 10px;">
-        <div class="col s12" style="margin-bottom: 10px;">
-          <div style="color: #9e9e9e; display: inline;">Auto Clean Nextcloud Snapshots</div>
-          <div class="switch" style="display: inline;">
-            <label>
-              <input id="auto_clean_backup" type="checkbox">
-              <span class="lever"></span>
-            </label>
-          </div>
-
-        </div>
-      </div>
-      <div class="row">
-        <div class="input-field col s3">
-          <input type="text" class="white-text" disabled readonly="true" id="backup-snap-keep-read">
-          <label class="white-text active">Nextcloud snapshot to keep</label>
-        </div>
-        <div class="input-field col s9">
-          <p class="range-field">
-            <input type="range" id="backup-snap-keep" min="1" max="20" style="border: none;" />
-          </p>
-        </div>
-
-      </div>
-
-    </div>
-
-
-
-
-    <div class="modal-footer blue-grey darken-4">
-      <a href="#" class="modal-close waves-effect btn red"><b>Cancel</b></a>
-      <a href="#" class="btn green waves-effect" style="margin-left: 5px;" id="save-backup-settings"><b>Save</b></a>
-
-    </div>
-  </div>
+  <%- include('modals/backup-settings-modal') %> 
 
 
   <div id="modal-loading" class="modal blue-grey darken-4 white-text">
@@ -631,7 +442,8 @@
     let hostname = $('#hostname').val();
     let username = $('#username').val();
     let password = $('#password').val();
-    $.post('./api/nextcloud-settings', { ssl: ssl, host: hostname, username: username, password: password })
+    let back_dir = $('#back-dir').val();
+    $.post('./api/nextcloud-settings', { ssl: ssl, host: hostname, username: username, password: password, back_dir: back_dir })
       .done((data) => {
         console.log('Saved');
         $('#nextcloud_settings_message').parent().addClass("hide");
@@ -676,6 +488,9 @@
       $('#password').val(data.password);
       $('#password + label').removeClass("active");
       $('#password + label').addClass("active");
+      $('#back-dir').val(data.back_dir);
+      $('#back-dir + label').removeClass("active");
+      $('#back-dir + label').addClass("active");
       loadingModal.close();
     });
   }
