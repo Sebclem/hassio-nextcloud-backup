@@ -233,7 +233,7 @@ class WebdavTools {
     }
     
     clean() {
-        let limit = settingsTools.getSettings().auto_clean_local_keep;
+        let limit = settingsTools.getSettings().auto_clean_backup_keep;
         if (limit == null)
         limit = 5;
         return new Promise((resolve, reject) => {
