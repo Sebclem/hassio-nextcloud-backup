@@ -22,7 +22,7 @@ const logger = winston.createLogger({
         // - Write all logs error (and below) to `quick-start-error.log`.
         //
         new winston.transports.Console({handleExceptions: true}),
-        new winston.transports.File({filename: '/data/NCB.log', handleExceptions: true})
+        // new winston.transports.File({filename: '/data/NCB.log', handleExceptions: true})
     ]
 });
 
