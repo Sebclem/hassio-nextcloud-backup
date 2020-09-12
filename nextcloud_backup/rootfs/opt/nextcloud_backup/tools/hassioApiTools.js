@@ -8,17 +8,11 @@ const {promisify} = require('util');
 const pipeline = promisify(stream.pipeline);
 const got = require ('got');
 
-// !!! FOR DEV PURPOSE ONLY !!!
-//put token here for dev (ssh port tunelling 'sudo ssh -L 80:hassio:80 root@`hassoi_ip`' + put 127.0.0.1 hassio into host)
-const fallbackToken = "cf199dd47c09839e8310955246e664c767a05c27f5f03078f3a15b04509c8869321a79eecbe5e8101635a7420c2ba06787823f7d5be4b502"
 
 
 function getSnapshots() {
     return new Promise((resolve, reject) => {
         let token = process.env.HASSIO_TOKEN;
-        if (token == null) {
-            token = fallbackToken
-        }
         let status = statusTools.getStatus();
         let option = {
             headers: { 'X-HASSIO-KEY': token },
@@ -56,9 +50,6 @@ function downloadSnapshot(id) {
         let tmp_file = `./temp/${id}.tar`
         let stream = fs.createWriteStream(tmp_file);
         let token = process.env.HASSIO_TOKEN;
-        if (token == null) {
-            token = fallbackToken
-        }
         let status = statusTools.getStatus();
         checkSnap(id).then(() => {
             status.status = "download";
@@ -111,9 +102,6 @@ function downloadSnapshot(id) {
         return new Promise((resolve, reject) => {
             checkSnap(id).then(() => {
                 let token = process.env.HASSIO_TOKEN;
-                if (token == null) {
-                    token = fallbackToken
-                }
                 
                 let option = {
                     headers: { 'X-HASSIO-KEY': token },
@@ -137,9 +125,6 @@ function downloadSnapshot(id) {
     function checkSnap(id) {
         return new Promise((resolve, reject) => {
             let token = process.env.HASSIO_TOKEN;
-            if (token == null) {
-                token = fallbackToken
-            }
             let option = {
                 headers: { 'X-HASSIO-KEY': token },
                 responseType: 'json'
@@ -166,9 +151,6 @@ function downloadSnapshot(id) {
             statusTools.setStatus(status);
             logger.info("Creating new snapshot...")
             let token = process.env.HASSIO_TOKEN;
-            if (token == null) {
-                token = fallbackToken
-            }
             let option = {
                 headers: { 'X-HASSIO-KEY': token },
                 responseType: 'json',
@@ -197,7 +179,7 @@ function downloadSnapshot(id) {
     }
     
     function clean() {
-        let limit = settingsTools.getSettings().auto_clean_backup_keep;
+        let limit = settingsTools.getSettings().auto_clean_local_keep;
         if (limit == null)
         limit = 5;
         return new Promise((resolve, reject) => {
