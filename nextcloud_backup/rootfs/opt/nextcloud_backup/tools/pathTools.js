@@ -1,4 +1,5 @@
-let root = '/Hassio Backup/';
-exports.root = root;
-exports.manual = root + 'Manual/';
-exports.auto = root + 'Auto/';
+
+let default_root = '/Hassio Backup/';
+exports.default_root = default_root;
+exports.manual = 'Manual/';
+exports.auto = 'Auto/';

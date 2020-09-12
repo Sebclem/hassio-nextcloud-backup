@@ -64,12 +64,31 @@ class WebdavTools {
             
         });
     }
+    async __createRoot(){
+        let root_splited = this.getConf().back_dir.split('/').splice(1)
+        let path = '/'
+        for(let elem of root_splited){
+            if(elem != ''){
+                path = path + elem + '/'
+                try {
+                    await this.client.createDirectory(path)
+                    logger.debug(`Path ${path} created.`)
+                } catch (error) {
+                    if(error.response.status == 405)
+                        logger.debug(`Path ${path} already exist.`)
+                    else
+                        logger.error(error)
+                }
+            }
+            
+        }
+    }
     
     initFolder() {
-        return new Promise((resolve, reject) => {
-            this.client.createDirectory(pathTools.root).catch(() => { }).then(() => {
-                this.client.createDirectory(pathTools.auto).catch(() => { }).then(() => {
-                    this.client.createDirectory(pathTools.manual).catch(() => { }).then(() => {
+        return new Promise((resolve) => {
+            this.__createRoot().catch((err) => { logger.error(err)}).then(() => {
+                this.client.createDirectory(this.getConf().back_dir + pathTools.auto).catch(() => { }).then(() => {
+                    this.client.createDirectory(this.getConf().back_dir + pathTools.manual).catch(() => { }).then(() => {
                         resolve();
                     })
                 })
@@ -104,6 +123,24 @@ class WebdavTools {
                     statusTools.setStatus(status);
                     logger.error(status.message);
                     reject("Nextcloud config invalid !");
+                }
+
+                if(conf.back_dir == null || conf.back_dir == ''){
+                    logger.info('Backup dir is null, initializing it.');
+                    conf.back_dir = pathTools.default_root;
+                    this.setConf(conf);
+                }
+                else{
+                    if(!conf.back_dir.startsWith('/')){
+                        logger.warn('Backup dir not starting with \'/\', fixing this...');
+                        conf.back_dir=`/${conf.back_dir}`;
+                        this.setConf(conf);
+                    }
+                    if(!conf.back_dir.endsWith('/')){
+                        logger.warn('Backup dir not ending with \'/\', fixing this...');
+                        conf.back_dir=`${conf.back_dir}/`;
+                        this.setConf(conf);
+                    }
                 }
             }
             else {
@@ -147,7 +184,7 @@ class WebdavTools {
     }
     
     _startUpload(id, path) {
-        return new Promise( async (resolve, reject) => {
+        return new Promise( (resolve, reject) => {
             let status = statusTools.getStatus();
             status.status = "upload";
             status.progress = 0;
@@ -156,7 +193,6 @@ class WebdavTools {
             statusTools.setStatus(status);
             logger.info('Uploading snap...');
             let tmpFile = `./temp/${id}.tar`
-            let fileSize = fs.statSync(tmpFile).size;
             let stream =  fs.createReadStream(tmpFile);
             
             let options = {
@@ -237,7 +273,7 @@ class WebdavTools {
         if (limit == null)
         limit = 5;
         return new Promise((resolve, reject) => {
-            this.getFolderContent(pathTools.auto).then(async (contents) => {
+            this.getFolderContent(this.getConf().back_dir + pathTools.auto).then(async (contents) => {
                 if (contents.length < limit) {
                     resolve();
                     return;
