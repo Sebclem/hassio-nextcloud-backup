@@ -1,0 +1,65 @@
+<div id="modal-settings-nextcloud" class="modal modal-fixed-footer blue-grey darken-4 white-text">
+    <div class="modal-content">
+      <div class="row">
+        <div class="col s12 center">
+          <h4>Nextcloud Settings</h4>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col s12 center divider">
+        </div>
+      </div>
+      <div class="row hide">
+        <div class="col s12 center red-text" id="nextcloud_settings_message">
+
+        </div>
+      </div>
+      <div class="row" style="margin-bottom: 10px;">
+        <div class="col s12" style="margin-bottom: 10px;">
+          <div style="color: #9e9e9e; display: inline;">SSL</div>
+          <div class="switch" style="display: inline;">
+            <label>
+              <input id="ssl" type="checkbox">
+              <span class="lever"></span>
+            </label>
+          </div>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <input id="hostname" type="text" class="white-text">
+          <label for="hostname">Hostname</label>
+          <span class="helper-text">exemple.com:8080</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s6">
+          <input id="username" type="text" class="white-text">
+          <label for="username">Username</label>
+        </div>
+        <div class="input-field col s6">
+          <input id="password" type="password" class="white-text">
+          <label for="password">Password</label>
+          <span class="helper-text">!!! Use App Password !!! See <a target="_blank"
+              href="https://github.com/Sebclem/hassio-nextcloud-backup#nextcloud-config">doc</a> for more
+            information.</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-field col s12">
+          <input id="back-dir" type="text" class="white-text">
+          <label for="back-dir">Backup Directory</label>
+          <span class="helper-text">Default: /Hassio Backup/</span>
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="modal-footer blue-grey darken-4">
+      <a href="#" class="modal-close waves-effect btn red"><b>Cancel</b></a>
+      <a href="#" class="btn green waves-effect" style="margin-left: 5px;" id="save-nextcloud-settings"><b>Save</b></a>
+
+    </div>
+  </div>

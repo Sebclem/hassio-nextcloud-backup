@@ -30,10 +30,14 @@ router.get('/formated-local-snap', function(req, res, next) {
     hassioApiTools.getSnapshots().then(
         (snaps) => {
             snaps.sort((a, b) => {
-                if (moment(a.date).isBefore(moment(b.date)))
+                if (moment(a.date).isBefore(moment(b.date))){
                     return 1;
+                }
                 else
+                {
                     return -1;
+                }
+                    
             })
             res.render('localSnaps', { snaps: snaps, moment: moment });
         },
@@ -46,7 +50,7 @@ router.get('/formated-local-snap', function(req, res, next) {
 });
 
 router.get('/formated-backup-manual', function(req, res, next) {
-    webdav.getFolderContent(pathTools.manual)
+    webdav.getFolderContent( webdav.getConf().back_dir + pathTools.manual)
         .then((contents) => {
             contents.sort((a, b) => {
                 if (moment(a.lastmod).isBefore(moment(b.lastmod)))
@@ -62,7 +66,8 @@ router.get('/formated-backup-manual', function(req, res, next) {
 });
 
 router.get('/formated-backup-auto', function(req, res, next) {
-    webdav.getFolderContent(pathTools.auto)
+    let url = webdav.getConf().back_dir + pathTools.auto
+    webdav.getFolderContent( url )
         .then((contents) => {
             contents.sort((a, b) => {
                 if (moment(a.lastmod).isBefore(moment(b.lastmod)))
@@ -122,7 +127,7 @@ router.post('/manual-backup', function(req, res, next) {
 
     hassioApiTools.downloadSnapshot(id)
         .then(() => {
-            webdav.uploadFile(id, pathTools.manual + name + '.tar');
+            webdav.uploadFile(id,  webdav.getConf().back_dir + pathTools.manual + name + '.tar');
             res.status(201);
             res.send();
         })
@@ -145,7 +150,7 @@ router.post('/new-backup', function(req, res, next) {
     hassioApiTools.createNewBackup(name).then((id) => {
         hassioApiTools.downloadSnapshot(id)
             .then(() => {
-                webdav.uploadFile(id, pathTools.manual + name + '.tar');
+                webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.manual + name + '.tar');
             }).catch(() => {
 
             })

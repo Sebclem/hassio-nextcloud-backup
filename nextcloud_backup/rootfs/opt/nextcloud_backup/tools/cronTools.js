@@ -128,7 +128,7 @@ class CronContainer {
         hassioApiTools.createNewBackup(name).then((id) => {
             hassioApiTools.downloadSnapshot(id)
                 .then(() => {
-                    webdav.uploadFile(id, pathTools.auto + name + '.tar');
+                    webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.auto + name + '.tar');
                 }).catch(() => {
 
                 })
