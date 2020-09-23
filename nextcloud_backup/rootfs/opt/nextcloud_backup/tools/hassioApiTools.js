@@ -9,6 +9,9 @@ const pipeline = promisify(stream.pipeline);
 const got = require ('got');
 
 
+const create_snap_timeout = 90 * 60 * 1000
+
+
 
 function getSnapshots() {
     return new Promise((resolve, reject) => {
@@ -154,7 +157,7 @@ function downloadSnapshot(id) {
             let option = {
                 headers: { 'X-HASSIO-KEY': token },
                 responseType: 'json',
-                timeout: 2400000,
+                timeout: create_snap_timeout,
                 json: { name: name }
                 
             };
