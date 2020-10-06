@@ -16,13 +16,13 @@
 
 [![Buy me a coffee][buymeacoffee-shield]][buymeacoffee]
 
-Hass.io snapshot backup to Nextcloud
+Home Assistant snapshot backup to Nextcloud
 
 ![Nextcloud Backup Screenshot](images/screenshot.png)
 
 ## About
 
-Easily backup your Hass.io snapshots to Nextcloud.
+Easily backup your Home Assistant snapshots to Nextcloud.
 
 ### Features
 - Auto Backup : Configure this add-on to automaticly backup your HassIO instance.
@@ -36,14 +36,14 @@ Easily backup your Hass.io snapshots to Nextcloud.
 The installation of this add-on is pretty straightforward and not different in
 comparison to installing any other Hass.io add-on.
 
-1. [Add our Hass.io add-ons repository][repository] to your Hass.io instance.
+1. [Add our Home Assisant add-ons repository][repository] to your HassOS instance.
 1. Install the "Nextcloud Backup" add-on.
 1. Start the "Nextcloud Backup" add-on
 1. Check the logs of the "Nextcloud Backup" add-on to see if everything went well.
 1. Open the web UI for the "Nextcloud Backup" to configure the add-on.
 
 
-**NOTE**: Do not add this repository to Hass.io, please use:
+**NOTE**: Do not add this repository to HassOS, please use:
 `https://github.com/Sebclem/sebclem-hassio-addon-repository`.
 
 
@@ -60,7 +60,7 @@ To do this:
 1. For password, we highly recommend to use `App Password`.<br>
     >To generate a `App Password`, go into your personal setting into Nextcloud, Security page. You can generate one via the `Devices & sessions` section. Simply entre a name and hit `Create new app password`
 
-## Hass.io Configuration
+## HassOs Configuration
 
 **Note**: _Remember to restart the add-on when the configuration is changed._
 
