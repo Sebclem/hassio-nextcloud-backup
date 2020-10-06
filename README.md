@@ -1,4 +1,4 @@
-# Hass.io Add-ons: Nextcloud Backup
+# Home Assistant Add-ons: Nextcloud Backup
 
 [![GitHub Release][releases-shield]][releases]
 ![Project Stage][project-stage-shield]
