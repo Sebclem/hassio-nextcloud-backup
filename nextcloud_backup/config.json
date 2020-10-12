@@ -2,7 +2,7 @@
     "name": "Nextcloud Backup",
     "version": "dev",
     "slug": "nextcloud_backup",
-    "description": "Hass.io snapshot backup to Nextcloud",
+    "description": "Easily backup your Home Assistant snapshots to Nextcloud",
     "url": "https://github.com/Sebclem/hassio-nextcloud-backup",
     "webui": "[PROTO:ssl]://[HOST]:[PORT:3000]/",
     "ingress": true,
