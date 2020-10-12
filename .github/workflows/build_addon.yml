@@ -64,7 +64,7 @@ jobs:
         if [ "${{env.version_type}}" != "dev" ]; then
           echo "TAGS=${{env.REPOSITORY}}/${{env.IMAGE}}:latest, ${{env.REPOSITORY}}/${{env.IMAGE}}:$(jq --raw-output '.version' "${{env.TARGET}}/config.json")" >> $GITHUB_ENV
         else
-          echo "TAGS=${{env.REPOSITORY}}/${{env.IMAGE}}:dev, $(jq --raw-output '.version' "${{env.TARGET}}/config.json")" >> $GITHUB_ENV
+          echo "TAGS=${{env.REPOSITORY}}/${{env.IMAGE}}:dev, ${{env.REPOSITORY}}/${{env.IMAGE}}:$(jq --raw-output '.version' "${{env.TARGET}}/config.json")" >> $GITHUB_ENV
         fi
 
     - name: Debug Env
