@@ -15,7 +15,7 @@
         </div>
       </div>
       <div class="row" style="margin-bottom: 10px;">
-        <div class="col s12" style="margin-bottom: 10px;">
+        <div class="col m4 s12 " style="margin-bottom: 10px;">
           <div style="color: #9e9e9e; display: inline;">SSL</div>
           <div class="switch" style="display: inline;">
             <label>
@@ -23,7 +23,15 @@
               <span class="lever"></span>
             </label>
           </div>
-
+        </div>
+        <div class="col m8 s12 hide" style="margin-bottom: 10px;">
+          <div style="color: #9e9e9e; display: inline;">Accept Self-signed certificate</div>
+          <div class="switch" style="display: inline;">
+            <label>
+              <input id="self_signed" type="checkbox">
+              <span class="lever"></span>
+            </label>
+          </div>
         </div>
       </div>
       <div class="row">
@@ -34,11 +42,11 @@
         </div>
       </div>
       <div class="row">
-        <div class="input-field col s6">
+        <div class="input-field col m6 s12">
           <input id="username" type="text" class="white-text">
           <label for="username">Username</label>
         </div>
-        <div class="input-field col s6">
+        <div class="input-field col m6 s12">
           <input id="password" type="password" class="white-text">
           <label for="password">Password</label>
           <span class="helper-text">!!! Use App Password !!! See <a target="_blank"

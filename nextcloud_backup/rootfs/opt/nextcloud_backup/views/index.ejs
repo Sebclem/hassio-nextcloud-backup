@@ -431,6 +431,15 @@
       $('#backup-snap-keep-read').val($(this).val());
     });
 
+    $('#ssl').change(function(){
+      let div = $('#self_signed').parent().parent().parent();
+        
+      if($('#ssl').is(':checked'))
+        div.removeClass("hide")
+      else
+        div.addClass("hide");
+    })
+
 
 
   }
@@ -439,11 +448,12 @@
   function sendNextcloudSettings() {
     loadingModal.open();
     let ssl = $('#ssl').is(':checked')
+    let self_signed = $('#self_signed').is(':checked')
     let hostname = $('#hostname').val();
     let username = $('#username').val();
     let password = $('#password').val();
     let back_dir = $('#back-dir').val();
-    $.post('./api/nextcloud-settings', { ssl: ssl, host: hostname, username: username, password: password, back_dir: back_dir })
+    $.post('./api/nextcloud-settings', { ssl: ssl, host: hostname, username: username, password: password, back_dir: back_dir, self_signed: self_signed })
       .done((data) => {
         console.log('Saved');
         $('#nextcloud_settings_message').parent().addClass("hide");
@@ -479,6 +489,11 @@
     loadingModal.open();
     $.get('./api/nextcloud-settings', (data) => {
       $('#ssl').prop("checked", data.ssl == "true");
+      if(data.ssl == "true"){
+        let div = $('#self_signed').parent().parent().parent();
+        div.removeClass("hide");
+      }
+      $('#self_signed').prop('checked', data.self_signed == "true")
       $('#hostname').val(data.host);
       $('#hostname + label').removeClass("active");
       $('#hostname + label').addClass("active");

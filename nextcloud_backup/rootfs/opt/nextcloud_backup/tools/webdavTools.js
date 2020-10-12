@@ -1,6 +1,7 @@
 const { createClient } = require("webdav");
 const fs = require("fs");
 const moment = require('moment');
+const https = require('https')
 
 const statusTools = require('./status');
 const endpoint = "/remote.php/webdav";
@@ -21,15 +22,16 @@ class WebdavTools {
         this.password = null;
     }
     
-    init(ssl, host, username, password) {
+    init(ssl, host, username, password, accept_selfsigned_cert) {
         return new Promise((resolve, reject) => {
             let status = statusTools.getStatus();
             logger.info("Initilizing and checking webdav client...");
             this.baseUrl = (ssl === "true" ? "https" : "http") + "://" + host + endpoint;
             this.username = username;
             this.password = password;
+            let agent_option = ssl === "true" ? { rejectUnauthorized: accept_selfsigned_cert === "false" } : {}
             try {
-                this.client = createClient(this.baseUrl, { username: username, password: password });
+                this.client = createClient(this.baseUrl, { username: username, password: password }, new https.Agent(agent_option));
                 
                 this.client.getDirectoryContents("/").then(() => {
                     if (status.error_code == 3) {
@@ -96,7 +98,9 @@ class WebdavTools {
         });
         
     }
-    
+    /**
+     * Check if theh webdav config is valid, if yes, start init of webdav client
+     */
     confIsValid() {
         return new Promise((resolve, reject) => {
             let status = statusTools.getStatus();
@@ -109,7 +113,12 @@ class WebdavTools {
                         status.error_code = null;
                         statusTools.setStatus(status);
                     }
-                    this.init(conf.ssl, conf.host, conf.username, conf.password).then(() => {
+                    // Check if self_signed option exist
+                    if( conf.self_signed == null || conf.self_signed == ''){
+                        conf.self_signed = "false";
+                        this.setConf(conf);
+                    }
+                    this.init(conf.ssl, conf.host, conf.username, conf.password, conf.self_signed).then(() => {
                         resolve();
                     }).catch((err) => {
                         reject(err);
@@ -194,11 +203,14 @@ class WebdavTools {
             logger.info('Uploading snap...');
             let tmpFile = `./temp/${id}.tar`
             let stream =  fs.createReadStream(tmpFile);
-            
+            let conf = this.getConf()
             let options = {
                 body: stream,
                 username: this.username,
-                password: this.password
+                password: this.password,
+            }
+            if(conf.ssl === 'true'){
+                options["https"] = { rejectUnauthorized: conf.self_signed === "false" }
             }
             
             got.stream.put(this.baseUrl + encodeURI(path), options).on('uploadProgress', e => {
