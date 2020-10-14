@@ -31,7 +31,7 @@ class WebdavTools {
             this.password = password;
             let agent_option = ssl === "true" ? { rejectUnauthorized: accept_selfsigned_cert === "false" } : {}
             try {
-                this.client = createClient(this.baseUrl, { username: username, password: password }, new https.Agent(agent_option));
+                this.client = createClient(this.baseUrl, { username: username, password: password, httpsAgent: new https.Agent(agent_option) }) ;
                 
                 this.client.getDirectoryContents("/").then(() => {
                     if (status.error_code == 3) {
