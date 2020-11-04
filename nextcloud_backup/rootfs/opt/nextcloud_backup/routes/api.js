@@ -7,6 +7,7 @@ const webdav = new WebdavTools().getInstance();
 const settingsTools = require('../tools/settingsTools');
 const pathTools = require('../tools/pathTools');
 const hassioApiTools = require('../tools/hassioApiTools');
+const humanFileSize = require('../tools/toolbox').humanFileSize;
 
 const cronTools = require('../tools/cronTools');
 
@@ -58,7 +59,7 @@ router.get('/formated-backup-manual', function(req, res, next) {
                 else
                     return -1;
             })
-            res.render('backupSnaps',{backups: contents, moment: moment});
+            res.render('backupSnaps',{backups: contents, moment: moment, humanFileSize: humanFileSize});
         }).catch(()=>{
             res.send();
         });
@@ -75,7 +76,7 @@ router.get('/formated-backup-auto', function(req, res, next) {
                 else
                     return -1;
             })
-            res.render('backupSnaps',{backups: contents, moment: moment});
+            res.render('backupSnaps',{backups: contents, moment: moment, humanFileSize: humanFileSize});
         }).catch(()=>{
             res.send();
         });

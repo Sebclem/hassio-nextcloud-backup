@@ -32,6 +32,11 @@
                         value="<%=moment(backups[index].lastmod).format('MMM D, YYYY HH:mm')%>" />
                     <label for="date-<%=backups[index].etag%>" class="white-text active">Date</label>
                 </div>
+                <div class="input-field col s12">
+                    <input disabled type="text" id="size-<%=backups[index].etag%>"
+                        value="<%=humanFileSize(backups[index].size, false)%>" />
+                    <label for="size-<%=backups[index].etag%>" class="white-text active">Size</label>
+                </div>
             </div>
         </div>
         <div class="modal-footer blue-grey darken-4">
