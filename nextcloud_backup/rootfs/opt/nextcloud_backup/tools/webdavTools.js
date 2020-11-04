@@ -13,6 +13,9 @@ const hassioApiTools = require('./hassioApiTools');
 const logger = require('../config/winston');
 
 const got = require ('got');
+const stream = require('stream');
+const {promisify} = require('util');
+const pipeline = promisify(stream.pipeline);
 
 class WebdavTools {
     constructor() {
@@ -77,9 +80,9 @@ class WebdavTools {
                     logger.debug(`Path ${path} created.`)
                 } catch (error) {
                     if(error.response.status == 405)
-                        logger.debug(`Path ${path} already exist.`)
+                    logger.debug(`Path ${path} already exist.`)
                     else
-                        logger.error(error)
+                    logger.error(error)
                 }
             }
             
@@ -99,8 +102,8 @@ class WebdavTools {
         
     }
     /**
-     * Check if theh webdav config is valid, if yes, start init of webdav client
-     */
+    * Check if theh webdav config is valid, if yes, start init of webdav client
+    */
     confIsValid() {
         return new Promise((resolve, reject) => {
             let status = statusTools.getStatus();
@@ -133,7 +136,7 @@ class WebdavTools {
                     logger.error(status.message);
                     reject("Nextcloud config invalid !");
                 }
-
+                
                 if(conf.back_dir == null || conf.back_dir == ''){
                     logger.info('Backup dir is null, initializing it.');
                     conf.back_dir = pathTools.default_root;
@@ -265,86 +268,157 @@ class WebdavTools {
         });
     }
     
-    getFolderContent(path) {
+    downloadFile(path) {
         return new Promise((resolve, reject) => {
-            if(this.client == null){
-                reject();
-                return;
+            if (this.client == null) {
+                this.confIsValid().then(() => {
+                    this._startDownload(path)
+                    .then((path)=> resolve(path))
+                    .catch(()=> reject());
+                }).catch((err) => {
+                    reject(err);
+                })
             }
-            this.client.getDirectoryContents(path)
-            .then((contents) => {
-                resolve(contents);
-            }).catch((error) => {
-                reject(error);
+            else
+            this._startDownload(path)
+            .then((path)=> resolve(path))
+            .catch(()=> reject());
+        });
+    }
+    _startDownload(path) {
+        return new Promise( (resolve, reject) => {
+            let status = statusTools.getStatus();
+            status.status = "download-b";
+            status.progress = 0;
+            status.message = null;
+            status.error_code = null;
+            statusTools.setStatus(status);
+            
+            logger.info('Downloading backup...');
+            
+            let tmpFile = `./temp/restore_${moment().format('MMM-DD-YYYY_HH_mm')}.tar`
+            let stream =  fs.createWriteStream(tmpFile);
+            let conf = this.getConf()
+            let options = {
+                username: this.username,
+                password: this.password,
+            }
+            if(conf.ssl === 'true'){
+                options["https"] = { rejectUnauthorized: conf.self_signed === "false" }
+            }
+            
+            pipeline(
+                got.stream.get(this.baseUrl + encodeURI(path), options)
+                .on('downloadProgress', e => {
+                    let percent = Math.round(e.percent * 100) / 100;
+                    if (status.progress != percent) {
+                        status.progress = percent;
+                        statusTools.setStatus(status);
+                    }
+                })
+                ,
+                stream
+                )
+                .then((res)=>{
+                    logger.info('Download success !')
+                    status.progress = 1;
+                    statusTools.setStatus(status);
+                    logger.debug("Backup dl size : " +  (fs.statSync(tmpFile).size / 1024 / 1024));
+                    resolve(tmpFile);
+                }).catch((err)=>{
+                    fs.unlinkSync(tmpFile);
+                    status.status = "error";
+                    status.message = "Fail to download Hassio snapshot (" + err.message + ")";
+                    status.error_code = 7;
+                    statusTools.setStatus(status);
+                    logger.error(status.message);
+                    reject(err.message);
+                })
+                
+            });
+        }
+        
+        getFolderContent(path) {
+            return new Promise((resolve, reject) => {
+                if(this.client == null){
+                    reject();
+                    return;
+                }
+                this.client.getDirectoryContents(path)
+                .then((contents) => {
+                    resolve(contents);
+                }).catch((error) => {
+                    reject(error);
+                })
+            });
+        }
+        
+        clean() {
+            let limit = settingsTools.getSettings().auto_clean_backup_keep;
+            if (limit == null)
+            limit = 5;
+            return new Promise((resolve, reject) => {
+                this.getFolderContent(this.getConf().back_dir + pathTools.auto).then(async (contents) => {
+                    if (contents.length < limit) {
+                        resolve();
+                        return;
+                    }
+                    contents.sort((a, b) => {
+                        if (moment(a.lastmod).isBefore(moment(b.lastmod)))
+                        return 1;
+                        else
+                        return -1;
+                    });
+                    
+                    let toDel = contents.slice(limit);
+                    for (let i in toDel) {
+                        await this.client.deleteFile(toDel[i].filename);
+                    }
+                    logger.info('Cloud clean done.')
+                    resolve();
+                    
+                }).catch((error) => {
+                    status.status = "error";
+                    status.error_code = 6;
+                    status.message = "Fail to clean Nexcloud (" + error + ") !"
+                    statusTools.setStatus(status);
+                    logger.error(status.message);
+                    reject(status.message);
+                });
             })
+            
+        }
+        
+        
+        
+        
+    }
+    
+    function cleanTempFolder() {
+        fs.readdir("./temp/", (err, files) => {
+            if (err) throw err;
+            
+            for (const file of files) {
+                fs.unlink(path.join("./temp/", file), err => {
+                    if (err) throw err;
+                });
+            }
         });
     }
     
-    clean() {
-        let limit = settingsTools.getSettings().auto_clean_backup_keep;
-        if (limit == null)
-        limit = 5;
-        return new Promise((resolve, reject) => {
-            this.getFolderContent(this.getConf().back_dir + pathTools.auto).then(async (contents) => {
-                if (contents.length < limit) {
-                    resolve();
-                    return;
-                }
-                contents.sort((a, b) => {
-                    if (moment(a.lastmod).isBefore(moment(b.lastmod)))
-                    return 1;
-                    else
-                    return -1;
-                });
-                
-                let toDel = contents.slice(limit);
-                for (let i in toDel) {
-                    await this.client.deleteFile(toDel[i].filename);
-                }
-                logger.info('Cloud clean done.')
-                resolve();
-                
-            }).catch((error) => {
-                status.status = "error";
-                status.error_code = 6;
-                status.message = "Fail to clean Nexcloud (" + error + ") !"
-                statusTools.setStatus(status);
-                logger.error(status.message);
-                reject(status.message);
-            });
-        })
-        
-    }
     
-    
-    
-    
-}
-
-function cleanTempFolder() {
-    fs.readdir("./temp/", (err, files) => {
-        if (err) throw err;
-        
-        for (const file of files) {
-            fs.unlink(path.join("./temp/", file), err => {
-                if (err) throw err;
-            });
+    class Singleton {
+        constructor() {
+            if (!Singleton.instance) {
+                Singleton.instance = new WebdavTools();
+            }
         }
-    });
-}
-
-
-class Singleton {
-    constructor() {
-        if (!Singleton.instance) {
-            Singleton.instance = new WebdavTools();
+        
+        getInstance() {
+            return Singleton.instance;
         }
     }
     
-    getInstance() {
-        return Singleton.instance;
-    }
-}
-
-module.exports = Singleton;
-
+    module.exports = Singleton;
+    
+    

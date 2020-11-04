@@ -185,7 +185,7 @@
   
   <%- include('modals/backup-settings-modal') %> 
   
-  <%- include('modals/restore-modal.ejs') %> 
+  <!-- <%- include('modals/restore-modal.ejs') %>  -->
   
   <div id="modal-loading" class="modal blue-grey darken-4 white-text">
     <div class="modal-content ">
@@ -261,8 +261,6 @@
   var last_manu_back = "";
   var last_auto_back = "";
   
-  var to_restore = "";
-  
   var loadingModal = null;
   document.addEventListener('DOMContentLoaded', function() {
     updateLocalSnaps();
@@ -299,10 +297,9 @@
       manualBackup(id, name);
     })
     $('.restore').click(function(){
-      to_restore = this.getAttribute('data-id');
+      let to_restore = this.getAttribute('data-id');
       console.log(to_restore)
-      let restore_modal = M.Modal.getInstance(document.querySelector('#modal-restore'));
-      restore_modal.open();
+      restore(to_restore)
       
     })
   }
@@ -368,7 +365,15 @@
           printStatusWithBar('Downloading Snapshot', data.progress);
           $('#btn-backup-now, #btn-clean-now').addClass("disabled");
           break;
+          case "download-b":
+          printStatusWithBar('Downloading Backup', data.progress);
+          $('#btn-backup-now, #btn-clean-now').addClass("disabled");
+          break;
           case "upload":
+          printStatusWithBar('Uploading Snapshot', data.progress);
+          $('#btn-backup-now, #btn-clean-now').addClass("disabled");
+          break;
+          case "upload-b":
           printStatusWithBar('Uploading Snapshot', data.progress);
           $('#btn-backup-now, #btn-clean-now').addClass("disabled");
           break;

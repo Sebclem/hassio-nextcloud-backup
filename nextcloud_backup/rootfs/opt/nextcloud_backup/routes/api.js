@@ -190,5 +190,20 @@ router.post('/clean-now', function(req, res, next){
 });
 
 
+router.post('/restore', function(req, res, next){
+    if(req.body['path'] != null){
+        webdav.downloadFile(req.body['path'] ).then((path)=>{
+            hassioApiTools.uploadSnapshot(path);
+        });
+        res.status(200);
+        res.send()
+    }
+    else{
+        res.status(400);
+        res.send()
+    }
+});
+
+
 
 module.exports = router;
