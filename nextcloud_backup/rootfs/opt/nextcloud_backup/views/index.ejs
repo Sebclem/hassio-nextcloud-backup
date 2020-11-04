@@ -5,9 +5,9 @@
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  
   <title>Nextcloud Backup</title>
-
+  
   <!-- <link rel='stylesheet' href='/stylesheets/style.css' /> -->
   <link rel="stylesheet" href="./css/materialize.min.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -16,50 +16,50 @@
       color: #757575 !important;
       border-color: #616161 !important;
     }
-
+    
     .modal .input-field span.helper-text {
       color: #9e9e9e;
-
+      
     }
-
+    
     .modal div.row:last-child {
       margin-bottom: 0;
     }
-
+    
     .modal div.col:last-child {
       margin-bottom: 0;
     }
-
+    
     @media (min-width: 601px) {
       .header-box {
         height: 150px;
       }
     }
-
+    
     .header-box .col {
       height: 100%;
     }
-
+    
     .header-box .col .card {
       height: 100%;
     }
-
+    
     .header-box .card-content {
       padding-top: 10px;
     }
-
+    
     .header-box .card-content h5 {
       margin-top: 10px;
     }
-
+    
     ul.dropdown-content a:hover {
       background-color: #101619 !important;
     }
-
+    
     ul.dropdown-content li:hover {
       background-color: #101619 !important;
     }
-
+    
     /* change autocomplete color */
     input:-webkit-autofill,
     input:-webkit-autofill:hover,
@@ -68,23 +68,27 @@
       -webkit-box-shadow: 0 0 0 30px #263238 inset !important;
       -webkit-text-fill-color: white !important;
     }
-
+    
     .select-dropdown {
       color: white;
     }
   </style>
-
-
+  
+  
 </head>
 
 <body class="blue-grey darken-4">
   <nav class=" light-blue accent-4">
     <div class="nav-wrapper container">
       <a href="#" class="brand-logo"><img src="./images/Nextcloud_Logo.svg" height="54"
-          style="margin: 5px"></a>
+        style="margin: 5px">
+      </a>
       <ul class="right">
-        <li id="setting-trigger"><a class="dropdown-trigger" href="#" data-target="dropdown-settings"><i
-              class="material-icons">settings</i></a></li>
+        <li id="setting-trigger">
+          <a class="dropdown-trigger" href="#" data-target="dropdown-settings">
+            <i class="material-icons">settings</i>
+          </a>
+        </li>
       </ul>
       <div style="height: 64px; display: table; margin-left: 130px;" class="hide-on-med-and-down">
         <h4 style="display: table-cell; vertical-align: middle;">Nextcloud Backup</h4>
@@ -97,7 +101,7 @@
     <li><a href="#modal-settings-backup" id="trigger-backup-settings" class="modal-trigger center">Backup</a></li>
   </ul>
   <div class="container ">
-
+    
     <div class="row header-box">
       <div class="col s12 m3">
         <div class="card cyan darken-3">
@@ -112,7 +116,7 @@
           </div>
         </div>
       </div>
-
+      
       <div class="col s12 m3">
         <div class="card cyan darken-3">
           <div class="card-content">
@@ -138,18 +142,18 @@
             <div class="divider"></div>
             <div style="width: 100%;" class="center">
               <a class="btn green center waves-effect waves-light" id="btn-backup-now"
-                style="margin-top: 7px; display: block;">Backup
-                Now</a>
+              style="margin-top: 7px; display: block;">Backup
+              Now</a>
               <a class="btn center teal darken-4 waves-effect waves-light" id="btn-clean-now"
-                style="margin-top: 7px; display: block;">Clean Now</a>
+              style="margin-top: 7px; display: block;">Clean Now</a>
             </div>
-
+            
           </div>
         </div>
       </div>
-
+      
     </div>
-
+    
     <div class="row">
       <div class="col s12 m12 l6 ">
         <div class="card cyan darken-3">
@@ -172,16 +176,17 @@
           </div>
         </div>
       </div>
-
+      
     </div>
   </div>
-
-
+  
+  
   <%- include('modals/nextcloud-settings-modal') %>  
-
+  
   <%- include('modals/backup-settings-modal') %> 
-
-
+  
+  <%- include('modals/restore-modal.ejs') %> 
+  
   <div id="modal-loading" class="modal blue-grey darken-4 white-text">
     <div class="modal-content ">
       <div class="row">
@@ -203,7 +208,7 @@
                 <div class="circle"></div>
               </div>
             </div>
-
+            
             <div class="spinner-layer spinner-red">
               <div class="circle-clipper left">
                 <div class="circle"></div>
@@ -215,7 +220,7 @@
                 <div class="circle"></div>
               </div>
             </div>
-
+            
             <div class="spinner-layer spinner-yellow">
               <div class="circle-clipper left">
                 <div class="circle"></div>
@@ -227,7 +232,7 @@
                 <div class="circle"></div>
               </div>
             </div>
-
+            
             <div class="spinner-layer spinner-green">
               <div class="circle-clipper left">
                 <div class="circle"></div>
@@ -244,7 +249,8 @@
       </div>
     </div>
   </div>
-
+  
+  
 </body>
 <script src="./js/materialize.min.js"></script>
 <script src="./js/jquery-3.4.1.min.js"></script>
@@ -254,7 +260,9 @@
   var last_local_snap = "";
   var last_manu_back = "";
   var last_auto_back = "";
-
+  
+  var to_restore = "";
+  
   var loadingModal = null;
   document.addEventListener('DOMContentLoaded', function() {
     updateLocalSnaps();
@@ -263,22 +271,22 @@
     M.Tooltip.init(tooltips, {});
     let drops = document.querySelectorAll('.dropdown-trigger');
     M.Dropdown.init(drops, { constrainWidth: false, coverTrigger: false, alignment: 'right', onOpenStart: () => $('#setting-trigger').addClass('active'), onCloseEnd: () => $('#setting-trigger').removeClass('active') });
-
+    
     setInterval(update_status, 500);
     setInterval(updateLocalSnaps, 2000);
     listeners();
-
+    
   });
-
+  
   function updateDynamicListeners() {
     var elems = document.querySelectorAll('.collapsible');
     M.Collapsible.init(elems, { accordion: true });
     var modals = document.querySelectorAll('.modal:not(#modal-loading)');
-    M.Modal.init(modals, { dismissible: false });
-
+    M.Modal.init(modals, { dismissible: true });
+    
     let loadingModals = document.querySelectorAll('#modal-loading');
     M.Modal.init(loadingModals, { dismissible: false });
-
+    
     loadingModal = M.Modal.getInstance(document.querySelector('#modal-loading'));
     $('.local-snap-listener').click(function() {
       let id = this.getAttribute('data-id');
@@ -290,13 +298,20 @@
       let name = this.getAttribute('data-name');
       manualBackup(id, name);
     })
+    $('.restore').click(function(){
+      to_restore = this.getAttribute('data-id');
+      console.log(to_restore)
+      let restore_modal = M.Modal.getInstance(document.querySelector('#modal-restore'));
+      restore_modal.open();
+      
+    })
   }
-
+  
   function updateLocalSnaps() {
     let needUpdate = false;
     $.get('./api/formated-local-snap', (data) => {
       if (JSON.stringify(data) === last_local_snap)
-        return;
+      return;
       last_local_snap = JSON.stringify(data);
       needUpdate = true;
       $('#local_snaps').empty();
@@ -305,17 +320,17 @@
       updateManuBackup(needUpdate);
     });
   }
-
+  
   function updateManuBackup(prevUpdate) {
     let needUpdate = false;
     $.get('./api/formated-backup-manual', (data) => {
       if (JSON.stringify(data) === last_manu_back)
-        return;
+      return;
       last_manu_back = JSON.stringify(data);
       needUpdate = true;
       $('#manual_backups').empty();
       $('#manual_backups').html(data);
-
+      
     }).always(() => {
       updateAutoBackup(prevUpdate || needUpdate);
     });
@@ -324,59 +339,59 @@
     let needUpdate = false;
     $.get('./api/formated-backup-auto', (data) => {
       if (JSON.stringify(data) === last_auto_back)
-        return;
+      return;
       needUpdate = true;
       last_auto_back = JSON.stringify(data);
       $('#auto_backups').empty();
       $('#auto_backups').html(data);
-
+      
     }).always(() => {
       if (prevUpdate || needUpdate)
-        updateDynamicListeners();
+      updateDynamicListeners();
     });
   }
-
+  
   function update_status() {
     $.get('./api/status', (data) => {
       if (JSON.stringify(data) !== last_status) {
         last_status = JSON.stringify(data);
         switch (data.status) {
           case "error":
-            printStatus('Error', data.message);
-            $('#btn-backup-now, #btn-clean-now').removeClass("disabled");
-            break;
+          printStatus('Error', data.message);
+          $('#btn-backup-now, #btn-clean-now').removeClass("disabled");
+          break;
           case "idle":
-            printStatus('Idle', "Waiting for next backup.");
-            $('#btn-backup-now, #btn-clean-now').removeClass("disabled");
-            break;
+          printStatus('Idle', "Waiting for next backup.");
+          $('#btn-backup-now, #btn-clean-now').removeClass("disabled");
+          break;
           case "download":
-            printStatusWithBar('Downloading Snapshot', data.progress);
-            $('#btn-backup-now, #btn-clean-now').addClass("disabled");
-            break;
+          printStatusWithBar('Downloading Snapshot', data.progress);
+          $('#btn-backup-now, #btn-clean-now').addClass("disabled");
+          break;
           case "upload":
-            printStatusWithBar('Uploading Snapshot', data.progress);
-            $('#btn-backup-now, #btn-clean-now').addClass("disabled");
-            break;
+          printStatusWithBar('Uploading Snapshot', data.progress);
+          $('#btn-backup-now, #btn-clean-now').addClass("disabled");
+          break;
           case "creating":
-            printStatusWithBar('Creating Snapshot', data.progress);
-            $('#btn-backup-now, #btn-clean-now').addClass("disabled");
-            break;
+          printStatusWithBar('Creating Snapshot', data.progress);
+          $('#btn-backup-now, #btn-clean-now').addClass("disabled");
+          break;
         }
         if (data.last_backup != null) {
           if ($('#last_back_status').html() != data.last_backup)
-            $('#last_back_status').html(data.last_backup);
+          $('#last_back_status').html(data.last_backup);
         }
         if (data.next_backup != null) {
           if ($('#next_back_status').html() != data.next_backup)
-            $('#next_back_status').html(data.next_backup);
+          $('#next_back_status').html(data.next_backup);
         }
       }
-
-
+      
+      
     });
   }
-
-
+  
+  
   function printStatus(status, secondLine) {
     $('#status').empty();
     $('#status').html(status);
@@ -386,7 +401,7 @@
     $('#status-second-line').attr('data-tooltip', secondLine)
     $('#progress').addClass("hide");
   }
-
+  
   function printStatusWithBar(status, progress) {
     $('#status').empty();
     $('#status').html(status);
@@ -395,7 +410,7 @@
     secondLine.html(progress == -1 ? "Waiting..." : (Math.round(progress * 100) + "%"));
     secondLine.addClass("center");
     secondLine.attr('data-tooltip', Math.round(progress * 100) + "%");
-
+    
     let progressDiv = $('#progress');
     progressDiv.removeClass("hide");
     if (progress == -1) {
@@ -407,44 +422,60 @@
       progressDiv.children().addClass('determinate');
       progressDiv.children().css('width', (progress * 100) + "%");
     }
-
+    
   }
-
+  
   function listeners() {
     $('#save-nextcloud-settings').click(sendNextcloudSettings);
     $('#trigger-nextcloud-settings').click(getNextcloudSettings);
     $('#trigger-backup-settings').click(getBackupSettings);
     $('#btn-backup-now').click(backupNow);
     $('#btn-clean-now').click(cleanNow);
-
-
+    
+    
     $('#save-backup-settings').click(sendBackupSettings);
     $('#cron-drop-day-month').on('input', function() {
       $('#cron-drop-day-month-read').val($(this).val());
     });
-
+    
     $('#local-snap-keep').on('input', function() {
       $('#local-snap-keep-read').val($(this).val());
     });
-
+    
     $('#backup-snap-keep').on('input', function() {
       $('#backup-snap-keep-read').val($(this).val());
     });
-
+    
     $('#ssl').change(function(){
       let div = $('#self_signed').parent().parent().parent();
-        
+      
       if($('#ssl').is(':checked'))
-        div.removeClass("hide")
+      div.removeClass("hide")
       else
-        div.addClass("hide");
-    })
-
-
-
+      div.addClass("hide");
+    });
+    
+    $('#confirm-restore').click(function(){
+      restore(to_restore);
+    });
+    
+    
+    
   }
-
-
+  
+  function restore(id){
+    loadingModal.open();
+    $.post('./api/restore', {path: id})
+    .done((data)=>{
+      console.log("Restore cmd send !");
+      M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Command send !', classes: "green" });
+    }).fail((error) => {
+      console.log(error);
+      M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t send command !', classes: "red" });
+    })
+    .always(()=> loadingModal.close())
+  }
+  
   function sendNextcloudSettings() {
     loadingModal.open();
     let ssl = $('#ssl').is(':checked')
@@ -454,37 +485,44 @@
     let password = $('#password').val();
     let back_dir = $('#back-dir').val();
     $.post('./api/nextcloud-settings', { ssl: ssl, host: hostname, username: username, password: password, back_dir: back_dir, self_signed: self_signed })
-      .done((data) => {
-        console.log('Saved');
-        $('#nextcloud_settings_message').parent().addClass("hide");
-        M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Nextcloud settings saved !', classes: "green" });
-        M.Modal.getInstance(document.querySelector('#modal-settings-nextcloud')).close();
-
-      }).fail((data) => {
-        debugger;
-        if (data.status == 406) {
-          console.log(data.responseJSON.message);
-          $('#nextcloud_settings_message').html(data.responseJSON.message);
-
-        }
-        else {
-          $('#nextcloud_settings_message').html("Invalid Settings.");
-
-        }
-        $('#nextcloud_settings_message').parent().removeClass("hide");
-        M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Invalid Nextcloud settings !', classes: "red" });
-        console.log('Fail');
-      }).always(() => {
-        loadingModal.close();
-      })
+    .done((data) => {
+      console.log('Saved');
+      $('#nextcloud_settings_message').parent().addClass("hide");
+      M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Nextcloud settings saved !', classes: "green" });
+      M.Modal.getInstance(document.querySelector('#modal-settings-nextcloud')).close();
+      
+    }).fail((data) => {
+      debugger;
+      if (data.status == 406) {
+        console.log(data.responseJSON.message);
+        $('#nextcloud_settings_message').html(data.responseJSON.message);
+        
+      }
+      else {
+        $('#nextcloud_settings_message').html("Invalid Settings.");
+        
+      }
+      $('#nextcloud_settings_message').parent().removeClass("hide");
+      M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Invalid Nextcloud settings !', classes: "red" });
+      console.log('Fail');
+    }).always(() => {
+      loadingModal.close();
+    })
   }
-
+  
   function manualBackup(id, name) {
-    $.post('./api/manual-backup?id=' + id + '&name=' + name);
-
+    $.post('./api/manual-backup?id=' + id + '&name=' + name)
+    .done((data)=>{
+      console.log("manual bk cmd send !");
+      M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Command send !', classes: "green" });
+    }).fail((error) => {
+      console.log(error);
+      M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t send command !', classes: "red" });
+    })
+    
   }
-
-
+  
+  
   function getNextcloudSettings() {
     loadingModal.open();
     $.get('./api/nextcloud-settings', (data) => {
@@ -509,33 +547,33 @@
       loadingModal.close();
     });
   }
-
+  
   function backupNow() {
     loadingModal.open();
     $.post('./api/new-backup')
-      .done(() => {
-        M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Command send !', classes: "green" });
-      }).fail((error) => {
-        console.log(error);
-        M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t send command !', classes: "red" });
-      })
-      .always(() => {
-        loadingModal.close();
-      })
+    .done(() => {
+      M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Command send !', classes: "green" });
+    }).fail((error) => {
+      console.log(error);
+      M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t send command !', classes: "red" });
+    })
+    .always(() => {
+      loadingModal.close();
+    })
   }
-
+  
   function cleanNow() {
     loadingModal.open();
     $.post('./api/clean-now')
-      .done(() => {
-        M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Command send !', classes: "green" });
-      }).fail((error) => {
-        console.log(error);
-        M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t send command !', classes: "red" });
-      })
-      .always(() => {
-        loadingModal.close();
-      })
+    .done(() => {
+      M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Command send !', classes: "green" });
+    }).fail((error) => {
+      console.log(error);
+      M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t send command !', classes: "red" });
+    })
+    .always(() => {
+      loadingModal.close();
+    })
   }
   function getBackupSettings() {
     loadingModal.open();
@@ -552,70 +590,70 @@
           auto_clean_backup_keep: 5,
         }
       }
-
+      
       changeSelect('#cron-drop-settings', data.cron_base);
       $('#cron-drop-settings').change(updateDropVisibility);
-
+      
       let timepicker = document.querySelector('#timepicker');
       $('#timepicker').val(data.cron_hour);
       $('#timepicker + label').removeClass("active");
       $('#timepicker + label').addClass("active");
       if (M.Timepicker.getInstance(timepicker) != null)
-        M.Timepicker.getInstance(timepicker).destroy();
+      M.Timepicker.getInstance(timepicker).destroy();
       M.Timepicker.init(timepicker, { defaultTime: data.cron_hour, twelveHour: false, container: 'body' });
       $('#cron-drop-day-month-read').val(data.cron_month_day);
       $('#cron-drop-day-month').val(data.cron_month_day);
-
+      
       $('#cron-drop-day-month-read + label').removeClass("active");
       $('#cron-drop-day-month-read + label').addClass("active");
-
-
+      
+      
       $('#auto_clean_local').prop('checked', data.auto_clean_local == "true");
       $('#local-snap-keep-read, #local-snap-keep').val(data.auto_clean_local_keep);
       $('#auto_clean_backup').prop('checked', data.auto_clean_backup == "true");
       $('#backup-snap-keep-read, #backup-snap-keep').val(data.auto_clean_backup_keep);
-
-
+      
+      
       $('#backup-snap-keep-read + label').removeClass("active");
       $('#backup-snap-keep-read + label').addClass("active");
       $('#local-snap-keep-read + label').removeClass("active");
       $('#local-snap-keep-read + label').addClass("active");
-
+      
       changeSelect('#cron-drop-day', data.cron_weekday);
       updateDropVisibility();
       loadingModal.close();
     });
-
+    
   }
-
+  
   function updateDropVisibility() {
     let cronBase = $("#cron-drop-settings").val();
-
+    
     switch (cronBase) {
       case "3":
-        $('#timepicker').parent().parent().removeClass("hide");
-        $('#cron-drop-day').parent().parent().parent().addClass("hide");
-        $('#cron-drop-day-month').parent().parent().parent().removeClass("hide");
-
-        break;
+      $('#timepicker').parent().parent().removeClass("hide");
+      $('#cron-drop-day').parent().parent().parent().addClass("hide");
+      $('#cron-drop-day-month').parent().parent().parent().removeClass("hide");
+      
+      break;
       case "2":
-        $('#timepicker').parent().parent().removeClass("hide");
-        $('#cron-drop-day').parent().parent().parent().removeClass("hide");
-        $('#cron-drop-day-month').parent().parent().parent().addClass("hide");
-        break;
+      $('#timepicker').parent().parent().removeClass("hide");
+      $('#cron-drop-day').parent().parent().parent().removeClass("hide");
+      $('#cron-drop-day-month').parent().parent().parent().addClass("hide");
+      break;
       case "1":
-        $('#timepicker').parent().parent().removeClass("hide");
-        $('#cron-drop-day').parent().parent().parent().addClass("hide");
-        $('#cron-drop-day-month').parent().parent().parent().addClass("hide");
-        break;
+      $('#timepicker').parent().parent().removeClass("hide");
+      $('#cron-drop-day').parent().parent().parent().addClass("hide");
+      $('#cron-drop-day-month').parent().parent().parent().addClass("hide");
+      break;
       case "0":
-        $('#timepicker').parent().parent().addClass("hide");
-        $('#cron-drop-day').parent().parent().parent().addClass("hide");
-        $('#cron-drop-day-month').parent().parent().parent().addClass("hide");
-        break;
+      $('#timepicker').parent().parent().addClass("hide");
+      $('#cron-drop-day').parent().parent().parent().addClass("hide");
+      $('#cron-drop-day-month').parent().parent().parent().addClass("hide");
+      break;
     }
   }
-
+  
   function sendBackupSettings() {
     let cron_month_day = $('#cron-drop-day-month').val();
     let cron_weekday = $('#cron-drop-day').val();
@@ -627,31 +665,31 @@
     let auto_clean_backup_keep = $("#backup-snap-keep").val();
     loadingModal.open();
     $.post('./api/backup-settings',
-      {
-        cron_base: cron_base,
-        cron_hour: cron_hour,
-        cron_weekday: cron_weekday,
-        cron_month_day: cron_month_day,
-        auto_clean_local: auto_clean_local,
-        auto_clean_local_keep: auto_clean_local_keep,
-        auto_clean_backup: auto_clean_backup,
-        auto_clean_backup_keep: auto_clean_backup_keep,
-      })
-      .done(() => {
-        M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Backup settings saved !', classes: "green" });
-        M.Modal.getInstance(document.querySelector('#modal-settings-backup')).close();
-      }).fail(() => {
-        M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t save backup settings !', classes: "red" });
-      }).always(() => {
-        loadingModal.close();
-      });
+    {
+      cron_base: cron_base,
+      cron_hour: cron_hour,
+      cron_weekday: cron_weekday,
+      cron_month_day: cron_month_day,
+      auto_clean_local: auto_clean_local,
+      auto_clean_local_keep: auto_clean_local_keep,
+      auto_clean_backup: auto_clean_backup,
+      auto_clean_backup_keep: auto_clean_backup_keep,
+    })
+    .done(() => {
+      M.toast({ html: '<i class="material-icons" style="margin-right:10px">check_box</i> Backup settings saved !', classes: "green" });
+      M.Modal.getInstance(document.querySelector('#modal-settings-backup')).close();
+    }).fail(() => {
+      M.toast({ html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t save backup settings !', classes: "red" });
+    }).always(() => {
+      loadingModal.close();
+    });
   }
-
+  
   function changeSelect(selector, value) {
     let selectBaseRaw = document.querySelector(selector);
-
+    
     if (M.FormSelect.getInstance(selectBaseRaw) != null)
-      M.FormSelect.getInstance(selectBaseRaw).destroy();
+    M.FormSelect.getInstance(selectBaseRaw).destroy();
     $(selector + ' option[selected]').removeAttr('selected');
     $(selector + ' option[value=' + value + ']').attr('selected', "true");
     M.FormSelect.init(selectBaseRaw, {});

@@ -1,7 +1,7 @@
 <% if (locals.backups) { %>
 <div class="collection">
     <% for(const index in backups) { %>
-    <a class="collection-item local-snap-listener modal-trigger" href="#modal-<%=backups[index].etag%>"
+    <a class="collection-item modal-trigger" href="#modal-<%=backups[index].etag%>"
         data-id="<%= backups[index].etag %>">
         <div><%= backups[index].basename%><div class="secondary-content hide-on-small-and-down">
                 <%= moment(backups[index].lastmod).format('MMM D, YYYY HH:mm')  %></div>
@@ -40,6 +40,7 @@
             </div>
         </div>
         <div class="modal-footer blue-grey darken-4">
+            <a href="#!" class="waves-effect waves-green btn green restore modal-close" data-id="<%=backups[index].filename%>" data-name='<%= backups[index].basename ? backups[index].basename : backups[index].etag %>'>Backup now</a>
             <a href="#!" class="modal-close waves-effect waves-green btn red">Close</a>
         </div>
     </div>
