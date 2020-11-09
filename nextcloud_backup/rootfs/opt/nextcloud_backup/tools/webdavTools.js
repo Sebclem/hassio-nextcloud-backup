@@ -298,7 +298,7 @@ class WebdavTools {
             statusTools.setStatus(status);
 
             logger.info("Downloading backup...");
-
+            if (!fs.existsSync("./temp/")) fs.mkdirSync("./temp/");
             let tmpFile = `./temp/restore_${moment().format("MMM-DD-YYYY_HH_mm")}.tar`;
             let stream = fs.createWriteStream(tmpFile);
             let conf = this.getConf();
