@@ -326,6 +326,7 @@ class WebdavTools {
                     logger.debug("Backup dl size : " +  (fs.statSync(tmpFile).size / 1024 / 1024));
                     resolve(tmpFile);
                 }).catch((err)=>{
+                    if(fs.existsSync(tmpFile))
                     fs.unlinkSync(tmpFile);
                     status.status = "error";
                     status.message = "Fail to download Hassio snapshot (" + err.message + ")";
