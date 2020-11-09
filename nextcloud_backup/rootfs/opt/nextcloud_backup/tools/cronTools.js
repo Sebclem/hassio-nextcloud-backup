@@ -1,43 +1,36 @@
-const settingsTools = require('./settingsTools');
+const settingsTools = require("./settingsTools");
 
-const WebdavTools = require('./webdavTools');
+const WebdavTools = require("./webdavTools");
 const webdav = new WebdavTools().getInstance();
 
-const hassioApiTools = require('./hassioApiTools');
+const hassioApiTools = require("./hassioApiTools");
 
-const statusTools = require('./status');
+const statusTools = require("./status");
 
-const pathTools = require('./pathTools');
+const pathTools = require("./pathTools");
 
-const CronJob = require('cron').CronJob;
-const moment = require('moment');
-const logger = require('../config/winston');
-
+const CronJob = require("cron").CronJob;
+const moment = require("moment");
+const logger = require("../config/winston");
 
 function checkConfig(conf) {
     if (conf.cron_base != null) {
-        if (conf.cron_base === '1' || conf.cron_base === '2' || conf.cron_base === '3') {
+        if (conf.cron_base === "1" || conf.cron_base === "2" || conf.cron_base === "3") {
             if (conf.cron_hour != null && conf.cron_hour.match(/\d\d:\d\d/)) {
-                if (conf.cron_base === '1')
-                    return true;
-            }
-            else
-                return false;
+                if (conf.cron_base === "1") return true;
+            } else return false;
         }
 
-        if (conf.cron_base === '2') {
+        if (conf.cron_base === "2") {
             return conf.cron_weekday != null && conf.cron_weekday >= 0 && conf.cron_weekday <= 6;
         }
 
-        if (conf.cron_base === '3') {
+        if (conf.cron_base === "3") {
             return conf.cron_month_day != null && conf.cron_month_day >= 1 && conf.cron_month_day <= 28;
         }
 
-        if (conf.cron_base === '0')
-            return true
-    }
-    else
-        return false;
+        if (conf.cron_base === "0") return true;
+    } else return false;
 
     return false;
 }
@@ -52,19 +45,18 @@ function updatetNextDate() {
     cronContainer.updatetNextDate();
 }
 
-
 class CronContainer {
     constructor() {
         this.cronJob = null;
-        this.cronClean = null
+        this.cronClean = null;
     }
 
     init() {
         let settings = settingsTools.getSettings();
         let cronStr = "";
         if (this.cronClean == null) {
-           logger.info("Starting auto clean cron...");
-            this.cronClean = new CronJob('0 1 * * *', this._clean, null, false, Intl.DateTimeFormat().resolvedOptions().timeZone);
+            logger.info("Starting auto clean cron...");
+            this.cronClean = new CronJob("0 1 * * *", this._clean, null, false, Intl.DateTimeFormat().resolvedOptions().timeZone);
             this.cronClean.start();
         }
         if (this.cronJob != null) {
@@ -78,28 +70,26 @@ class CronContainer {
         }
 
         switch (settings.cron_base) {
-            case '0':
+            case "0":
                 logger.warn("No Cron settings available.");
                 return;
-            case '1': {
-                let splited = settings.cron_hour.split(':');
+            case "1": {
+                let splited = settings.cron_hour.split(":");
                 cronStr = "" + splited[1] + " " + splited[0] + " * * *";
                 break;
             }
 
-            case '2': {
-                let splited = settings.cron_hour.split(':');
+            case "2": {
+                let splited = settings.cron_hour.split(":");
                 cronStr = "" + splited[1] + " " + splited[0] + " * * " + settings.cron_weekday;
                 break;
             }
 
-            case '3': {
-                let splited = settings.cron_hour.split(':');
+            case "3": {
+                let splited = settings.cron_hour.split(":");
                 cronStr = "" + splited[1] + " " + splited[0] + " " + settings.cron_month_day + " * *";
                 break;
             }
-
-
         }
         logger.info("Starting Cron...");
         this.cronJob = new CronJob(cronStr, this._createBackup, null, false, Intl.DateTimeFormat().resolvedOptions().timeZone);
@@ -109,32 +99,30 @@ class CronContainer {
 
     updatetNextDate() {
         let date;
-        if (this.cronJob == null)
-            date = "Not configured";
-        else
-            date = this.cronJob.nextDate().format('MMM D, YYYY HH:mm');
+        if (this.cronJob == null) date = "Not configured";
+        else date = this.cronJob.nextDate().format("MMM D, YYYY HH:mm");
         let status = statusTools.getStatus();
         status.next_backup = date;
         statusTools.setStatus(status);
     }
 
     _createBackup() {
-        logger.debug('Cron triggered !');
+        logger.debug("Cron triggered !");
         let status = statusTools.getStatus();
-        if (status.status === "creating" || status.status === "upload" || status.status === "download")
-            return;
+        if (status.status === "creating" || status.status === "upload" || status.status === "download") return;
 
-        let name = 'Auto-' + moment().format('YYYY-MM-DD_HH-mm');
-        hassioApiTools.createNewBackup(name).then((id) => {
-            hassioApiTools.downloadSnapshot(id)
-                .then(() => {
-                    webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.auto + name + '.tar');
-                }).catch(() => {
-
-                })
-        }).catch(() => {
-
-        })
+        let name = "Auto-" + moment().format("YYYY-MM-DD_HH-mm");
+        hassioApiTools
+            .createNewBackup(name)
+            .then((id) => {
+                hassioApiTools
+                    .downloadSnapshot(id)
+                    .then(() => {
+                        webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.auto + name + ".tar");
+                    })
+                    .catch(() => {});
+            })
+            .catch(() => {});
     }
 
     _clean() {
@@ -146,10 +134,8 @@ class CronContainer {
         if (autoCleanCloud != null && autoCleanCloud === "true") {
             webdav.clean().catch(() => {});
         }
-        
     }
 }
-
 
 class Singleton {
     constructor() {

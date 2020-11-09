@@ -1,18 +1,17 @@
-const appRoot = require('app-root-path');
-const winston = require('winston');
-
+const appRoot = require("app-root-path");
+const winston = require("winston");
 
 const logger = winston.createLogger({
-    level: 'debug',
+    level: "debug",
     format: winston.format.combine(
         winston.format.timestamp({
-            format: 'YYYY-MM-DD HH:mm:ss'
+            format: "YYYY-MM-DD HH:mm:ss",
         }),
         // winston.format.errors({ stack: true }),
         // winston.format.splat(),
 
         winston.format.colorize(),
-        winston.format.printf(({level, message, timestamp}) => {
+        winston.format.printf(({ level, message, timestamp }) => {
             return `[${timestamp}] [${level}]: ${message}`;
         })
     ),
@@ -21,10 +20,9 @@ const logger = winston.createLogger({
         // - Write to all logs with level `info` and below to `quick-start-combined.log`.
         // - Write all logs error (and below) to `quick-start-error.log`.
         //
-        new winston.transports.Console({handleExceptions: true}),
+        new winston.transports.Console({ handleExceptions: true }),
         // new winston.transports.File({filename: '/data/NCB.log', handleExceptions: true})
-    ]
+    ],
 });
-
 
 module.exports = logger;

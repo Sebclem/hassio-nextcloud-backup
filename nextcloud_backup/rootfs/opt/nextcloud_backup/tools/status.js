@@ -1,31 +1,27 @@
-const fs = require('fs');
+const fs = require("fs");
 
-const statusPath = '/data/status.json';
+const statusPath = "/data/status.json";
 
 let baseStatus = {
     status: "idle",
     last_backup: null,
-    next_backup: null
+    next_backup: null,
 };
-
-
 
 function init() {
     if (!fs.existsSync(statusPath)) {
         fs.writeFileSync(statusPath, JSON.stringify(baseStatus));
-    }
-    else{
+    } else {
         let content = getStatus();
-        if(content.status !== "idle"){
+        if (content.status !== "idle") {
             content.status = "idle";
             content.message = null;
-            setStatus(content)
+            setStatus(content);
         }
     }
 }
 
-
-function getStatus(){
+function getStatus() {
     if (!fs.existsSync(statusPath)) {
         fs.writeFileSync(statusPath, JSON.stringify(baseStatus));
     }
@@ -34,11 +30,9 @@ function getStatus(){
     return JSON.parse(content);
 }
 
-function setStatus(state){
+function setStatus(state) {
     fs.writeFileSync(statusPath, JSON.stringify(state));
 }
-
-
 
 exports.init = init;
 exports.getStatus = getStatus;
