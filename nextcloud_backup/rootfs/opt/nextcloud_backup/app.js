@@ -71,7 +71,8 @@ webdav.confIsValid().then(
         newlog.error("... " + err);
     }
 );
-
+const settingTool = require('./tools/settingsTools')
+settingTool.check(settingTool.getSettings(), true);
 const cronTools = require("./tools/cronTools");
 cronTools.startCron();
 

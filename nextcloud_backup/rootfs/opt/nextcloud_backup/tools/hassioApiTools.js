@@ -13,6 +13,40 @@ const logger = require("../config/winston");
 
 const create_snap_timeout = 90 * 60 * 1000;
 
+
+
+function getVersion() {
+    return new Promise((resolve, reject) => {
+        let token = process.env.HASSIO_TOKEN;
+        let status = statusTools.getStatus();
+        let option = {
+            headers: { "X-HASSIO-KEY": token },
+            responseType: "json",
+        };
+        
+        got("http://hassio/core/info", option)
+        .then((result) => {
+            if (status.error_code === 1) {
+                status.status = "idle";
+                status.message = null;
+                status.error_code = null;
+                statusTools.setStatus(status);
+            }
+            let version = result.body.data.version;
+            resolve(version);
+        })
+        .catch((error) => {
+            status.status = "error";
+            status.message = "Fail to fetch HA Version (" + error.message + ")";
+            status.error_code = 1;
+            statusTools.setStatus(status);
+            logger.error(status.message);
+            reject(error.message);
+        });
+    });
+}
+
+
 function getSnapshots() {
     return new Promise((resolve, reject) => {
         let token = process.env.HASSIO_TOKEN;
@@ -267,6 +301,7 @@ function uploadSnapshot(path) {
     });
 }
 
+exports.getVersion = getVersion;
 exports.getSnapshots = getSnapshots;
 exports.downloadSnapshot = downloadSnapshot;
 exports.createNewBackup = createNewBackup;

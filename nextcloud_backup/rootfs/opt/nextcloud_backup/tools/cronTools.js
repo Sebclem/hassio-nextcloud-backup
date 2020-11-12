@@ -13,28 +13,6 @@ const CronJob = require("cron").CronJob;
 const moment = require("moment");
 const logger = require("../config/winston");
 
-function checkConfig(conf) {
-    if (conf.cron_base != null) {
-        if (conf.cron_base === "1" || conf.cron_base === "2" || conf.cron_base === "3") {
-            if (conf.cron_hour != null && conf.cron_hour.match(/\d\d:\d\d/)) {
-                if (conf.cron_base === "1") return true;
-            } else return false;
-        }
-
-        if (conf.cron_base === "2") {
-            return conf.cron_weekday != null && conf.cron_weekday >= 0 && conf.cron_weekday <= 6;
-        }
-
-        if (conf.cron_base === "3") {
-            return conf.cron_month_day != null && conf.cron_month_day >= 1 && conf.cron_month_day <= 28;
-        }
-
-        if (conf.cron_base === "0") return true;
-    } else return false;
-
-    return false;
-}
-
 function startCron() {
     let cronContainer = new Singleton().getInstance();
     cronContainer.init();
@@ -64,7 +42,7 @@ class CronContainer {
             this.cronJob.stop();
             this.cronJob = null;
         }
-        if (!checkConfig(settingsTools.getSettings())) {
+        if (!settingsTools.check_cron(settingsTools.getSettings())) {
             logger.warn("No Cron settings available.");
             return;
         }
@@ -110,15 +88,19 @@ class CronContainer {
         logger.debug("Cron triggered !");
         let status = statusTools.getStatus();
         if (status.status === "creating" || status.status === "upload" || status.status === "download") return;
-
-        let name = "Auto-" + moment().format("YYYY-MM-DD_HH-mm");
         hassioApiTools
-            .createNewBackup(name)
-            .then((id) => {
+            .getVersion()
+            .then((version) => {
+                let name = settingsTools.getFormatedName(false, version)
                 hassioApiTools
-                    .downloadSnapshot(id)
-                    .then(() => {
-                        webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.auto + name + ".tar");
+                    .createNewBackup(name)
+                    .then((id) => {
+                        hassioApiTools
+                            .downloadSnapshot(id)
+                            .then(() => {
+                                webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.auto + name + ".tar");
+                            })
+                            .catch(() => {});
                     })
                     .catch(() => {});
             })
@@ -149,6 +131,5 @@ class Singleton {
     }
 }
 
-exports.checkConfig = checkConfig;
 exports.startCron = startCron;
 exports.updatetNextDate = updatetNextDate;

@@ -130,18 +130,24 @@ router.post("/new-backup", function (req, res, next) {
         res.send();
         return;
     }
-    let name = "Manual-" + moment().format("YYYY-MM-DD_HH-mm");
     hassioApiTools
-        .createNewBackup(name)
-        .then((id) => {
+        .getVersion()
+        .then((version) => {
+            let name = settingsTools.getFormatedName(true, version);
             hassioApiTools
-                .downloadSnapshot(id)
-                .then(() => {
-                    webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.manual + name + ".tar");
+                .createNewBackup(name)
+                .then((id) => {
+                    hassioApiTools
+                        .downloadSnapshot(id)
+                        .then(() => {
+                            webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.manual + name + ".tar");
+                        })
+                        .catch(() => {});
                 })
                 .catch(() => {});
         })
         .catch(() => {});
+
     res.status(201);
     res.send();
 });
@@ -151,7 +157,7 @@ router.get("/backup-settings", function (req, res, next) {
 });
 
 router.post("/backup-settings", function (req, res, next) {
-    if (cronTools.checkConfig(req.body)) {
+    if (settingsTools.check(req.body)) {
         settingsTools.setSettings(req.body);
         cronTools.startCron();
         res.send();

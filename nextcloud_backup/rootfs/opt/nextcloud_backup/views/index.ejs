@@ -598,6 +598,9 @@
       
       changeSelect('#cron-drop-settings', data.cron_base);
       $('#cron-drop-settings').change(updateDropVisibility);
+      $('#name-template').val(data.name_template);
+      $('#name-template + label').removeClass("active");
+      $('#name-template + label').addClass("active");
       
       let timepicker = document.querySelector('#timepicker');
       $('#timepicker').val(data.cron_hour);
@@ -668,9 +671,11 @@
     let auto_clean_backup = $("#auto_clean_backup").is(':checked');
     let auto_clean_local_keep = $("#local-snap-keep").val();
     let auto_clean_backup_keep = $("#backup-snap-keep").val();
+    let name_template = $('#name-template').val();
     loadingModal.open();
     $.post('./api/backup-settings',
     {
+      name_template: name_template,
       cron_base: cron_base,
       cron_hour: cron_hour,
       cron_weekday: cron_weekday,
