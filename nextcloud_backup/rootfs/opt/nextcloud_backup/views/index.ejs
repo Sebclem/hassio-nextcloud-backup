@@ -614,15 +614,15 @@
       
       
       $('#auto_clean_local').prop('checked', data.auto_clean_local == "true");
-      $('#local-snap-keep-read, #local-snap-keep').val(data.auto_clean_local_keep);
+      $('#local-snap-keep').val(data.auto_clean_local_keep);
       $('#auto_clean_backup').prop('checked', data.auto_clean_backup == "true");
-      $('#backup-snap-keep-read, #backup-snap-keep').val(data.auto_clean_backup_keep);
+      $('#backup-snap-keep').val(data.auto_clean_backup_keep);
       
       
-      $('#backup-snap-keep-read + label').removeClass("active");
-      $('#backup-snap-keep-read + label').addClass("active");
-      $('#local-snap-keep-read + label').removeClass("active");
-      $('#local-snap-keep-read + label').addClass("active");
+      $('#backup-snap-keep + label').removeClass("active");
+      $('#backup-snap-keep + label').addClass("active");
+      $('#local-snap-keep + label').removeClass("active");
+      $('#local-snap-keep + label').addClass("active");
       
       changeSelect('#cron-drop-day', data.cron_weekday);
       updateDropVisibility();
