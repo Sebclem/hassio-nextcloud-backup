@@ -22,6 +22,7 @@
     "boot": "auto",
     "hassio_api": true,
     "hassio_role": "backup",
+    "homeassistant_api": true,
     "options": {
         "ssl": false,
         "certfile": "fullchain.pem",
