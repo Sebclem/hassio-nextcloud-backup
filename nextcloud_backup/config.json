@@ -21,7 +21,7 @@
     ],
     "boot": "auto",
     "hassio_api": true,
-    "hassio_role": "backup",
+    "hassio_role": "manager",
     "homeassistant_api": true,
     "options": {
         "ssl": false,
