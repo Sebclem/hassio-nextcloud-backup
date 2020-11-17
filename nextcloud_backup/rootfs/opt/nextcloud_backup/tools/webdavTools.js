@@ -211,7 +211,7 @@ class WebdavTools {
             let options = {
                 body: stream,
                 username: this.username,
-                password: this.password,
+                password: encodeURIComponent(this.password),
             };
             if (conf.ssl === "true") {
                 options["https"] = { rejectUnauthorized: conf.self_signed === "false" };
@@ -306,7 +306,7 @@ class WebdavTools {
             let conf = this.getConf();
             let options = {
                 username: this.username,
-                password: encodeURI(this.password),
+                password: encodeURIComponent(this.password),
             };
             if (conf.ssl === "true") {
                 options["https"] = { rejectUnauthorized: conf.self_signed === "false" };
