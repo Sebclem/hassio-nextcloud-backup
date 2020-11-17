@@ -19,6 +19,7 @@ const pipeline = promisify(stream.pipeline);
 
 class WebdavTools {
     constructor() {
+        this.host = null;
         this.client = null;
         this.baseUrl = null;
         this.username = null;
@@ -27,6 +28,7 @@ class WebdavTools {
 
     init(ssl, host, username, password, accept_selfsigned_cert) {
         return new Promise((resolve, reject) => {
+            this.host = host;
             let status = statusTools.getStatus();
             logger.info("Initilizing and checking webdav client...");
             this.baseUrl = (ssl === "true" ? "https" : "http") + "://" + host + endpoint;
@@ -216,7 +218,8 @@ class WebdavTools {
             if (conf.ssl === "true") {
                 options["https"] = { rejectUnauthorized: conf.self_signed === "false" };
             }
-            logger.debug(`...URI: ${encodeURI(this.baseUrl + path)} rejectUnauthorized: ${options["https"]["rejectUnauthorized"]}`);
+            logger.debug(`...URI: ${encodeURI(this.baseUrl.replace(this.host, 'host.hiden') + path)}`);
+            logger.debug(`...rejectUnauthorized: ${options["https"]["rejectUnauthorized"]}`);
 
             got.stream
                 .put(encodeURI(this.baseUrl + path), options)
@@ -311,7 +314,8 @@ class WebdavTools {
             if (conf.ssl === "true") {
                 options["https"] = { rejectUnauthorized: conf.self_signed === "false" };
             }
-            logger.debug(`...URI: ${encodeURI(this.baseUrl + path)} rejectUnauthorized: ${options["https"]["rejectUnauthorized"]}`);
+            logger.debug(`...URI: ${encodeURI(this.baseUrl.replace(this.host, 'host.hiden') + path)}`);
+            logger.debug(`...rejectUnauthorized: ${options["https"]["rejectUnauthorized"]}`);
             pipeline(
                 got.stream.get(encodeURI(this.baseUrl + path), options).on("downloadProgress", (e) => {
                     let percent = Math.round(e.percent * 100) / 100;
