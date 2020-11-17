@@ -216,6 +216,7 @@ class WebdavTools {
             if (conf.ssl === "true") {
                 options["https"] = { rejectUnauthorized: conf.self_signed === "false" };
             }
+            logger.debug(`...URI: ${this.baseUrl + encodeURI(path)} rejectUnauthorized: ${options["https"]["rejectUnauthorized"]}`);
 
             got.stream
                 .put(this.baseUrl + encodeURI(path), options)
@@ -310,7 +311,7 @@ class WebdavTools {
             if (conf.ssl === "true") {
                 options["https"] = { rejectUnauthorized: conf.self_signed === "false" };
             }
-
+            logger.debug(`...URI: ${this.baseUrl + encodeURI(path)} rejectUnauthorized: ${options["https"]["rejectUnauthorized"]}`)
             pipeline(
                 got.stream.get(this.baseUrl + encodeURI(path), options).on("downloadProgress", (e) => {
                     let percent = Math.round(e.percent * 100) / 100;
