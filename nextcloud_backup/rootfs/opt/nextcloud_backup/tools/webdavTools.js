@@ -265,6 +265,7 @@ class WebdavTools {
                     status.message = `Fail to upload snapshot to nextcloud (${err}) !`;
                     statusTools.setStatus(status);
                     logger.error(status.message);
+                    logger.error(err);
                     reject(status.message);
                 });
         });
@@ -334,6 +335,7 @@ class WebdavTools {
                     status.error_code = 7;
                     statusTools.setStatus(status);
                     logger.error(status.message);
+                    logger.error(err);
                     reject(err.message);
                 });
         });
