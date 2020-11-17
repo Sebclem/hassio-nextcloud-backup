@@ -211,15 +211,15 @@ class WebdavTools {
             let options = {
                 body: stream,
                 username: this.username,
-                password: this.password,
+                password: encodeURI(this.password),
             };
             if (conf.ssl === "true") {
                 options["https"] = { rejectUnauthorized: conf.self_signed === "false" };
             }
-            logger.debug(`...URI: ${this.baseUrl + encodeURI(path)} rejectUnauthorized: ${options["https"]["rejectUnauthorized"]}`);
+            logger.debug(`...URI: ${encodeURI(this.baseUrl + path)} rejectUnauthorized: ${options["https"]["rejectUnauthorized"]}`);
 
             got.stream
-                .put(this.baseUrl + encodeURI(path), options)
+                .put(encodeURI(this.baseUrl + path), options)
                 .on("uploadProgress", (e) => {
                     let percent = e.percent;
                     if (status.progress != percent) {
@@ -311,9 +311,9 @@ class WebdavTools {
             if (conf.ssl === "true") {
                 options["https"] = { rejectUnauthorized: conf.self_signed === "false" };
             }
-            logger.debug(`...URI: ${this.baseUrl + encodeURI(path)} rejectUnauthorized: ${options["https"]["rejectUnauthorized"]}`)
+            logger.debug(`...URI: ${encodeURI(this.baseUrl + path)} rejectUnauthorized: ${options["https"]["rejectUnauthorized"]}`);
             pipeline(
-                got.stream.get(this.baseUrl + encodeURI(path), options).on("downloadProgress", (e) => {
+                got.stream.get(encodeURI(this.baseUrl + path), options).on("downloadProgress", (e) => {
                     let percent = Math.round(e.percent * 100) / 100;
                     if (status.progress != percent) {
                         status.progress = percent;
