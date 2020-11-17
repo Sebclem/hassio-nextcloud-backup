@@ -211,7 +211,7 @@ class WebdavTools {
             let options = {
                 body: stream,
                 username: this.username,
-                password: encodeURI(this.password),
+                password: this.password,
             };
             if (conf.ssl === "true") {
                 options["https"] = { rejectUnauthorized: conf.self_signed === "false" };
@@ -266,7 +266,7 @@ class WebdavTools {
                     status.message = `Fail to upload snapshot to nextcloud (${err}) !`;
                     statusTools.setStatus(status);
                     logger.error(status.message);
-                    logger.error(err);
+                    logger.error(err?.stack);
                     reject(status.message);
                 });
         });
@@ -306,7 +306,7 @@ class WebdavTools {
             let conf = this.getConf();
             let options = {
                 username: this.username,
-                password: this.password,
+                password: encodeURI(this.password),
             };
             if (conf.ssl === "true") {
                 options["https"] = { rejectUnauthorized: conf.self_signed === "false" };
@@ -336,7 +336,7 @@ class WebdavTools {
                     status.error_code = 7;
                     statusTools.setStatus(status);
                     logger.error(status.message);
-                    logger.error(err);
+                    logger.error(err?.stack);
                     reject(err.message);
                 });
         });
