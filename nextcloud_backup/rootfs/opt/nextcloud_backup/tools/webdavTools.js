@@ -212,8 +212,11 @@ class WebdavTools {
             let conf = this.getConf();
             let options = {
                 body: stream,
-                username: this.username,
-                password: encodeURIComponent(this.password),
+                // username: this.username,
+                // password: encodeURIComponent(this.password),
+                headers: {
+                    'Authorization': 'Basic ' + Buffer.from(this.username + ':' + this.password).toString('base64')
+                }
             };
             if (conf.ssl === "true") {
                 options["https"] = { rejectUnauthorized: conf.self_signed === "false" };
@@ -308,8 +311,9 @@ class WebdavTools {
             let stream = fs.createWriteStream(tmpFile);
             let conf = this.getConf();
             let options = {
-                username: this.username,
-                password: encodeURIComponent(this.password),
+                headers: {
+                    'Authorization': 'Basic ' + Buffer.from(this.username + ':' + this.password).toString('base64')
+                }
             };
             if (conf.ssl === "true") {
                 options["https"] = { rejectUnauthorized: conf.self_signed === "false" };
