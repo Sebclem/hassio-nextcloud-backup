@@ -89,6 +89,20 @@ function getAddonList() {
     });
 }
 
+function getAddonToBackup(){
+    return new Promise((resolve, reject) => {
+        let excluded_addon = settingsTools.getSettings().exclude_addon;
+        getAddonList().then((all_addon)=>{
+            let slugs = [];
+            for(let i in all_addon){
+                if(!excluded_addon.includes(all_addon[i].slug))
+                    slugs.push(all_addon[i].slug)
+            }
+            resolve(slugs)
+        }).catch(()=>reject()); 
+    });  
+}
+
 function getFolderList(){
     return [
         {
@@ -115,6 +129,16 @@ function getFolderList(){
     ]
 }
 
+function getFolderToBackup(){
+    let excluded_folder = settingsTools.getSettings().exclude_folder;
+    let all_folder = getFolderList()
+    let slugs = [];
+    for(let i in all_folder){
+        if(!excluded_folder.includes(all_folder[i].slug))
+            slugs.push(all_folder[i].slug)
+    }
+    return slugs;
+}
 
 function getSnapshots() {
     return new Promise((resolve, reject) => {
@@ -254,26 +278,35 @@ function createNewBackup(name) {
         statusTools.setStatus(status);
         logger.info("Creating new snapshot...");
         let token = process.env.HASSIO_TOKEN;
-        let option = {
-            headers: { "X-HASSIO-KEY": token },
-            responseType: "json",
-            timeout: create_snap_timeout,
-            json: { name: name },
-        };
+        getAddonToBackup().then((addons)=>{
+            let folders = getFolderToBackup();
+            let option = {
+                headers: { "X-HASSIO-KEY": token },
+                responseType: "json",
+                timeout: create_snap_timeout,
+                json: { 
+                    name: name,
+                    addons: addons,
+                    folders: folders
+                 },
+            };
+            
+            got.post(`http://hassio/snapshots/new/partial`, option)
+            .then((result) => {
+                logger.info(`Snapshot created with id ${result.body.data.slug}`);
+                resolve(result.body.data.slug);
+            })
+            .catch((error) => {
+                status.status = "error";
+                status.message = "Can't create new snapshot (" + error.message + ")";
+                status.error_code = 5;
+                statusTools.setStatus(status);
+                logger.error(status.message);
+                reject(status.message);
+            });
+            
+        }).catch(reject);
         
-        got.post(`http://hassio/snapshots/new/full`, option)
-        .then((result) => {
-            logger.info(`Snapshot created with id ${result.body.data.slug}`);
-            resolve(result.body.data.slug);
-        })
-        .catch((error) => {
-            status.status = "error";
-            status.message = "Can't create new snapshot (" + error.message + ")";
-            status.error_code = 5;
-            statusTools.setStatus(status);
-            logger.error(status.message);
-            reject(status.message);
-        });
     });
 }
 

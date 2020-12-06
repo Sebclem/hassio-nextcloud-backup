@@ -272,7 +272,7 @@
     M.Dropdown.init(drops, { constrainWidth: false, coverTrigger: false, alignment: 'right', onOpenStart: () => $('#setting-trigger').addClass('active'), onCloseEnd: () => $('#setting-trigger').removeClass('active') });
     
     setInterval(update_status, 500);
-    setInterval(updateLocalSnaps, 2000);
+    setInterval(updateLocalSnaps, 5000);
     listeners();
     
   });
