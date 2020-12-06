@@ -28,6 +28,7 @@ function check_cron(conf){
 
 
 function check(conf, fallback = false){
+    let needSave = false;
     if(!check_cron(conf)){
         if(fallback){
             logger.warn("Bad value for cron settings, fallback to default ")
@@ -92,7 +93,39 @@ function check(conf, fallback = false){
             return false;
         }
     }
-    if(fallback){
+    if(conf.exclude_addon == null){
+        if(fallback){
+            logger.warn("Bad value for 'exclude_addon', fallback to [] ")
+            conf.exclude_addon = []
+        }
+        else {
+            logger.error("Bad value for 'exclude_addon'")
+            return false;
+        }
+    }
+    if(conf.exclude_folder == null){
+        if(fallback){
+            logger.warn("Bad value for 'exclude_folder', fallback to [] ")
+            conf.exclude_folder = []
+        }
+        else {
+            logger.error("Bad value for 'exclude_folder'")
+            return false;
+        }
+    }
+
+    if(!Array.isArray(conf.exclude_folder)){
+        logger.debug("exclude_folder is not array (Empty value), reset...");
+        conf.exclude_folder = []
+        needSave = true;
+    }
+    if(!Array.isArray(conf.exclude_addon)){
+        logger.debug("exclude_addon is not array (Empty value), reset...");
+        conf.exclude_addon = []
+        needSave = true;
+    }
+
+    if(fallback || needSave){
         setSettings(conf);
     }
     return true

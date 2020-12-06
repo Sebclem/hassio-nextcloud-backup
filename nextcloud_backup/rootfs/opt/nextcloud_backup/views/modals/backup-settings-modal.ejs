@@ -14,131 +14,156 @@
           <input id="name-template" type="text" class="white-text">
           <label for="name-template">Backup name</label>
           <span class="helper-text">You can find all available variables <a target="_blank"
-              href="https://github.com/Sebclem/hassio-nextcloud-backup/blob/master/naming_template.md">here</a></span>
-        </div>
-      </div>
-      
-      <div class="row">
-        <div class="input-field col offset-xl2 xl8 offset-l1 l10 m12 s12">
-          <select id="cron-drop-settings">
-            <option value="0">Disable</option>
-            <option value="1">Daily</option>
-            <option value="2">Weekly</option>
-            <option value="3">Monthly</option>
-          </select>
-          <label>Auto Backup</label>
-        </div>
-      </div>
-      <div class="row hide">
-        <div class="input-field col offset-xl2 xl8 offset-l1 l10 m12 s12">
-          <input type="text" class="timepicker white-text" readonly="true" id="timepicker">
-          <label>Hour </label>
-        </div>
-      </div>
-      
-      <div class="row hide">
-        <div class="input-field col offset-xl2 xl8 offset-l1 l10 m12 s12">
-          <select id="cron-drop-day">
-            <option value="1">Monday</option>
-            <option value="2">Tuesday</option>
-            <option value="3">Wednesday</option>
-            <option value="4">Thursday</option>
-            <option value="5">Friday</option>
-            <option value="6">Saturday</option>
-            <option value="0">Sunday</option>
-          </select>
-          <label>Day</label>
-        </div>
-      </div>
-      
-      <div class="row hide">
-        <div class="input-field col s2">
-          <input type="text" class="white-text" disabled readonly="true" id="cron-drop-day-month-read">
-          <label class="white-text active">Day of month</label>
-        </div>
-        <div class="input-field col s10">
-          <p class="range-field">
-            <input type="range" id="cron-drop-day-month" min="1" max="28" style="border: none;" />
-          </p>
+            href="https://github.com/Sebclem/hassio-nextcloud-backup/blob/master/naming_template.md">here</a></span>
+          </div>
         </div>
         
-      </div>
-      <div class="row">
-        <div class="col s12">
+        <div class="row">
+          <div class="input-field col offset-xl2 xl8 offset-l1 l10 m12 s12">
+            <select id="cron-drop-settings">
+              <option value="0">Disable</option>
+              <option value="1">Daily</option>
+              <option value="2">Weekly</option>
+              <option value="3">Monthly</option>
+            </select>
+            <label>Auto Backup</label>
+          </div>
+        </div>
+        <div class="row hide">
+          <div class="input-field col offset-xl2 xl8 offset-l1 l10 m12 s12">
+            <input type="text" class="timepicker white-text" readonly="true" id="timepicker">
+            <label>Hour </label>
+          </div>
+        </div>
+        
+        <div class="row hide">
+          <div class="input-field col offset-xl2 xl8 offset-l1 l10 m12 s12">
+            <select id="cron-drop-day">
+              <option value="1">Monday</option>
+              <option value="2">Tuesday</option>
+              <option value="3">Wednesday</option>
+              <option value="4">Thursday</option>
+              <option value="5">Friday</option>
+              <option value="6">Saturday</option>
+              <option value="0">Sunday</option>
+            </select>
+            <label>Day</label>
+          </div>
+        </div>
+        
+        <div class="row hide">
+          <div class="input-field col s2">
+            <input type="text" class="white-text" disabled readonly="true" id="cron-drop-day-month-read">
+            <label class="white-text active">Day of month</label>
+          </div>
+          <div class="input-field col s10">
+            <p class="range-field">
+              <input type="range" id="cron-drop-day-month" min="1" max="28" style="border: none;" />
+            </p>
+          </div>
           
         </div>
-      </div>
-      <div class="row" style="margin-bottom: 5px;">
-        <div class="col s12 center">
-          <h4>Auto Clean Settings</h2>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col s12 center divider">
-            
-          </div>
-        </div>
-        
         <div class="row">
           <div class="col offset-xl1 xl5 l6 m12 s12">
-            <div class="row" style="margin-bottom: 10px;">
-              <div class="col s12">
-                <div style="color: #9e9e9e; display: inline;">Auto Clean Local Snapshots</div>
-                <div class="switch" style="display: inline;">
-                  <label>
-                    <input id="auto_clean_local" type="checkbox">
-                    <span class="lever"></span>
-                  </label>
-                </div>
+            <div class="row">
+              <div class="col s12 center">
+                <h5>Folders</h5>
               </div>
             </div>
             <div class="row">
-              <div class="input-field col s12">
-                <input type="number" class="white-text" id="local-snap-keep">
-                <label class="active">Local snapshot to keep</label>
+              <div class="col offset-s1 s11 xl10 offset-xl2" >
+                <ul id="folders-div">
+
+                </ul>
               </div>
-            </div>
-            
+            </div>           
           </div>
           <div class="col xl5 l6 m12 s12" >
-            <div class="row" style="margin-bottom: 10px;">
-              <div class="col s12">
-                <div style="color: #9e9e9e; display: inline;">Auto Clean Nextcloud Snapshots</div>
-              <div class="switch" style="display: inline;">
-                <label>
-                  <input id="auto_clean_backup" type="checkbox">
-                  <span class="lever"></span>
-                </label>
+            <div class="row">
+              <div class="col s12 center">
+                <h5>Addons</h5>
               </div>
+            </div>
+            <div class="row">
+              <div class="col offset-s1 s11 xl10 offset-xl2">
+                <ul id="addons-div">
+
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" style="margin-bottom: 5px;">
+          <div class="col s12 center">
+            <h4>Auto Clean Settings</h2>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col s12 center divider">
+              
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col offset-xl1 xl5 l6 m12 s12">
+              <div class="row" style="margin-bottom: 10px;">
+                <div class="col s12">
+                  <div style="color: #9e9e9e; display: inline;">Auto Clean Local Snapshots</div>
+                  <div class="switch" style="display: inline;">
+                    <label>
+                      <input id="auto_clean_local" type="checkbox">
+                      <span class="lever"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <input type="number" class="white-text" id="local-snap-keep">
+                  <label class="active">Local snapshot to keep</label>
+                </div>
               </div>
               
             </div>
-            <div class="row">
-              <div class="input-field col s12">
-                <input type="number" class="white-text" id="backup-snap-keep">
-                <label class="active">Nextcloud snapshot to keep</label>
+            <div class="col xl5 l6 m12 s12" >
+              <div class="row" style="margin-bottom: 10px;">
+                <div class="col s12">
+                  <div style="color: #9e9e9e; display: inline;">Auto Clean Nextcloud Snapshots</div>
+                  <div class="switch" style="display: inline;">
+                    <label>
+                      <input id="auto_clean_backup" type="checkbox">
+                      <span class="lever"></span>
+                    </label>
+                  </div>
+                </div>
+                
               </div>
+              <div class="row">
+                <div class="input-field col s12">
+                  <input type="number" class="white-text" id="backup-snap-keep">
+                  <label class="active">Nextcloud snapshot to keep</label>
+                </div>
+              </div>
+              
+              
             </div>
-            
+          </div>
+          
+          <div class="row" style="margin-bottom: 10px;">
             
           </div>
-        </div>
-        
-        <div class="row" style="margin-bottom: 10px;">
-          
-        </div>
-        <div class="row">
+          <div class="row">
+            
+          </div>
           
         </div>
         
-      </div>
-      
-      
-      
-      
-      <div class="modal-footer blue-grey darken-4">
-        <a href="#" class="modal-close waves-effect btn red"><b>Cancel</b></a>
-        <a href="#" class="btn green waves-effect" style="margin-left: 5px;" id="save-backup-settings"><b>Save</b></a>
         
+        
+        
+        <div class="modal-footer blue-grey darken-4">
+          <a href="#" class="modal-close waves-effect btn red"><b>Cancel</b></a>
+          <a href="#" class="btn green waves-effect" style="margin-left: 5px;" id="save-backup-settings"><b>Save</b></a>
+          
+        </div>
       </div>
-    </div>

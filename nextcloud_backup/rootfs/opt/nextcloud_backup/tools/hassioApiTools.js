@@ -46,6 +46,75 @@ function getVersion() {
     });
 }
 
+function getAddonList() {
+    return new Promise((resolve, reject) => {
+        let token = process.env.HASSIO_TOKEN;
+        let status = statusTools.getStatus();
+        let option = {
+            headers: { "X-HASSIO-KEY": token },
+            responseType: "json",
+        };
+        
+        got("http://hassio/addons", option)
+        .then((result) => {
+            if (status.error_code === 1) {
+                status.status = "idle";
+                status.message = null;
+                status.error_code = null;
+                statusTools.setStatus(status);
+            }
+            let addons = result.body.data.addons;
+            let instaled = [];
+            for(let index in addons){
+                let current = addons[index];
+                if(current.installed == true){
+                    instaled.push({slug:current.slug, name: current.name})
+                }                
+            }
+            instaled.sort((a,b)=>{
+                var textA = a.name.toUpperCase();
+                var textB = b.name.toUpperCase();
+                return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+            });
+            resolve(instaled);
+        })
+        .catch((error) => {
+            status.status = "error";
+            status.message = "Fail to fetch addons list (" + error.message + ")";
+            status.error_code = 1;
+            statusTools.setStatus(status);
+            logger.error(status.message);
+            reject(error.message);
+        });
+    });
+}
+
+function getFolderList(){
+    return [
+        {
+            name: "Homme Assistant configuration",
+            slug: "homeassistant"
+            
+        },
+        {
+            name: "SSL",
+            slug: "ssl"
+        },
+        {
+            name: "Share",
+            slug: "share"
+        },
+        {
+            name: "Media",
+            slug: "media"
+        },
+        {
+            name: "Local add-ons",
+            slug: "addons/local"
+        }   
+    ]
+}
+
 
 function getSnapshots() {
     return new Promise((resolve, reject) => {
@@ -302,6 +371,8 @@ function uploadSnapshot(path) {
 }
 
 exports.getVersion = getVersion;
+exports.getAddonList = getAddonList;
+exports.getFolderList = getFolderList;
 exports.getSnapshots = getSnapshots;
 exports.downloadSnapshot = downloadSnapshot;
 exports.createNewBackup = createNewBackup;
