@@ -139,8 +139,8 @@ function getFormatedName(is_manual, ha_version){
     template = template.replace('{type}', is_manual ? 'Manual' : 'Auto');
     template = template.replace('{ha_version}', ha_version);
     let mmt = moment()
-    template = template.replace('{hour_12}', mmt.format('hh:mmA'));
-    template = template.replace('{hour}', mmt.format('HH:mm'));
+    template = template.replace('{hour_12}', mmt.format('hhmmA'));
+    template = template.replace('{hour}', mmt.format('HHmm'));
     template = template.replace('{date}', mmt.format('YYYY-MM-DD'));
     return  template
 }
