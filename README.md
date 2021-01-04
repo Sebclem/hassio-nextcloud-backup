@@ -160,7 +160,7 @@ check [the contributor's page][contributors].
 
 MIT License
 
-Copyright (c) 2020 Sébastien Clément
+Copyright (c) 2021 Sébastien Clément
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -193,7 +193,7 @@ SOFTWARE.
 [i386-shield]: https://img.shields.io/badge/i386-yes-green.svg
 [issue]: https://github.com/hassio-addons/addon-log-viewer/issues
 [license-shield]: https://img.shields.io/github/license/Sebclem/hassio-nextcloud-backup.svg
-[maintenance-shield]: https://img.shields.io/maintenance/yes/2020.svg
+[maintenance-shield]: https://img.shields.io/maintenance/yes/2021.svg
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-Beta-red.svg
 [reddit]: https://reddit.com/r/homeassistant
 [releases-shield]: https://img.shields.io/github/release/Sebclem/hassio-nextcloud-backup.svg?include_prereleases
