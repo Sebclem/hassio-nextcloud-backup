@@ -57,7 +57,7 @@ jobs:
         echo "URL=$(jq --raw-output '.url // empty' "${{env.TARGET}}/config.json")" >> $GITHUB_ENV
         echo "VERSION=$(jq --raw-output '.version' "${{env.TARGET}}/config.json")" >> $GITHUB_ENV
         echo "IMAGE=$(echo "${{env.IMAGE}}" | sed -r "s/\{arch\}/${{matrix.arch}}/g")" >> $GITHUB_ENV
-        echo "BUILD_FROM=homeassistant/${{matrix.arch}}-base:latest" >> $GITHUB_ENV
+        echo "BUILD_FROM=hassioaddons/base-${{matrix.arch}}:$(cat nextcloud_backup/.base_version)" >> $GITHUB_ENV
         
     - name: Set Tags ${{matrix.arch}}
       run: |
