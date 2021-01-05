@@ -24,15 +24,10 @@
     "hassio_role": "manager",
     "homeassistant_api": true,
     "options": {
-        "ssl": false,
-        "certfile": "fullchain.pem",
-        "keyfile": "privkey.pem"
+        "log_level": "info"
     },
     "schema": {
         "log_level": "match(^(trace|debug|info|notice|warning|error|fatal)$)?",
-        "ssl": "bool",
-        "certfile": "str",
-        "keyfile": "str",
         "leave_front_door_open": "bool?"
     },
     "ports": {

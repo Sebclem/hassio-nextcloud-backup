@@ -9,4 +9,9 @@
 # ==============================================================================
 
 cd /opt/nextcloud_backup/
-npm start
+if bashio::config.exists 'log_level'; then
+  LOG_LEVEL=$(bashio::config 'log_level')
+else
+  LOG_LEVEL='info'
+fi
+LOG_LEVEL=$LOG_LEVEL npm start

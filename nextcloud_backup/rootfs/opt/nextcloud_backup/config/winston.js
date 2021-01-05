@@ -2,7 +2,7 @@ const appRoot = require("app-root-path");
 const winston = require("winston");
 
 const logger = winston.createLogger({
-    level: "debug",
+    level: process.env.LOG_LEVEL || 'info' ,
     format: winston.format.combine(
         winston.format.timestamp({
             format: "YYYY-MM-DD HH:mm:ss",
@@ -11,6 +11,7 @@ const logger = winston.createLogger({
         // winston.format.splat(),
 
         winston.format.colorize(),
+        winston.format.align(),
         winston.format.printf(({ level, message, timestamp }) => {
             return `[${timestamp}] [${level}]: ${message}`;
         })
