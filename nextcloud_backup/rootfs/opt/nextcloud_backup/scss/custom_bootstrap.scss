@@ -1,4 +1,15 @@
+$body-bg: #222222;
+$dark: #292929;
+$secondary: #343a40;
+$accent: #b58e51;
+
+
 @import "../node_modules/bootstrap/scss/bootstrap";
-:root{
-  --bs-primary: var(--primary-color, #{$primary}) !important;
+
+
+.bg-accent{
+  background-color: $accent;
+}
+.text-accent{
+  color:  $accent
 }
