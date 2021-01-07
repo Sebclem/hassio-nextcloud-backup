@@ -1,16 +1,12 @@
-const settingsTools = require("./settingsTools");
+const CronJob = require("cron").CronJob;
 
+const settingsTools = require("./settingsTools");
 const WebdavTools = require("./webdavTools");
 const webdav = new WebdavTools().getInstance();
-
 const hassioApiTools = require("./hassioApiTools");
-
 const statusTools = require("./status");
-
 const pathTools = require("./pathTools");
 
-const CronJob = require("cron").CronJob;
-const moment = require("moment");
 const logger = require("../config/winston");
 
 function startCron() {
@@ -100,21 +96,26 @@ class CronContainer {
                             .then(() => {
                                 webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.auto + name + ".tar");
                             })
-                            .catch(() => {});
+                            .catch(() => {
+                            });
                     })
-                    .catch(() => {});
+                    .catch(() => {
+                    });
             })
-            .catch(() => {});
+            .catch(() => {
+            });
     }
 
     _clean() {
         let autoCleanlocal = settingsTools.getSettings().auto_clean_local;
         if (autoCleanlocal != null && autoCleanlocal === "true") {
-            hassioApiTools.clean().catch(() => {});
+            hassioApiTools.clean().catch(() => {
+            });
         }
         let autoCleanCloud = settingsTools.getSettings().auto_clean_backup;
         if (autoCleanCloud != null && autoCleanCloud === "true") {
-            webdav.clean().catch(() => {});
+            webdav.clean().catch(() => {
+            });
         }
     }
 }

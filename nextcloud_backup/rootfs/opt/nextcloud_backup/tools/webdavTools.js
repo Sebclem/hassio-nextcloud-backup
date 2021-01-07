@@ -36,7 +36,11 @@ class WebdavTools {
             this.password = password;
             let agent_option = ssl === "true" ? { rejectUnauthorized: accept_selfsigned_cert === "false" } : {};
             try {
-                this.client = createClient(this.baseUrl, { username: username, password: password, httpsAgent: new https.Agent(agent_option) });
+                this.client = createClient(this.baseUrl, {
+                    username: username,
+                    password: password,
+                    httpsAgent: new https.Agent(agent_option)
+                });
 
                 this.client
                     .getDirectoryContents("/")
@@ -72,6 +76,7 @@ class WebdavTools {
             }
         });
     }
+
     async __createRoot() {
         let root_splited = this.getConf().back_dir.split("/").splice(1);
         let path = "/";
@@ -91,25 +96,25 @@ class WebdavTools {
 
     initFolder() {
         return new Promise((resolve) => {
-            this.__createRoot()
-                .catch((err) => {
-                    logger.error(err);
-                })
-                .then(() => {
-                    this.client
-                        .createDirectory(this.getConf().back_dir + pathTools.auto)
-                        .catch(() => {})
-                        .then(() => {
-                            this.client
-                                .createDirectory(this.getConf().back_dir + pathTools.manual)
-                                .catch(() => {})
-                                .then(() => {
-                                    resolve();
-                                });
-                        });
-                });
+            this.__createRoot().catch((err) => {
+                logger.error(err);
+            }).then(() => {
+                this.client.createDirectory(this.getConf().back_dir + pathTools.auto)
+                    .catch(() => {
+                    })
+                    .then(() => {
+                        this.client
+                            .createDirectory(this.getConf().back_dir + pathTools.manual)
+                            .catch(() => {
+                            })
+                            .then(() => {
+                                resolve();
+                            });
+                    });
+            });
         });
     }
+
     /**
      * Check if theh webdav config is valid, if yes, start init of webdav client
      */
@@ -177,7 +182,8 @@ class WebdavTools {
         if (fs.existsSync(configPath)) {
             let content = JSON.parse(fs.readFileSync(configPath));
             return content;
-        } else return null;
+        } else
+            return null;
     }
 
     setConf(conf) {
@@ -194,7 +200,8 @@ class WebdavTools {
                     .catch((err) => {
                         reject(err);
                     });
-            } else this._startUpload(id, path);
+            } else
+                this._startUpload(id, path);
         });
     }
 
@@ -237,7 +244,7 @@ class WebdavTools {
                     }
                 })
                 .on("response", (res) => {
-                    if (res.statusCode != 201 && res.statusCode != 204) {
+                    if (res.statusCode !== 201 && res.statusCode !== 204) {
                         status.status = "error";
                         status.error_code = 4;
                         status.message = `Fail to upload snapshot to nextcloud (Status code: ${res.statusCode})!`;
@@ -255,11 +262,11 @@ class WebdavTools {
                         statusTools.setStatus(status);
                         cleanTempFolder();
                         let autoCleanCloud = settingsTools.getSettings().auto_clean_backup;
-                        if (autoCleanCloud != null && autoCleanCloud == "true") {
+                        if (autoCleanCloud != null && autoCleanCloud === "true") {
                             this.clean().catch();
                         }
                         let autoCleanlocal = settingsTools.getSettings().auto_clean_local;
-                        if (autoCleanlocal != null && autoCleanlocal == "true") {
+                        if (autoCleanlocal != null && autoCleanlocal === "true") {
                             hassioApiTools.clean();
                         }
                         resolve();
@@ -296,6 +303,7 @@ class WebdavTools {
                     .catch(() => reject());
         });
     }
+
     _startDownload(path) {
         return new Promise((resolve, reject) => {
             let status = statusTools.getStatus();
@@ -321,32 +329,31 @@ class WebdavTools {
             logger.debug(`...URI: ${encodeURI(this.baseUrl.replace(this.host, 'host.hiden') + path)}`);
             logger.debug(`...rejectUnauthorized: ${options["https"]["rejectUnauthorized"]}`);
             pipeline(
-                got.stream.get(encodeURI(this.baseUrl + path), options).on("downloadProgress", (e) => {
-                    let percent = Math.round(e.percent * 100) / 100;
-                    if (status.progress != percent) {
-                        status.progress = percent;
-                        statusTools.setStatus(status);
-                    }
-                }),
+                got.stream.get(encodeURI(this.baseUrl + path), options)
+                    .on("downloadProgress", (e) => {
+                        let percent = Math.round(e.percent * 100) / 100;
+                        if (status.progress !== percent) {
+                            status.progress = percent;
+                            statusTools.setStatus(status);
+                        }
+                    }),
                 stream
-            )
-                .then((res) => {
-                    logger.info("Download success !");
-                    status.progress = 1;
-                    statusTools.setStatus(status);
-                    logger.debug("Backup dl size : " + fs.statSync(tmpFile).size / 1024 / 1024);
-                    resolve(tmpFile);
-                })
-                .catch((err) => {
-                    if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile);
-                    status.status = "error";
-                    status.message = "Fail to download Hassio snapshot (" + err.message + ")";
-                    status.error_code = 7;
-                    statusTools.setStatus(status);
-                    logger.error(status.message);
-                    logger.error(err.stack);
-                    reject(err.message);
-                });
+            ).then((res) => {
+                logger.info("Download success !");
+                status.progress = 1;
+                statusTools.setStatus(status);
+                logger.debug("Backup dl size : " + fs.statSync(tmpFile).size / 1024 / 1024);
+                resolve(tmpFile);
+            }).catch((err) => {
+                if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile);
+                status.status = "error";
+                status.message = "Fail to download Hassio snapshot (" + err.message + ")";
+                status.error_code = 7;
+                statusTools.setStatus(status);
+                logger.error(status.message);
+                logger.error(err.stack);
+                reject(err.message);
+            });
         });
     }
 
@@ -358,12 +365,8 @@ class WebdavTools {
             }
             this.client
                 .getDirectoryContents(path)
-                .then((contents) => {
-                    resolve(contents);
-                })
-                .catch((error) => {
-                    reject(error);
-                });
+                .then((contents) => resolve(contents))
+                .catch((error) => reject(error));
         });
     }
 
@@ -378,8 +381,10 @@ class WebdavTools {
                         return;
                     }
                     contents.sort((a, b) => {
-                        if (moment(a.lastmod).isBefore(moment(b.lastmod))) return 1;
-                        else return -1;
+                        if (moment(a.lastmod).isBefore(moment(b.lastmod)))
+                            return 1;
+                        else
+                            return -1;
                     });
 
                     let toDel = contents.slice(limit);
@@ -403,11 +408,13 @@ class WebdavTools {
 
 function cleanTempFolder() {
     fs.readdir("./temp/", (err, files) => {
-        if (err) throw err;
+        if (err)
+            throw err;
 
         for (const file of files) {
             fs.unlink(path.join("./temp/", file), (err) => {
-                if (err) throw err;
+                if (err)
+                    throw err;
             });
         }
     });
