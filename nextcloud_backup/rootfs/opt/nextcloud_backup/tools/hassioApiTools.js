@@ -107,7 +107,7 @@ function getAddonToBackup() {
 function getFolderList() {
     return [
         {
-            name: "Homme Assistant configuration",
+            name: "Home Assistant configuration",
             slug: "homeassistant"
 
         },
