@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "app-root-path": "^3.0.0",
+    "bootstrap": "^5.0.0-beta1",
     "cookie-parser": "^1.4.5",
     "cron": "^1.8.2",
     "debug": "~2.6.9",
