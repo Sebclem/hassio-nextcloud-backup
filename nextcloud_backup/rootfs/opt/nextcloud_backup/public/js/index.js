@@ -6,6 +6,7 @@ var last_auto_back = "";
 const default_toast_timeout = 10000;
 let loadingModal = null;
 let nextcloud_setting_modal;
+let backup_setting_modal;
 document.addEventListener('DOMContentLoaded', function () {
     $.ajaxSetup({ traditional: true });
     updateLocalSnaps();
@@ -15,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
         backdrop: 'static'
     });
     nextcloud_setting_modal = new bootstrap.Modal(document.getElementById('modal-settings-nextcloud'));
+    backup_setting_modal = new bootstrap.Modal(document.getElementById('modal-settings-backup'));
 
     setInterval(update_status, 500);
     setInterval(updateLocalSnaps, 5000);
@@ -171,12 +173,10 @@ function listeners() {
     $('#trigger-backup-settings').click(getBackupSettings);
     $('#btn-backup-now').click(backupNow);
     $('#btn-clean-now').click(cleanNow);
+    $('#cron-drop-settings').change(updateDropVisibility);
 
 
     $('#save-backup-settings').click(sendBackupSettings);
-    $('#cron-drop-day-month').on('input', function () {
-        $('#cron-drop-day-month-read').val($(this).val());
-    });
 
     $('#local-snap-keep').on('input', function () {
         $('#local-snap-keep-read').val($(this).val());
@@ -236,7 +236,8 @@ function sendNextcloudSettings() {
         .done((data) => {
             console.log('Saved');
             $('#nextcloud_settings_message').parent().addClass("d-none");
-            create_toast("success", "Nextcloud settings saved !", default_toast_timeout);0
+            create_toast("success", "Nextcloud settings saved !", default_toast_timeout);
+            0
         })
         .fail((data) => {
             if (data.status == 406) {
@@ -334,47 +335,26 @@ function getBackupSettings() {
             }
         }
 
-        changeSelect('#cron-drop-settings', data.settings.cron_base);
-        $('#cron-drop-settings').change(updateDropVisibility);
+        $('#cron-drop-settings').val(data.settings.cron_base);
         $('#name-template').val(data.settings.name_template);
-        $('#name-template + label').removeClass("active");
-        $('#name-template + label').addClass("active");
 
-        let timepicker = document.querySelector('#timepicker');
+
         $('#timepicker').val(data.settings.cron_hour);
-        $('#timepicker + label').removeClass("active");
-        $('#timepicker + label').addClass("active");
-        if (M.Timepicker.getInstance(timepicker) != null)
-            M.Timepicker.getInstance(timepicker).destroy();
-        M.Timepicker.init(timepicker, {
-            defaultTime: data.settings.cron_hour,
-            twelveHour: false,
-            container: 'body'
-        });
         $('#cron-drop-day-month-read').val(data.settings.cron_month_day);
         $('#cron-drop-day-month').val(data.settings.cron_month_day);
 
-        $('#cron-drop-day-month-read + label').removeClass("active");
-        $('#cron-drop-day-month-read + label').addClass("active");
 
-
-        $('#auto_clean_local').prop('checked', data.settings.auto_clean_local == "true");
+        $('#auto_clean_local').prop('checked', data.settings.auto_clean_local === "true");
         $('#local-snap-keep').val(data.settings.auto_clean_local_keep);
-        $('#auto_clean_backup').prop('checked', data.settings.auto_clean_backup == "true");
+        $('#auto_clean_backup').prop('checked', data.settings.auto_clean_backup === "true");
         $('#backup-snap-keep').val(data.settings.auto_clean_backup_keep);
 
-
-        $('#backup-snap-keep + label').removeClass("active");
-        $('#backup-snap-keep + label').addClass("active");
-        $('#local-snap-keep + label').removeClass("active");
-        $('#local-snap-keep + label').addClass("active");
-
-        changeSelect('#cron-drop-day', data.settings.cron_weekday);
+        $('#cron-drop-day').val(data.settings.cron_weekday);
         let folder_html = ""
         for (let index in data.folders) {
             let thisFolder = data.folders[index];
             let exclude = data.settings.exclude_folder.includes(thisFolder.slug);
-            folder_html += `<li><label><input type="checkbox" class="folders-box" id="${thisFolder.slug}" ${exclude ? "" : "checked=checked"}/><span>${thisFolder.name}</span></label></li>`
+            folder_html += `<li class="list-group-item"><div class="form-check"><input class="form-check-input addons-box" type="checkbox" id="${thisFolder.slug}" ${exclude ? "" : "checked"}><label class="form-label mb-0" for="${thisFolder.slug}">${thisFolder.name}</label></div></li>`
         }
         $("#folders-div").html(folder_html);
 
@@ -382,12 +362,13 @@ function getBackupSettings() {
         for (let index in data.addonList) {
             let thisAddon = data.addonList[index];
             let exclude = data.settings.exclude_addon.includes(thisAddon.slug);
-            addons_html += `<li><label><input type="checkbox" class="addons-box" id="${thisAddon.slug}"  ${exclude ? "" : "checked=checked"}/><span>${thisAddon.name}</span></label></li>`
+            addons_html += `<li class="list-group-item"><div class="form-check"><input class="form-check-input addons-box" type="checkbox" id="${thisAddon.slug}" ${exclude ? "" : "checked"}><label class="form-label mb-0" for="${thisAddon.slug}">${thisAddon.name}</label></div></li>`
         }
         $("#addons-div").html(addons_html);
         updateDropVisibility();
         loadingModal.hide();
-        M.Modal.getInstance(document.querySelector("#modal-settings-backup")).open()
+        backup_setting_modal.show();
+
 
     });
 
@@ -398,25 +379,25 @@ function updateDropVisibility() {
 
     switch (cronBase) {
         case "3":
-            $('#timepicker').parent().parent().removeClass("hide");
-            $('#cron-drop-day').parent().parent().parent().addClass("hide");
-            $('#cron-drop-day-month').parent().parent().parent().removeClass("hide");
+            $('#timepicker').parent().parent().removeClass("d-none");
+            $('#cron-drop-day').parent().parent().addClass("d-none");
+            $('#cron-drop-day-month').parent().parent().removeClass("d-none");
 
             break;
         case "2":
-            $('#timepicker').parent().parent().removeClass("hide");
-            $('#cron-drop-day').parent().parent().parent().removeClass("hide");
-            $('#cron-drop-day-month').parent().parent().parent().addClass("hide");
+            $('#timepicker').parent().parent().removeClass("d-none");
+            $('#cron-drop-day').parent().parent().removeClass("d-none");
+            $('#cron-drop-day-month').parent().parent().addClass("d-none");
             break;
         case "1":
-            $('#timepicker').parent().parent().removeClass("hide");
-            $('#cron-drop-day').parent().parent().parent().addClass("hide");
-            $('#cron-drop-day-month').parent().parent().parent().addClass("hide");
+            $('#timepicker').parent().parent().removeClass("d-none");
+            $('#cron-drop-day').parent().parent().addClass("d-none");
+            $('#cron-drop-day-month').parent().parent().addClass("d-none");
             break;
         case "0":
-            $('#timepicker').parent().parent().addClass("hide");
-            $('#cron-drop-day').parent().parent().parent().addClass("hide");
-            $('#cron-drop-day-month').parent().parent().parent().addClass("hide");
+            $('#timepicker').parent().parent().addClass("d-none");
+            $('#cron-drop-day').parent().parent().addClass("d-none");
+            $('#cron-drop-day-month').parent().parent().addClass("d-none");
             break;
     }
 }
@@ -445,6 +426,7 @@ function sendBackupSettings() {
     }
 
     loadingModal.show();
+    backup_setting_modal.hide();
     $.post('./api/backup-settings',
         {
             name_template: name_template,
@@ -461,25 +443,13 @@ function sendBackupSettings() {
         })
         .done(() => {
             create_toast("success", "Backup settings saved !", default_toast_timeout);
-            M.Modal.getInstance(document.querySelector('#modal-settings-backup')).close();
+
         })
         .fail(() => {
             create_toast("error", "Can't save backup settings !", default_toast_timeout);
-            M.toast({
-                html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t save backup settings !',
-                classes: "red"
-            });
-        }).always(() => {
-        loadingModal.hide();
-    });
-}
-
-function changeSelect(selector, value) {
-    let selectBaseRaw = document.querySelector(selector);
-
-    if (M.FormSelect.getInstance(selectBaseRaw) != null)
-        M.FormSelect.getInstance(selectBaseRaw).destroy();
-    $(selector + ' option[selected]').removeAttr('selected');
-    $(selector + ' option[value=' + value + ']').attr('selected', "true");
-    M.FormSelect.init(selectBaseRaw, {});
+            backup_setting_modal.show();
+        })
+        .always(() => {
+            loadingModal.hide();
+        });
 }
