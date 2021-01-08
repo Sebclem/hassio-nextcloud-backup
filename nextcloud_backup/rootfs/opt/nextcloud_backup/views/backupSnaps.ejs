@@ -1,54 +1,66 @@
 <% if (locals.backups) { %>
-<div class="collection">
-    <% for(const index in backups) { %>
-    <a class="collection-item modal-trigger" href="#modal-<%=backups[index].etag%>"
-        data-id="<%= backups[index].etag %>">
-        <div><%= backups[index].basename%><div class="secondary-content hide-on-small-and-down">
-                <%= moment(backups[index].lastmod).format('MMM D, YYYY HH:mm')  %></div>
-        </div>
-    </a>
+    <div class="list-group ">
+        <% for(const index in backups) { %>
+            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+               href="#"
+               data-id="<%= backups[index].etag %>"
+               data-bs-toggle="modal"
+               data-bs-target="#modal-<%= backups[index].etag %>">
+                <%= backups[index].basename %>
+                <span class="badge bg-primary">
+                    <%= moment(backups[index].lastmod).format('MMM D, YYYY HH:mm') %>
+                </span>
+            </a>
 
-    <div id="modal-<%=backups[index].etag%>" class="modal modal-fixed-footer blue-grey darken-4 white-text">
-        <div class="modal-content">
-            <div class="row">
-                <div class="col s12 center">
-                    <h4>Backup Detail</h2>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col s12 center divider">
-                </div>
-            </div>
-            <div class="row">
-                 
-                <div class="input-field col s12">
-                    <input disabled type="text" id="name-<%=backups[index].etag%>" value="<%= backups[index].basename %>" />
-                    <label for="name-<%=backups[index].etag%>" class="white-text active">Name</label>
-                </div>
+            <div id="modal-<%= backups[index].etag %>" class="modal fade">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content bg-dark">
+                        <div class="modal-header border-secondary">
+                            <h5 class="modal-title" id="exampleModalLabel"> Backup Detail</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+
+                            <div class="mb-3">
+                                <label for="name-<%= backups[index].etag %>" class="form-label">Name</label>
+                                <input disabled type="text" class="form-control bg-secondary border-dark text-accent"
+                                       id="name-<%= backups[index].etag %>"
+                                       value="<%= backups[index].basename %>"/>
+                            </div>
 
 
-                <div class="input-field col s12">
-                    <input disabled type="text" id="date-<%=backups[index].etag%>"
-                        value="<%=moment(backups[index].lastmod).format('MMM D, YYYY HH:mm')%>" />
-                    <label for="date-<%=backups[index].etag%>" class="white-text active">Date</label>
+                            <div class="mb-3">
+                                <label for="date-<%= backups[index].etag %>" class="form-label">Date</label>
+                                <input disabled type="text" class="form-control bg-secondary border-dark text-accent"
+                                       id="date-<%= backups[index].etag %>"
+                                       value="<%= moment(backups[index].lastmod).format('MMM D, YYYY HH:mm') %>"/>
+
+                            </div>
+                            <div class="input-field col s12">
+                                <label for="size-<%= backups[index].etag %>" class="form-label">Size</label>
+                                <input disabled type="text" class="form-control bg-secondary border-dark text-accent"
+                                       id="size-<%= backups[index].etag %>"
+                                       value="<%= humanFileSize(backups[index].size, false) %>"/>
+
+                            </div>
+                        </div>
+                        <div class="modal-footer border-secondary">
+                            <button data-bs-dismiss="modal" class="btn btn-danger">Close</button>
+                            <button class="btn btn-success restore"
+                                    data-id="<%= backups[index].filename %>"
+                                    data-name='<%= backups[index].basename ? backups[index].basename : backups[index].etag %>'
+                                    data-bs-dismiss="modal">
+                                Upload to HA
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div class="input-field col s12">
-                    <input disabled type="text" id="size-<%=backups[index].etag%>"
-                        value="<%=humanFileSize(backups[index].size, false)%>" />
-                    <label for="size-<%=backups[index].etag%>" class="white-text active">Size</label>
-                </div>
+
             </div>
-        </div>
-        <div class="modal-footer blue-grey darken-4">
-            <a href="#!" class="waves-effect waves-green btn green restore modal-close" data-id="<%=backups[index].filename%>" data-name='<%= backups[index].basename ? backups[index].basename : backups[index].etag %>'>Upload to HA</a>
-            <a href="#!" class="modal-close waves-effect waves-green btn red">Close</a>
-        </div>
+
+        <% } %>
     </div>
-
-
-    <% } %>
-</div>
-
 
 
 <% } %>

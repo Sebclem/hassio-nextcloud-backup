@@ -13,7 +13,7 @@ Auto backup can be configured via the web interface.
 ### Features
 - Auto Backup : Configure this add-on to automaticly backup your HassIO instance.
 - Auto Clean : You can specify the maximum number of local snapshots and (__ONLY__) auto backed-up snapshots.
-- ~~Restore backups.~~ (Coming Soon)
+- Upload backed-up snapshot to Home assistant.
 > __Info:__
 > Auto Clean is executed after every upload and every day at 00h30
 

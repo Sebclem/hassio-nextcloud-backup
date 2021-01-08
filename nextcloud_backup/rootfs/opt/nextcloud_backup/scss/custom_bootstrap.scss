@@ -1,0 +1,52 @@
+$body-bg: #222222;
+$dark: #292929;
+$secondary: #343a40;
+$accent: #b58e51;
+
+$enable-shadows: true;
+$btn-box-shadow: none;
+
+$component-active-bg: $accent;
+
+$input-color: $accent;
+$input-bg: $secondary;
+$input-border-color: $secondary;
+
+$form-select-indicator-color: $accent;
+
+$form-switch-color: $accent;
+$form-switch-bg-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$form-switch-color}'/></svg>");
+$form-check-input-border: 1px solid $accent !default;
+
+$list-group-action-color: $accent;
+$list-group-bg: $secondary;
+$list-group-hover-bg: $secondary;
+$list-group-action-hover-color: #adb5bd;
+
+$alert-bg-scale: 0%;
+$alert-border-scale: -10%;
+$alert-color-scale: -100%;
+
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+
+.bg-accent {
+  background-color: $accent;
+}
+
+.text-accent {
+  color: $accent;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(63%) sepia(23%) saturate(819%) hue-rotate(358deg) brightness(88%) contrast(91%);
+  height: 30px;
+  margin: -12px;
+  width: 32px;
+}
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  cursor: pointer;
+}
+
+

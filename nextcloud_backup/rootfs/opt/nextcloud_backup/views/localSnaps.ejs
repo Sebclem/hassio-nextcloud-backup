@@ -1,61 +1,71 @@
 <% if (locals.snaps) { %>
-<div class="collection">
-    <% for(const index in snaps) { %>
-    <a class="collection-item local-snap-listener modal-trigger" href="#modal-<%=snaps[index].slug%>"
-        data-id="<%= snaps[index].slug %>">
-        <div><%= snaps[index].name ? snaps[index].name : snaps[index].slug %><div class="secondary-content hide-on-small-and-down">
-                <%= moment(snaps[index].date).format('MMM D, YYYY HH:mm')  %></div>
-        </div>
-    </a>
+    <div class="list-group">
+        <% for(const index in snaps) { %>
+            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+               href="#"
+               data-id="<%= snaps[index].slug %>"
+               data-bs-toggle="modal"
+               data-bs-target="#modal-<%= snaps[index].slug %>">
+                <%= snaps[index].name ? snaps[index].name : snaps[index].slug %>
+                <span class="badge bg-primary">
+                    <%= moment(snaps[index].date).format('MMM D, YYYY HH:mm') %>
+                </span>
+            </a>
 
-    <div id="modal-<%=snaps[index].slug%>" class="modal modal-fixed-footer blue-grey darken-4 white-text">
-        <div class="modal-content">
-            <div class="row">
-                <div class="col s12 center">
-                    <h4>Snapshot Detail</h2>
+            <div id="modal-<%= snaps[index].slug %>" class="modal fade">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content bg-dark">
+                        <div class="modal-header border-secondary">
+                            <h5 class="modal-title" id="exampleModalLabel"> Snapshot Detail</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="name-<%= snaps[index].slug %>" class="form-label">Name</label>
+                                <input disabled type="text" class="form-control bg-secondary border-dark text-accent" id="name-<%= snaps[index].slug %>"
+                                       value="<%= snaps[index].name ? snaps[index].name : snaps[index].slug %>"/>
+
+                            </div>
+
+
+                            <div class="mb-3">
+                                <label for="date-<%= snaps[index].slug %>" class="form-label">Date</label>
+                                <input disabled type="text" class="form-control bg-secondary border-dark text-accent" id="date-<%= snaps[index].slug %>"
+                                       value="<%= moment(snaps[index].date).format('MMM D, YYYY HH:mm') %>"/>
+
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="protected-<%= snaps[index].slug %>"
+                                       class="form-label">Protected</label>
+                                <input disabled type="text" class="form-control bg-secondary border-dark text-accent" id="protected-<%= snaps[index].slug %>"
+                                       value="<%= snaps[index].protected %>"/>
+                            </div>
+
+                            <div >
+                                <label for="type-<%= snaps[index].slug %>" class="form-label">Type</label>
+                                <input disabled type="text" class="form-control bg-secondary border-dark text-accent" id="type-<%= snaps[index].slug %>"
+                                       value="<%= snaps[index].type %>"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-secondary">
+                            <button data-bs-dismiss="modal" class="btn btn-danger">Close</button>
+                            <button class="btn btn-success restore"
+                                    data-id="<%= snaps[index].slug %>"
+                                    data-name='<%= snaps[index].name ? snaps[index].name : snaps[index].slug %>'
+                                    data-bs-dismiss="modal">
+                                Backup now
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
+
             </div>
-            <div class="row">
-                <div class="col s12 center divider">
-                </div>
-            </div>
-            <div class="row">
-                 
-                <div class="input-field col s12">
-                    <input disabled type="text" id="name-<%=snaps[index].slug%>" value="<%= snaps[index].name ? snaps[index].name : snaps[index].slug %>" />
-                    <label for="name-<%=snaps[index].slug%>" class="white-text active">Name</label>
-                </div>
 
-
-                <div class="input-field col s12">
-                    <input disabled type="text" id="date-<%=snaps[index].slug%>"
-                        value="<%=moment(snaps[index].date).format('MMM D, YYYY HH:mm')%>" />
-                    <label for="date-<%=snaps[index].slug%>" class="white-text active">Date</label>
-                </div>
-
-                <div class="input-field col s12">
-                    <input disabled type="text" id="protected-<%=snaps[index].slug%>"
-                        value="<%=snaps[index].protected%>" />
-                    <label for="protected-<%=snaps[index].slug%>" class="white-text active">Protected</label>
-                </div>
-
-                <div class="input-field col s12">
-                    <input disabled type="text" id="type-<%=snaps[index].slug%>" value="<%=snaps[index].type%>" />
-                    <label for="type-<%=snaps[index].slug%>" class="white-text active">Type</label>
-                </div>
-            </div>
+        <% } %>
         </div>
-        <div class="modal-footer blue-grey darken-4">
-            <a href="#!" class="waves-effect waves-green btn green manual-back-list modal-close" data-id="<%=snaps[index].slug%>" data-name='<%= snaps[index].name ? snaps[index].name : snaps[index].slug %>'</a>Backup now</a>
-            <a href="#!" class="modal-close waves-effect waves-green btn red">Close</a>
-
-        </div>
-    </div>
-
-
-    <% } %>
-</div>
-
 
 
 <% } %>

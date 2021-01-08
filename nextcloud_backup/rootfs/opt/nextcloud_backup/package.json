@@ -6,7 +6,9 @@
     "start": "node --inspect=0.0.0.0:9226 ./bin/www "
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.1",
     "app-root-path": "^3.0.0",
+    "bootstrap": "^5.0.0-beta1",
     "cookie-parser": "^1.4.5",
     "cron": "^1.8.2",
     "debug": "~2.6.9",
@@ -15,16 +17,10 @@
     "form-data": "^3.0.0",
     "got": "^11.8.1",
     "http-errors": "~1.6.3",
+    "jquery": "^3.5.1",
     "moment": "^2.29.1",
     "morgan": "~1.9.1",
     "webdav": "^3.6.2",
     "winston": "^3.3.3"
-  },
-  "devDependencies": {
-    "eslint": "^7.17.0",
-    "eslint-config-eslint": "^6.0.0",
-    "eslint-config-prettier": "^6.15.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-node": "^11.1.0"
   }
 }

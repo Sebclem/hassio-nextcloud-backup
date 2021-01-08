@@ -27,6 +27,28 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/api", apiRouter);
 
+/*
+-----------------------------------------------------------
+        Library statics
+----------------------------------------------------------
+*/
+
+// Boootstrap JS Files
+app.use('/js/bootstrap.min.js', express.static(path.join(__dirname, '/node_modules/bootstrap/dist/js/bootstrap.min.js')))
+
+
+// Fontawesome Files
+app.use('/css/fa-all.min.css', express.static(path.join(__dirname, '/node_modules/@fortawesome/fontawesome-free/css/all.min.css')))
+app.use('/webfonts/', express.static(path.join(__dirname, '/node_modules/@fortawesome/fontawesome-free/webfonts')))
+
+// Jquery JS Files
+app.use('/js/jquery.min.js', express.static(path.join(__dirname, '/node_modules/jquery/dist/jquery.min.js')))
+
+/*
+-----------------------------------------------------------
+        Error handler
+----------------------------------------------------------
+*/
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     next(createError(404));
@@ -43,6 +65,12 @@ app.use(function (err, req, res, next) {
     res.render("error");
 });
 
+
+/*
+-----------------------------------------------------------
+        Init app
+----------------------------------------------------------
+*/
 const fs = require("fs");
 const newlog = require("./config/winston");
 if (!fs.existsSync("/data")) fs.mkdirSync("/data");
