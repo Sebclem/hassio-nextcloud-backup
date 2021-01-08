@@ -1,14 +1,10 @@
-.navbar{
-    background-color: #0091ea ;
+.navbar {
+    background-color: #0091ea;
 }
-#header-box{
+
+#header-box {
     min-height: 160px;
 }
-
-.btn .bi::before{
-    vertical-align: middle ;
-}
-
 
 .toast-container {
     position: fixed;

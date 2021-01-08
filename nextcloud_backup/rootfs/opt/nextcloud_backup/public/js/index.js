@@ -194,12 +194,6 @@ function listeners() {
         else
             div.addClass("invisible");
     });
-
-    $('#confirm-restore').click(function () {
-        restore(to_restore);
-    });
-
-
 }
 
 function restore(id) {
