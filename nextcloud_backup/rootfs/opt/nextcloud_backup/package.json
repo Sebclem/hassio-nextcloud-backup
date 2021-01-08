@@ -6,9 +6,9 @@
     "start": "node --inspect=0.0.0.0:9226 ./bin/www "
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.1",
     "app-root-path": "^3.0.0",
     "bootstrap": "^5.0.0-beta1",
-    "bootstrap-icons": "^1.2.2",
     "cookie-parser": "^1.4.5",
     "cron": "^1.8.2",
     "debug": "~2.6.9",

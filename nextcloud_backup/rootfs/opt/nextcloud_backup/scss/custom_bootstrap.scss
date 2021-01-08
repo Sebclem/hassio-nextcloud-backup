@@ -1,8 +1,8 @@
+
 $body-bg: #222222;
 $dark: #292929;
 $secondary: #343a40;
 $accent: #b58e51;
-
 
 @import "../node_modules/bootstrap/scss/bootstrap";
 
@@ -11,5 +11,6 @@ $accent: #b58e51;
   background-color: $accent;
 }
 .text-accent{
-  color:  $accent
+  color:  $accent;
 }
+

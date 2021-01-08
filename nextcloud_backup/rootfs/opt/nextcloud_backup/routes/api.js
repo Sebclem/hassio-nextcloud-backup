@@ -48,6 +48,10 @@ router.get("/formated-local-snap", function (req, res, next) {
                 if (moment(a.lastmod).isBefore(moment(b.lastmod))) return 1;
                 else return -1;
             });
+            //TODO Remove this when bug is fixed, etag contain '&quot;' at start and end ?
+            for(let backup of contents){
+                backup.etag = backup.etag.replace(/&quot;/g, '');
+            }
             res.render("backupSnaps", { backups: contents, moment: moment, humanFileSize: humanFileSize });
         })
         .catch(() => {

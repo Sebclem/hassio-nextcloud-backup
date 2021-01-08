@@ -1,7 +1,10 @@
 .navbar{
     background-color: #0091ea ;
 }
-
 #header-box{
-    height: 150px;
+    min-height: 150px;
+}
+
+.btn .bi::before{
+    vertical-align: middle ;
 }

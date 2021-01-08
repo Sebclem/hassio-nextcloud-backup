@@ -10,7 +10,7 @@
 
     <link rel='stylesheet' href='./css/style.css'/>
     <link rel="stylesheet" href="./css/custom_bootstrap.css">
-    <link rel="stylesheet" href="./font/bootstrap-icons.css">
+    <link rel="stylesheet" href="./css/all.css">
     <!--  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">-->
     <!--  <style>-->
     <!--    .modal input[disabled] {-->
@@ -87,9 +87,10 @@
         </a>
         <ul class="navbar-nav">
             <li class="nav-item dropdown" id="setting-trigger">
-                <a class="nav-link active dropdown-toggle" href="#" id="dropdown-settings" role="button"
+                <a class="btn btn-outline-light bg-transparent nav-link active" href="#" id="dropdown-settings"
+                   role="button"
                    data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-gear-fill"></i>
+                    <i class="fas fa-cogs"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdown-settings">
                     <li><a href="#modal-settings-nextcloud" id="trigger-nextcloud-settings"
@@ -106,30 +107,31 @@
 
 <div class="container">
     <div class="row mt-3 mb-3" id="header-box">
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-md-3 mb-3 mb-md-0">
             <div class="card text-white bg-dark h-100 shadow border-secondary">
-                <div class="card-header fw-bold h5">Status</div>
+                <div class="card-header fw-bold h5 border-secondary border-bottom">Status</div>
                 <div class="card-body">
                     <h6 id="status" class="white-text"></h6>
                     <div id="status-second-line" class="truncate mb-2 text-accent"></div>
-                    <div class="progress bg-secondary" id="progress">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 15%" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress bg-secondary invisible" id="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 15%" aria-valuemin="0"
+                             aria-valuemax="100"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-md-3 mb-3 mb-md-0">
             <div class="card text-white bg-dark h-100 shadow border-secondary">
-                <div class="card-header fw-bold h5">Last Backup</div>
+                <div class="card-header fw-bold h5 border-secondary border-bottom">Last Backup</div>
                 <div class="card-body">
                     <h6 class="white-text" id="last_back_status"></h6>
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-3">
+        <div class="col-12 col-md-3 mb-3 mb-md-0">
             <div class="card text-white bg-dark h-100 shadow border-secondary">
-                <div class="card-header fw-bold h5">Next Backup </div>
+                <div class="card-header fw-bold h5 border-secondary border-bottom">Next Backup</div>
                 <div class="card-body">
                     <h6 class="white-text" id="next_back_status"></h6>
                 </div>
@@ -137,14 +139,15 @@
         </div>
         <div class="col-12 col-md-3">
             <div class="card text-white bg-dark h-100 shadow border-secondary">
-                <div class="card-header fw-bold h5">Manual</div>
+                <div class="card-header fw-bold h5 border-secondary border-bottom">Manual</div>
                 <div class="card-body py-2">
                     <div class="center w-100">
-                        <a class="btn btn-success" id="btn-backup-now"
-                           style="margin-top: 7px; display: block;">Backup
-                            Now</a>
-                        <a class="btn btn-danger" id="btn-clean-now" "
-                           style="margin-top: 7px; display: block;">Clean Now</a>
+                        <a class="btn btn-success" id="btn-backup-now" style="margin-top: 7px; display: block;">
+                            Backup Now
+                        </a>
+                        <a class="btn btn-danger" id="btn-clean-now" style="margin-top: 7px; display: block;">
+                            Clean Now
+                        </a>
                     </div>
 
                 </div>
@@ -154,23 +157,21 @@
     </div>
 
     <div class="row">
-        <div class="col s12 m12 l6 ">
-            <div class="card cyan darken-3">
-                <div class="card-content">
-                    <span class="card-title center white-text">Local Snapshots</span>
+        <div class="col-12 col-md-12 col-lg-6 mb-3 mb-lg-0">
+            <div class="card text-white bg-dark h-100 shadow border-secondary">
+                <div class="card-header fw-bold h4 text-center border-secondary border-bottom">Local Snapshots</div>
+                <div class="card-body">
                     <div id="local_snaps"></div>
                 </div>
             </div>
         </div>
-        <div class="col s12 m12 l6 ">
-            <div class="card cyan darken-3">
-                <div class="card-content">
-                    <span class="card-title center white-text">Snapshots in Nextcloud</span>
-                    <span class="card-title center white-text">Auto</span>
-                    <span class="card-title center white-text divider"></span>
+        <div class="col-12 col-md-12 col-lg-6 ">
+            <div class="card text-white bg-dark h-100 shadow border-secondary">
+                <div class="card-header fw-bold h4 text-center border-secondary border-bottom">Snapshots in Nextcloud</div>
+                <div class="card-body">
+                    <h5 class="card-title text-center fw-bold border-bottom border-secondary pb-3">Auto</h5>
                     <div id="auto_backups"></div>
-                    <span class="card-title center white-text">Manual</span>
-                    <span class="card-title center white-text divider"></span>
+                    <h5 class="card-title text-center fw-bold border-bottom border-secondary pb-3">Manual</h5>
                     <div id="manual_backups"></div>
                 </div>
             </div>
@@ -181,10 +182,7 @@
 
 
 <%- include('modals/nextcloud-settings-modal') %>
-
 <%- include('modals/backup-settings-modal') %>
-
-<!-- <%- include('modals/restore-modal.ejs') %>  -->
 
 <div id="modal-loading" class="modal blue-grey darken-4 white-text">
     <div class="modal-content ">

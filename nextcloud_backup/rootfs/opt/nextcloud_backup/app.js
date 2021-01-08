@@ -23,8 +23,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-app.use('/js/',express.static(path.join(__dirname, '/node_modules/bootstrap/dist/js')))
-app.use('/font/',express.static(path.join(__dirname, '/node_modules/bootstrap-icons/font')))
+
+// Boootstrap JS Files
+app.use('/js/', express.static(path.join(__dirname, '/node_modules/bootstrap/dist/js')))
+// Fontawesome files
+app.use('/css/', express.static(path.join(__dirname, '/node_modules/@fortawesome/fontawesome-free/css')))
+app.use('/webfonts/', express.static(path.join(__dirname, '/node_modules/@fortawesome/fontawesome-free/webfonts')))
+
+
 app.use("/", indexRouter);
 app.use("/api", apiRouter);
 
