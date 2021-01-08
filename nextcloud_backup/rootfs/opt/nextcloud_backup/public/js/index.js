@@ -346,9 +346,8 @@ function getBackupSettings() {
         $('#cron-drop-day').val(data.settings.cron_weekday);
         let folder_html = ""
         for (let thisFolder of data.folders) {
-            //TODO Bug ici ?
             let exclude = data.settings.exclude_folder.includes(thisFolder.slug);
-            folder_html += `<li class="list-group-item"><div class="form-check"><input class="form-check-input addons-box" type="checkbox" id="${thisFolder.slug}" ${exclude ? "" : "checked"}><label class="form-label mb-0" for="${thisFolder.slug}">${thisFolder.name}</label></div></li>`
+            folder_html += `<li class="list-group-item"><div class="form-check"><input class="form-check-input folders-box" type="checkbox" id="${thisFolder.slug}" ${exclude ? "" : "checked"}><label class="form-label mb-0" for="${thisFolder.slug}">${thisFolder.name}</label></div></li>`
         }
         $("#folders-div").html(folder_html);
 
@@ -407,7 +406,6 @@ function sendBackupSettings() {
     let auto_clean_local_keep = $("#local-snap-keep").val();
     let auto_clean_backup_keep = $("#backup-snap-keep").val();
     let name_template = $('#name-template').val();
-    //TODO Bug ici ?
     let excluded_folders_nodes = document.querySelectorAll('.folders-box:not(:checked)');
     let exclude_folder = [""];
     for (let i of excluded_folders_nodes) {

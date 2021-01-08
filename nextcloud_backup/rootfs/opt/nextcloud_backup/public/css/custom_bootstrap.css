@@ -10670,6 +10670,13 @@ textarea.form-control-lg {
 
 input[type=time]::-webkit-calendar-picker-indicator {
   filter: invert(63%) sepia(23%) saturate(819%) hue-rotate(358deg) brightness(88%) contrast(91%);
+  height: 30px;
+  margin: -12px;
+  width: 32px;
+}
+
+input[type=time]::-webkit-calendar-picker-indicator:hover {
+  cursor: pointer;
 }
 
 /*# sourceMappingURL=custom_bootstrap.css.map */
