@@ -10,7 +10,8 @@
 
     <link rel='stylesheet' href='./css/style.css'/>
     <link rel="stylesheet" href="./css/custom_bootstrap.css">
-    <link rel="stylesheet" href="./css/all.css">
+    <link rel="stylesheet" href="./css/fa-all.min.css">
+    <!--    <link rel="stylesheet" href="./css/toast.min.css">-->
     <!--  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">-->
     <!--  <style>-->
     <!--    .modal input[disabled] {-->
@@ -140,13 +141,13 @@
         <div class="col-12 col-md-3">
             <div class="card text-white bg-dark h-100 shadow border-secondary">
                 <div class="card-header fw-bold h5 border-secondary border-bottom">Manual</div>
-                <div class="card-body py-2">
-                    <div class="center w-100">
-                        <a class="btn btn-success" id="btn-backup-now" style="margin-top: 7px; display: block;">
+                <div class="card-body">
+                    <div class="w-100">
+                        <a class="btn btn-success d-block mb-2" id="btn-backup-now">
                             Backup Now
                         </a>
-                        <a class="btn btn-danger" id="btn-clean-now" style="margin-top: 7px; display: block;">
-                            Clean Now
+                        <a class="btn btn-danger d-block" id="btn-clean-now"">
+                        Clean Now
                         </a>
                     </div>
 
@@ -167,7 +168,8 @@
         </div>
         <div class="col-12 col-md-12 col-lg-6 ">
             <div class="card text-white bg-dark h-100 shadow border-secondary">
-                <div class="card-header fw-bold h4 text-center border-secondary border-bottom">Snapshots in Nextcloud</div>
+                <div class="card-header fw-bold h4 text-center border-secondary border-bottom">Snapshots in Nextcloud
+                </div>
                 <div class="card-body">
                     <h5 class="card-title text-center fw-bold border-bottom border-secondary pb-3">Auto</h5>
                     <div id="auto_backups"></div>
@@ -183,95 +185,31 @@
 
 <%- include('modals/nextcloud-settings-modal') %>
 <%- include('modals/backup-settings-modal') %>
-
-<div id="modal-loading" class="modal blue-grey darken-4 white-text">
-    <div class="modal-content ">
-        <div class="row">
-            <div class="col s12 center">
-                <h4>Loading</h4>
-            </div>
-        </div>
-        <div class="row valign-wrapper" style="height: 150px;">
-            <div class="col s12 center">
-                <div class="preloader-wrapper big active">
-                    <div class="spinner-layer spinner-blue">
-                        <div class="circle-clipper left">
-                            <div class="circle"></div>
-                        </div>
-                        <div class="gap-patch">
-                            <div class="circle"></div>
-                        </div>
-                        <div class="circle-clipper right">
-                            <div class="circle"></div>
-                        </div>
-                    </div>
-
-                    <div class="spinner-layer spinner-red">
-                        <div class="circle-clipper left">
-                            <div class="circle"></div>
-                        </div>
-                        <div class="gap-patch">
-                            <div class="circle"></div>
-                        </div>
-                        <div class="circle-clipper right">
-                            <div class="circle"></div>
-                        </div>
-                    </div>
-
-                    <div class="spinner-layer spinner-yellow">
-                        <div class="circle-clipper left">
-                            <div class="circle"></div>
-                        </div>
-                        <div class="gap-patch">
-                            <div class="circle"></div>
-                        </div>
-                        <div class="circle-clipper right">
-                            <div class="circle"></div>
-                        </div>
-                    </div>
-
-                    <div class="spinner-layer spinner-green">
-                        <div class="circle-clipper left">
-                            <div class="circle"></div>
-                        </div>
-                        <div class="gap-patch">
-                            <div class="circle"></div>
-                        </div>
-                        <div class="circle-clipper right">
-                            <div class="circle"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<%- include('modals/loading-modal') %>
+<div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true">
 </div>
 
 
 </body>
 <script src="./js/bootstrap.min.js"></script>
-<script src="./js/jquery-3.4.1.min.js"></script>
+<script src="./js/jquery.min.js"></script>
 <script src="./js/index.js"></script>
+<script src="./js/toast.js"></script>
 <script>
     var last_status = "";
     var last_local_snap = "";
     var last_manu_back = "";
     var last_auto_back = "";
 
+    const default_toast_timeout = 10000;
     var loadingModal = null;
     document.addEventListener('DOMContentLoaded', function () {
         $.ajaxSetup({ traditional: true });
         updateLocalSnaps();
         update_status();
-        let tooltips = document.querySelectorAll('.tooltipped');
-        M.Tooltip.init(tooltips, {});
-        let drops = document.querySelectorAll('.dropdown-trigger');
-        M.Dropdown.init(drops, {
-            constrainWidth: false,
-            coverTrigger: false,
-            alignment: 'right',
-            onOpenStart: () => $('#setting-trigger').addClass('active'),
-            onCloseEnd: () => $('#setting-trigger').removeClass('active')
+        loadingModal = new bootstrap.Modal(document.getElementById('loading-modal'), {
+            keyboard: false,
+            backdrop: 'static'
         });
 
         setInterval(update_status, 500);
@@ -281,15 +219,6 @@
     });
 
     function updateDynamicListeners() {
-        var elems = document.querySelectorAll('.collapsible');
-        M.Collapsible.init(elems, { accordion: true });
-        var modals = document.querySelectorAll('.modal:not(#modal-loading)');
-        M.Modal.init(modals, { dismissible: true });
-
-        let loadingModals = document.querySelectorAll('#modal-loading');
-        M.Modal.init(loadingModals, { dismissible: false });
-
-        loadingModal = M.Modal.getInstance(document.querySelector('#modal-loading'));
         $('.local-snap-listener').click(function () {
             let id = this.getAttribute('data-id');
             console.log(id);
@@ -476,17 +405,12 @@
         $.post('./api/restore', { path: id })
             .done((data) => {
                 console.log("Restore cmd send !");
-                M.toast({
-                    html: '<i class="material-icons" style="margin-right:10px">check_box</i> Command send !',
-                    classes: "green"
-                });
-            }).fail((error) => {
-            console.log(error);
-            M.toast({
-                html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t send command !',
-                classes: "red"
-            });
-        })
+                create_toast("success", "Command send !", default_toast_timeout);
+            })
+            .fail((error) => {
+                console.log(error);
+                create_toast("error", "Can't send command !", default_toast_timeout);
+            })
             .always(() => loadingModal.close())
     }
 
@@ -509,29 +433,24 @@
             .done((data) => {
                 console.log('Saved');
                 $('#nextcloud_settings_message').parent().addClass("hide");
-                M.toast({
-                    html: '<i class="material-icons" style="margin-right:10px">check_box</i> Nextcloud settings saved !',
-                    classes: "green"
-                });
+                create_toast("success", "Nextcloud settings saved !", default_toast_timeout);
                 M.Modal.getInstance(document.querySelector('#modal-settings-nextcloud')).close();
 
-            }).fail((data) => {
-            debugger;
-            if (data.status == 406) {
-                console.log(data.responseJSON.message);
-                $('#nextcloud_settings_message').html(data.responseJSON.message);
+            })
+            .fail((data) => {
+                debugger;
+                if (data.status == 406) {
+                    console.log(data.responseJSON.message);
+                    $('#nextcloud_settings_message').html(data.responseJSON.message);
 
-            } else {
-                $('#nextcloud_settings_message').html("Invalid Settings.");
+                } else {
+                    $('#nextcloud_settings_message').html("Invalid Settings.");
 
-            }
-            $('#nextcloud_settings_message').parent().removeClass("hide");
-            M.toast({
-                html: '<i class="material-icons" style="margin-right:10px">warning</i> Invalid Nextcloud settings !',
-                classes: "red"
-            });
-            console.log('Fail');
-        }).always(() => {
+                }
+                $('#nextcloud_settings_message').parent().removeClass("hide");
+                create_toast("error", "Invalid Nextcloud settings !", default_toast_timeout);
+                console.log('Fail');
+            }).always(() => {
             loadingModal.close();
         })
     }
@@ -540,17 +459,12 @@
         $.post('./api/manual-backup?id=' + id + '&name=' + name)
             .done((data) => {
                 console.log("manual bk cmd send !");
-                M.toast({
-                    html: '<i class="material-icons" style="margin-right:10px">check_box</i> Command send !',
-                    classes: "green"
-                });
-            }).fail((error) => {
-            console.log(error);
-            M.toast({
-                html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t send command !',
-                classes: "red"
-            });
-        })
+                create_toast("success", "Command send !", default_toast_timeout);
+            })
+            .fail((error) => {
+                console.log(error);
+                create_toast("error", "Can't send command !", default_toast_timeout);
+            })
 
     }
 
@@ -584,17 +498,12 @@
         loadingModal.open();
         $.post('./api/new-backup')
             .done(() => {
-                M.toast({
-                    html: '<i class="material-icons" style="margin-right:10px">check_box</i> Command send !',
-                    classes: "green"
-                });
-            }).fail((error) => {
-            console.log(error);
-            M.toast({
-                html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t send command !',
-                classes: "red"
-            });
-        })
+                create_toast("success", "Command send !", default_toast_timeout);
+            })
+            .fail((error) => {
+                console.log(error);
+                create_toast("error", "Can't send command !", default_toast_timeout);
+            })
             .always(() => {
                 loadingModal.close();
             })
@@ -604,17 +513,12 @@
         loadingModal.open();
         $.post('./api/clean-now')
             .done(() => {
-                M.toast({
-                    html: '<i class="material-icons" style="margin-right:10px">check_box</i> Command send !',
-                    classes: "green"
-                });
-            }).fail((error) => {
-            console.log(error);
-            M.toast({
-                html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t send command !',
-                classes: "red"
-            });
-        })
+                create_toast("success", "Command send !", default_toast_timeout);
+            })
+            .fail((error) => {
+                console.log(error);
+                create_toast("error", "Can't send command !", default_toast_timeout);
+            })
             .always(() => {
                 loadingModal.close();
             })
@@ -762,17 +666,16 @@
                 exclude_folder: exclude_folder
             })
             .done(() => {
-                M.toast({
-                    html: '<i class="material-icons" style="margin-right:10px">check_box</i> Backup settings saved !',
-                    classes: "green"
-                });
+                create_toast("success", "Backup settings saved !", default_toast_timeout);
                 M.Modal.getInstance(document.querySelector('#modal-settings-backup')).close();
-            }).fail(() => {
-            M.toast({
-                html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t save backup settings !',
-                classes: "red"
-            });
-        }).always(() => {
+            })
+            .fail(() => {
+                create_toast("error", "Can't save backup settings !", default_toast_timeout);
+                M.toast({
+                    html: '<i class="material-icons" style="margin-right:10px">warning</i> Can\'t save backup settings !',
+                    classes: "red"
+                });
+            }).always(() => {
             loadingModal.close();
         });
     }

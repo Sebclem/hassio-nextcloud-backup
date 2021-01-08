@@ -2,9 +2,18 @@
     background-color: #0091ea ;
 }
 #header-box{
-    min-height: 150px;
+    min-height: 160px;
 }
 
 .btn .bi::before{
     vertical-align: middle ;
+}
+
+
+.toast-container {
+    position: fixed;
+    z-index: 1055;
+    margin: 5px;
+    top: 58px;
+    right: 0;
 }
