@@ -9,11 +9,11 @@ function create_toast(type, message, delay) {
 
         default:
             toast_class = `bg-${type}`
-            icon_class = 'fa-check'
+            icon_class = 'fa-check-square'
     }
     let toast_id = Date.now().toString();
     let toast_html = `<div id="${toast_id}" class="toast d-flex align-items-center text-white ${toast_class}" role="alert" aria-live="assertive" aria-atomic="true">`
-    toast_html += `<div class="toast-body h5 mb-0"><i class="fas ${icon_class} me-2"></i> ${message}</div>`
+    toast_html += `<div class="toast-body h6 mb-0 align-middle"><i class="fas ${icon_class} me-2 h5 mb-0"></i><span>${message}</span></div>`
     toast_html += `<button type="button" class="btn-close btn-close-white ms-auto me-2" data-bs-dismiss="toast" aria-label="Close"></button></div>`
     $('#toast-container').prepend(toast_html);
     let toast_dom = document.getElementById(toast_id)

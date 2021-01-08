@@ -4,7 +4,8 @@ var last_manu_back = "";
 var last_auto_back = "";
 
 const default_toast_timeout = 10000;
-var loadingModal = null;
+let loadingModal = null;
+let nextcloud_setting_modal;
 document.addEventListener('DOMContentLoaded', function () {
     $.ajaxSetup({ traditional: true });
     updateLocalSnaps();
@@ -13,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
         keyboard: false,
         backdrop: 'static'
     });
+    nextcloud_setting_modal = new bootstrap.Modal(document.getElementById('modal-settings-nextcloud'));
 
     setInterval(update_status, 500);
     setInterval(updateLocalSnaps, 5000);
@@ -185,12 +187,12 @@ function listeners() {
     });
 
     $('#ssl').change(function () {
-        let div = $('#self_signed').parent().parent().parent();
+        let div = $('#self_signed').parent().parent();
 
         if ($('#ssl').is(':checked'))
-            div.removeClass("hide")
+            div.removeClass("invisible")
         else
-            div.addClass("hide");
+            div.addClass("invisible");
     });
 
     $('#confirm-restore').click(function () {
@@ -216,6 +218,7 @@ function restore(id) {
 
 function sendNextcloudSettings() {
     loadingModal.show();
+    nextcloud_setting_modal.hide();
     let ssl = $('#ssl').is(':checked')
     let self_signed = $('#self_signed').is(':checked')
     let hostname = $('#hostname').val();
@@ -232,13 +235,10 @@ function sendNextcloudSettings() {
     })
         .done((data) => {
             console.log('Saved');
-            $('#nextcloud_settings_message').parent().addClass("hide");
-            create_toast("success", "Nextcloud settings saved !", default_toast_timeout);
-            M.Modal.getInstance(document.querySelector('#modal-settings-nextcloud')).close();
-
+            $('#nextcloud_settings_message').parent().addClass("d-none");
+            create_toast("success", "Nextcloud settings saved !", default_toast_timeout);0
         })
         .fail((data) => {
-            debugger;
             if (data.status == 406) {
                 console.log(data.responseJSON.message);
                 $('#nextcloud_settings_message').html(data.responseJSON.message);
@@ -247,7 +247,8 @@ function sendNextcloudSettings() {
                 $('#nextcloud_settings_message').html("Invalid Settings.");
 
             }
-            $('#nextcloud_settings_message').parent().removeClass("hide");
+            $('#nextcloud_settings_message').parent().removeClass("d-none");
+            nextcloud_setting_modal.show();
             create_toast("error", "Invalid Nextcloud settings !", default_toast_timeout);
             console.log('Fail');
         }).always(() => {
@@ -274,23 +275,16 @@ function getNextcloudSettings() {
     $.get('./api/nextcloud-settings', (data) => {
         $('#ssl').prop("checked", data.ssl == "true");
         if (data.ssl == "true") {
-            let div = $('#self_signed').parent().parent().parent();
-            div.removeClass("hide");
+            let div = $('#self_signed').parent().parent();
+            div.removeClass("invisible");
         }
         $('#self_signed').prop('checked', data.self_signed == "true")
         $('#hostname').val(data.host);
-        $('#hostname + label').removeClass("active");
-        $('#hostname + label').addClass("active");
         $('#username').val(data.username);
-        $('#username + label').removeClass("active");
-        $('#username + label').addClass("active");
         $('#password').val(data.password);
-        $('#password + label').removeClass("active");
-        $('#password + label').addClass("active");
         $('#back-dir').val(data.back_dir);
-        $('#back-dir + label').removeClass("active");
-        $('#back-dir + label').addClass("active");
         loadingModal.hide();
+        nextcloud_setting_modal.show();
     });
 }
 

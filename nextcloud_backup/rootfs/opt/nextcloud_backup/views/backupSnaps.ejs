@@ -1,7 +1,7 @@
 <% if (locals.backups) { %>
     <div class="list-group ">
         <% for(const index in backups) { %>
-            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center bg-secondary text-accent"
+            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                href="#"
                data-id="<%= backups[index].etag %>"
                data-bs-toggle="modal"
