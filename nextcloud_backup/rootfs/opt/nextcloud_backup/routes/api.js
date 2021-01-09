@@ -42,6 +42,10 @@ router.get("/formated-local-snap", function (req, res, next) {
     });
     
     router.get("/formated-backup-manual", function (req, res, next) {
+        if(webdav.getConf() == null){
+            res.send("");
+            return;
+        }
         webdav
         .getFolderContent(webdav.getConf().back_dir + pathTools.manual)
         .then((contents) => {
@@ -56,11 +60,15 @@ router.get("/formated-local-snap", function (req, res, next) {
             res.render("backupSnaps", { backups: contents, moment: moment, humanFileSize: humanFileSize });
         })
         .catch(() => {
-            res.send();
+            res.send("");
         });
     });
     
     router.get("/formated-backup-auto", function (req, res, next) {
+        if(webdav.getConf() == null){
+            res.send("");
+            return;
+        }
         let url = webdav.getConf().back_dir + pathTools.auto;
         webdav
         .getFolderContent(url)
@@ -76,7 +84,7 @@ router.get("/formated-local-snap", function (req, res, next) {
             res.render("backupSnaps", { backups: contents, moment: moment, humanFileSize: humanFileSize });
         })
         .catch(() => {
-            res.send();
+            res.send("");
         });
     });
     
