@@ -16,7 +16,7 @@ function startCron() {
 
 function updatetNextDate() {
     let cronContainer = new Singleton().getInstance();
-    cronContainer.updatetNextDate();
+    cronContainer.updateNextDate();
 }
 
 class CronContainer {
@@ -34,7 +34,7 @@ class CronContainer {
             this.cronClean.start();
         }
         if (this.cronJob != null) {
-            logger.info("Stoping Cron...");
+            logger.info("Stopping Cron...");
             this.cronJob.stop();
             this.cronJob = null;
         }
@@ -68,10 +68,10 @@ class CronContainer {
         logger.info("Starting Cron...");
         this.cronJob = new CronJob(cronStr, this._createBackup, null, false, Intl.DateTimeFormat().resolvedOptions().timeZone);
         this.cronJob.start();
-        this.updatetNextDate();
+        this.updateNextDate();
     }
 
-    updatetNextDate() {
+    updateNextDate() {
         let date;
         if (this.cronJob == null) date = "Not configured";
         else date = this.cronJob.nextDate().format("MMM D, YYYY HH:mm");
@@ -94,28 +94,20 @@ class CronContainer {
                         hassioApiTools
                             .downloadSnapshot(id)
                             .then(() => {
-                                webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.auto + name + ".tar");
-                            })
-                            .catch(() => {
-                            });
-                    })
-                    .catch(() => {
-                    });
-            })
-            .catch(() => {
-            });
+                                webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.auto + name + ".tar").catch();
+                            }).catch();
+                    }).catch();
+            }).catch();
     }
 
     _clean() {
         let autoCleanlocal = settingsTools.getSettings().auto_clean_local;
         if (autoCleanlocal != null && autoCleanlocal === "true") {
-            hassioApiTools.clean().catch(() => {
-            });
+            hassioApiTools.clean().catch();
         }
         let autoCleanCloud = settingsTools.getSettings().auto_clean_backup;
         if (autoCleanCloud != null && autoCleanCloud === "true") {
-            webdav.clean().catch(() => {
-            });
+            webdav.clean().catch();
         }
     }
 }

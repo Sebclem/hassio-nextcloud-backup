@@ -36,7 +36,6 @@ app.use("/api", apiRouter);
 // Boootstrap JS Files
 app.use('/js/bootstrap.min.js', express.static(path.join(__dirname, '/node_modules/bootstrap/dist/js/bootstrap.min.js')))
 
-
 // Fontawesome Files
 app.use('/css/fa-all.min.css', express.static(path.join(__dirname, '/node_modules/@fortawesome/fontawesome-free/css/all.min.css')))
 app.use('/webfonts/', express.static(path.join(__dirname, '/node_modules/@fortawesome/fontawesome-free/webfonts')))
@@ -103,5 +102,7 @@ const settingTool = require('./tools/settingsTools')
 settingTool.check(settingTool.getSettings(), true);
 const cronTools = require("./tools/cronTools");
 cronTools.startCron();
+
+
 
 module.exports = app;

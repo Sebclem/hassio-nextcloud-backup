@@ -64,8 +64,7 @@ function getAddonList() {
                 }
                 let addons = result.body.data.addons;
                 let installed = [];
-                for (let index in addons) {
-                    let current = addons[index];
+                for (let current of addons) {
                     if (current.installed === true) {
                         installed.push({ slug: current.slug, name: current.name })
                     }
@@ -94,9 +93,9 @@ function getAddonToBackup() {
         getAddonList()
             .then((all_addon) => {
                 let slugs = [];
-                for (let i in all_addon) {
-                    if (!excluded_addon.includes(all_addon[i].slug))
-                        slugs.push(all_addon[i].slug)
+                for (let addon of all_addon) {
+                    if (!excluded_addon.includes(addon.slug))
+                        slugs.push(addon.slug)
                 }
                 resolve(slugs)
             })
@@ -109,7 +108,6 @@ function getFolderList() {
         {
             name: "Home Assistant configuration",
             slug: "homeassistant"
-
         },
         {
             name: "SSL",
@@ -134,9 +132,9 @@ function getFolderToBackup() {
     let excluded_folder = settingsTools.getSettings().exclude_folder;
     let all_folder = getFolderList()
     let slugs = [];
-    for (let i in all_folder) {
-        if (!excluded_folder.includes(all_folder[i].slug))
-            slugs.push(all_folder[i].slug)
+    for (let folder of all_folder) {
+        if (!excluded_folder.includes(folder.slug))
+            slugs.push(folder.slug)
     }
     return slugs;
 }
@@ -322,8 +320,8 @@ function clean() {
                         return -1;
                 });
                 let toDel = snaps.slice(limit);
-                for (let i in toDel) {
-                    await dellSnap(toDel[i].slug);
+                for (let i of toDel) {
+                    await dellSnap(i.slug);
                 }
                 logger.info("Local clean done.");
                 resolve();
@@ -372,7 +370,7 @@ function uploadSnapshot(path) {
                 if (res.statusCode !== 200) {
                     status.status = "error";
                     status.error_code = 4;
-                    status.message = `Fail to upload backup to home assitant (Status code: ${res.statusCode})!`;
+                    status.message = `Fail to upload backup to home assistant (Status code: ${res.statusCode})!`;
                     statusTools.setStatus(status);
                     logger.error(status.message);
                     fs.unlinkSync(path);

@@ -12,7 +12,6 @@ const humanFileSize = require("../tools/toolbox").humanFileSize;
 const cronTools = require("../tools/cronTools");
 
 const logger = require("../config/winston");
-const { add } = require("../config/winston");
 
 router.get("/status", (req, res, next) => {
     cronTools.updatetNextDate();
@@ -21,8 +20,8 @@ router.get("/status", (req, res, next) => {
 });
 
 router.get("/formated-local-snap", function (req, res, next) {
-    hassioApiTools.getSnapshots().then(
-        (snaps) => {
+    hassioApiTools.getSnapshots()
+        .then((snaps) => {
             snaps.sort((a, b) => {
                 if (moment(a.date).isBefore(moment(b.date))) {
                     return 1;
@@ -32,21 +31,21 @@ router.get("/formated-local-snap", function (req, res, next) {
             });
 
             res.render("localSnaps", { snaps: snaps, moment: moment });
-        },
-        (err) => {
-            logger.error(err);
-            res.status(500);
-            res.send("");
-        }
+        })
+        .catch((err) => {
+                logger.error(err);
+                res.status(500);
+                res.send("");
+            }
         );
-    });
-    
-    router.get("/formated-backup-manual", function (req, res, next) {
-        if(webdav.getConf() == null){
-            res.send("");
-            return;
-        }
-        webdav
+});
+
+router.get("/formated-backup-manual", function (req, res, next) {
+    if (webdav.getConf() == null) {
+        res.send("");
+        return;
+    }
+    webdav
         .getFolderContent(webdav.getConf().back_dir + pathTools.manual)
         .then((contents) => {
             contents.sort((a, b) => {
@@ -54,7 +53,7 @@ router.get("/formated-local-snap", function (req, res, next) {
                 else return -1;
             });
             //TODO Remove this when bug is fixed, etag contain '&quot;' at start and end ?
-            for(let backup of contents){
+            for (let backup of contents) {
                 backup.etag = backup.etag.replace(/&quot;/g, '');
             }
             res.render("backupSnaps", { backups: contents, moment: moment, humanFileSize: humanFileSize });
@@ -62,15 +61,15 @@ router.get("/formated-local-snap", function (req, res, next) {
         .catch(() => {
             res.send("");
         });
-    });
-    
-    router.get("/formated-backup-auto", function (req, res, next) {
-        if(webdav.getConf() == null){
-            res.send("");
-            return;
-        }
-        let url = webdav.getConf().back_dir + pathTools.auto;
-        webdav
+});
+
+router.get("/formated-backup-auto", function (req, res, next) {
+    if (webdav.getConf() == null) {
+        res.send("");
+        return;
+    }
+    let url = webdav.getConf().back_dir + pathTools.auto;
+    webdav
         .getFolderContent(url)
         .then((contents) => {
             contents.sort((a, b) => {
@@ -78,7 +77,7 @@ router.get("/formated-local-snap", function (req, res, next) {
                 else return -1;
             });
             //TODO Remove this when bug is fixed, etag contain '&quot;' at start and end ?
-            for(let backup of contents){
+            for (let backup of contents) {
                 backup.etag = backup.etag.replace(/&quot;/g, '');
             }
             res.render("backupSnaps", { backups: contents, moment: moment, humanFileSize: humanFileSize });
@@ -86,13 +85,13 @@ router.get("/formated-local-snap", function (req, res, next) {
         .catch(() => {
             res.send("");
         });
-    });
-    
-    router.post("/nextcloud-settings", function (req, res, next) {
-        let settings = req.body;
-        if (settings.ssl != null && settings.host != null && settings.host != "" && settings.username != null && settings.password != null) {
-            webdav.setConf(settings);
-            webdav
+});
+
+router.post("/nextcloud-settings", function (req, res, next) {
+    let settings = req.body;
+    if (settings.ssl != null && settings.host != null && settings.host !== "" && settings.username != null && settings.password != null) {
+        webdav.setConf(settings);
+        webdav
             .confIsValid()
             .then(() => {
                 res.status(201);
@@ -102,36 +101,36 @@ router.get("/formated-local-snap", function (req, res, next) {
                 res.status(406);
                 res.json({ message: err });
             });
-        } else {
-            res.status(400);
-            res.send();
-        }
-    });
-    
-    router.get("/nextcloud-settings", function (req, res, next) {
-        let conf = webdav.getConf();
-        if (conf == null) {
-            res.status(404);
-            res.send();
-        } else {
-            res.json(conf);
-        }
-    });
-    
-    router.post("/manual-backup", function (req, res, next) {
-        let id = req.query.id;
-        let name = req.query.name;
-        let status = statusTools.getStatus();
-        if (status.status == "creating" && status.status == "upload" && status.status == "download") {
-            res.status(503);
-            res.send();
-            return;
-        }
-        
-        hassioApiTools
+    } else {
+        res.status(400);
+        res.send();
+    }
+});
+
+router.get("/nextcloud-settings", function (req, res, next) {
+    let conf = webdav.getConf();
+    if (conf == null) {
+        res.status(404);
+        res.send();
+    } else {
+        res.json(conf);
+    }
+});
+
+router.post("/manual-backup", function (req, res, next) {
+    let id = req.query.id;
+    let name = req.query.name;
+    let status = statusTools.getStatus();
+    if (status.status === "creating" && status.status === "upload" && status.status === "download") {
+        res.status(503);
+        res.send();
+        return;
+    }
+
+    hassioApiTools
         .downloadSnapshot(id)
         .then(() => {
-            webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.manual + name + ".tar");
+            webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.manual + name + ".tar").catch();
             res.status(201);
             res.send();
         })
@@ -139,61 +138,64 @@ router.get("/formated-local-snap", function (req, res, next) {
             res.status(500);
             res.send();
         });
-    });
-    
-    router.post("/new-backup", function (req, res, next) {
-        let status = statusTools.getStatus();
-        if (status.status === "creating" && status.status === "upload" && status.status === "download") {
-            res.status(503);
-            res.send();
-            return;
-        }
-        hassioApiTools
+});
+
+router.post("/new-backup", function (req, res, next) {
+    let status = statusTools.getStatus();
+    if (status.status === "creating" && status.status === "upload" && status.status === "download") {
+        res.status(503);
+        res.send();
+        return;
+    }
+    hassioApiTools
         .getVersion()
         .then((version) => {
             let name = settingsTools.getFormatedName(true, version);
             hassioApiTools
-            .createNewBackup(name)
-            .then((id) => {
-                hassioApiTools
-                .downloadSnapshot(id)
-                .then(() => {
-                    webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.manual + name + ".tar");
+                .createNewBackup(name)
+                .then((id) => {
+                    hassioApiTools
+                        .downloadSnapshot(id)
+                        .then(() => {
+                            webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.manual + name + ".tar").catch();
+                        })
+                        .catch(() => {
+                        });
                 })
-                .catch(() => {});
-            })
-            .catch(() => {});
+                .catch(() => {
+                });
         })
-        .catch(() => {});
-        
-        res.status(201);
+        .catch(() => {
+        });
+
+    res.status(201);
+    res.send();
+});
+
+router.get("/backup-settings", function (req, res, next) {
+    hassioApiTools.getAddonList().then((addonList) => {
+        let data = {};
+        data['folders'] = hassioApiTools.getFolderList();
+        data['addonList'] = addonList;
+        data['settings'] = settingsTools.getSettings();
+        res.send(data);
+    })
+
+});
+
+router.post("/backup-settings", function (req, res, next) {
+    if (settingsTools.check(req.body)) {
+        settingsTools.setSettings(req.body);
+        cronTools.startCron();
         res.send();
-    });
-    
-    router.get("/backup-settings", function (req, res, next) {
-        hassioApiTools.getAddonList().then((addonList)=>{
-            let data = {};
-            data['folders'] = hassioApiTools.getFolderList();
-            data['addonList'] = addonList;
-            data['settings'] = settingsTools.getSettings();
-            res.send(data);
-        })
-        
-    });
-    
-    router.post("/backup-settings", function (req, res, next) {
-        if (settingsTools.check(req.body)) {
-            settingsTools.setSettings(req.body);
-            cronTools.startCron();
-            res.send();
-        } else {
-            res.status(400);
-            res.send();
-        }
-    });
-    
-    router.post("/clean-now", function (req, res, next) {
-        webdav
+    } else {
+        res.status(400);
+        res.send();
+    }
+});
+
+router.post("/clean-now", function (req, res, next) {
+    webdav
         .clean()
         .then(() => {
             hassioApiTools.clean().catch();
@@ -201,22 +203,22 @@ router.get("/formated-local-snap", function (req, res, next) {
         .catch(() => {
             hassioApiTools.clean().catch();
         });
-        res.status(201);
+    res.status(201);
+    res.send();
+});
+
+router.post("/restore", function (req, res, next) {
+    if (req.body["path"] != null) {
+        webdav.downloadFile(req.body["path"]).then((path) => {
+            hassioApiTools.uploadSnapshot(path).catch();
+        });
+        res.status(200);
         res.send();
-    });
-    
-    router.post("/restore", function (req, res, next) {
-        if (req.body["path"] != null) {
-            webdav.downloadFile(req.body["path"]).then((path) => {
-                hassioApiTools.uploadSnapshot(path);
-            });
-            res.status(200);
-            res.send();
-        } else {
-            res.status(400);
-            res.send();
-        }
-    });
-    
-    module.exports = router;
+    } else {
+        res.status(400);
+        res.send();
+    }
+});
+
+module.exports = router;
     

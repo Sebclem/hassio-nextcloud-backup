@@ -30,7 +30,7 @@ class WebdavTools {
         return new Promise((resolve, reject) => {
             this.host = host;
             let status = statusTools.getStatus();
-            logger.info("Initilizing and checking webdav client...");
+            logger.info("Initializing and checking webdav client...");
             this.baseUrl = (ssl === "true" ? "https" : "http") + "://" + host + endpoint;
             this.username = username;
             this.password = password;
@@ -45,7 +45,7 @@ class WebdavTools {
                 this.client
                     .getDirectoryContents("/")
                     .then(() => {
-                        if (status.error_code == 3) {
+                        if (status.error_code === 3) {
                             status.status = "idle";
                             status.message = null;
                             status.error_code = null;
@@ -57,37 +57,37 @@ class WebdavTools {
                         });
                     })
                     .catch((error) => {
-                        status.status = "error";
-                        status.error_code = 3;
-                        status.message = "Can't connect to Nextcloud (" + error + ") !";
-                        statusTools.setStatus(status);
+                        this.__cant_connect_status(error);
                         this.client = null;
-                        logger.error("Can't connect to Nextcloud (" + error + ") !");
                         reject("Can't connect to Nextcloud (" + error + ") !");
                     });
             } catch (err) {
-                status.status = "error";
-                status.error_code = 3;
-                status.message = "Can't connect to Nextcloud (" + err + ") !";
-                statusTools.setStatus(status);
+                this.__cant_connect_status(err);
                 this.client = null;
-                logger.error("Can't connect to Nextcloud (" + err + ") !");
                 reject("Can't connect to Nextcloud (" + err + ") !");
             }
         });
+    }
+    __cant_connect_status(err){
+        let status = statusTools.getStatus();
+        status.status = "error";
+        status.error_code = 3;
+        status.message = "Can't connect to Nextcloud (" + err + ") !";
+        statusTools.setStatus(status);
+        logger.error("Can't connect to Nextcloud (" + err + ") !");
     }
 
     async __createRoot() {
         let root_splited = this.getConf().back_dir.split("/").splice(1);
         let path = "/";
         for (let elem of root_splited) {
-            if (elem != "") {
+            if (elem !== "") {
                 path = path + elem + "/";
                 try {
                     await this.client.createDirectory(path);
                     logger.debug(`Path ${path} created.`);
                 } catch (error) {
-                    if (error.response.status == 405) logger.debug(`Path ${path} already exist.`);
+                    if (error.response.status === 405) logger.debug(`Path ${path} already exist.`);
                     else logger.error(error);
                 }
             }
@@ -124,14 +124,14 @@ class WebdavTools {
             let conf = this.getConf();
             if (conf !== null) {
                 if (conf.ssl !== null && conf.host !== null && conf.username !== null && conf.password !== null) {
-                    if (status.error_code == 2) {
+                    if (status.error_code === 2) {
                         status.status = "idle";
                         status.message = null;
                         status.error_code = null;
                         statusTools.setStatus(status);
                     }
                     // Check if self_signed option exist
-                    if (conf.self_signed == null || conf.self_signed == "") {
+                    if (conf.self_signed == null || conf.self_signed === "") {
                         conf.self_signed = "false";
                         this.setConf(conf);
                     }
@@ -151,7 +151,7 @@ class WebdavTools {
                     reject("Nextcloud config invalid !");
                 }
 
-                if (conf.back_dir == null || conf.back_dir == "") {
+                if (conf.back_dir == null || conf.back_dir === "") {
                     logger.info("Backup dir is null, initializing it.");
                     conf.back_dir = pathTools.default_root;
                     this.setConf(conf);
@@ -180,8 +180,7 @@ class WebdavTools {
 
     getConf() {
         if (fs.existsSync(configPath)) {
-            let content = JSON.parse(fs.readFileSync(configPath));
-            return content;
+            return JSON.parse(fs.readFileSync(configPath).toString());
         } else
             return null;
     }
@@ -195,13 +194,13 @@ class WebdavTools {
             if (this.client == null) {
                 this.confIsValid()
                     .then(() => {
-                        this._startUpload(id, path);
+                        this._startUpload(id, path).catch((err) => reject(err));
                     })
                     .catch((err) => {
                         reject(err);
                     });
             } else
-                this._startUpload(id, path);
+                this._startUpload(id, path).catch((err) => reject(err));
         });
     }
 
@@ -235,7 +234,7 @@ class WebdavTools {
                 .put(encodeURI(this.baseUrl + path), options)
                 .on("uploadProgress", (e) => {
                     let percent = e.percent;
-                    if (status.progress != percent) {
+                    if (status.progress !== percent) {
                         status.progress = percent;
                         statusTools.setStatus(status);
                     }
@@ -267,7 +266,7 @@ class WebdavTools {
                         }
                         let autoCleanlocal = settingsTools.getSettings().auto_clean_local;
                         if (autoCleanlocal != null && autoCleanlocal === "true") {
-                            hassioApiTools.clean();
+                            hassioApiTools.clean().catch();
                         }
                         resolve();
                     }
@@ -314,7 +313,8 @@ class WebdavTools {
             statusTools.setStatus(status);
 
             logger.info("Downloading backup...");
-            if (!fs.existsSync("./temp/")) fs.mkdirSync("./temp/");
+            if (!fs.existsSync("./temp/"))
+                fs.mkdirSync("./temp/");
             let tmpFile = `./temp/restore_${moment().format("MMM-DD-YYYY_HH_mm")}.tar`;
             let stream = fs.createWriteStream(tmpFile);
             let conf = this.getConf();
@@ -395,6 +395,7 @@ class WebdavTools {
                     resolve();
                 })
                 .catch((error) => {
+                    let status = statusTools.getStatus();
                     status.status = "error";
                     status.error_code = 6;
                     status.message = "Fail to clean Nexcloud (" + error + ") !";

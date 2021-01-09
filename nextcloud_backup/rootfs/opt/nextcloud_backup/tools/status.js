@@ -25,9 +25,7 @@ function getStatus() {
     if (!fs.existsSync(statusPath)) {
         fs.writeFileSync(statusPath, JSON.stringify(baseStatus));
     }
-
-    let content = fs.readFileSync(statusPath);
-    return JSON.parse(content);
+    return JSON.parse(fs.readFileSync(statusPath).toString());
 }
 
 function setStatus(state) {

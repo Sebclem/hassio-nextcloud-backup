@@ -141,8 +141,7 @@ function getSettings() {
     if (!fs.existsSync(settingsPath)) {
         return {};
     } else {
-        let rawSettings = fs.readFileSync(settingsPath);
-        return JSON.parse(rawSettings);
+        return JSON.parse(fs.readFileSync(settingsPath).toString());
     }
 }
 
