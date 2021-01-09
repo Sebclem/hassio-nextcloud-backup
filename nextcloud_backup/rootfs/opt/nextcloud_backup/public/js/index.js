@@ -278,8 +278,16 @@ function getNextcloudSettings() {
         $('#username').val(data.username);
         $('#password').val(data.password);
         $('#back-dir').val(data.back_dir);
-        loadingModal.hide();
         nextcloud_setting_modal.show();
+    }).fail((error) => {
+        if (error.status === 404)
+            nextcloud_setting_modal.show();
+        else {
+            console.log(error);
+            create_toast("error", "Fail to fetch Nextcloud config !", default_toast_timeout);
+        }
+    }).always(() => {
+        loadingModal.hide();
     });
 }
 
@@ -358,10 +366,14 @@ function getBackupSettings() {
         }
         $("#addons-div").html(addons_html);
         updateDropVisibility();
-        loadingModal.hide();
         backup_setting_modal.show();
 
 
+    }).fail((error) => {
+        console.log(error);
+        create_toast("error", "Fail to fetch Nextcloud config !", default_toast_timeout);
+    }).always(() => {
+        loadingModal.hide();
     });
 
 }
