@@ -16,7 +16,7 @@
 
 [![Buy me a coffee][buymeacoffee-shield]][buymeacoffee]
 
-Home Assistant snapshot backup to Nextcloud
+Easily backup your Home Assistant snapshots to Nextcloud
 
 ![Nextcloud Backup Screenshot](images/screenshot.png)
 
@@ -27,7 +27,7 @@ Easily backup your Home Assistant snapshots to Nextcloud.
 ### Features
 - Auto Backup : Configure this add-on to automaticly backup your HassIO instance.
 - Auto Clean : You can specify the maximum number of local snapshots and (__ONLY__) auto backuped snapshots.
-- ~~Restore backups.~~ (Coming Soon)
+- Upload backed-up snapshot to Home assistant.
 > __Info:__<br>
 > Auto Clean is executed after every upload and every day at 00h30
 
@@ -69,9 +69,6 @@ Example add-on configuration:
 ```json
 {
   "log_level": "info",
-  "ssl": false,
-  "certfile": "fullchain.pem",
-  "keyfile": "privkey.pem",
 }
 ```
 
@@ -94,26 +91,6 @@ Please note that each level automatically includes log messages from a
 more severe level, e.g., `debug` also shows `info` messages. By default,
 the `log_level` is set to `info`, which is the recommended setting unless
 you are troubleshooting.
-
-### Option: `ssl`
-
-Enables/Disables SSL on the Log Viewer. Set it `true` to enable it,
-`false` otherwise.
-
-**Note**: _The SSL settings only apply to direct access and has no effect
-on the Hass.io Ingress service._
-
-### Option: `certfile`
-
-The certificate file to use for SSL.
-
-**Note**: _The file MUST be stored in `/ssl/`, which is default for Hass.io._
-
-### Option: `keyfile`
-
-The private key file to use for SSL.
-
-**Note**: _The file MUST be stored in `/ssl/`, which is default for Hass.io._
 
 ### Option: `leave_front_door_open`
 
