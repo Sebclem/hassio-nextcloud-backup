@@ -29,7 +29,15 @@ function getStatus() {
 }
 
 function setStatus(state) {
-    fs.writeFileSync(statusPath, JSON.stringify(state));
+    if (fs.existsSync(statusPath)) {
+        let old_state_str = fs.readFileSync(statusPath).toString();
+        if(old_state_str !== JSON.stringify(state)){
+            fs.writeFileSync(statusPath, JSON.stringify(state));
+        }
+    }else{
+        fs.writeFileSync(statusPath, JSON.stringify(state));
+    }
+
 }
 
 exports.init = init;
