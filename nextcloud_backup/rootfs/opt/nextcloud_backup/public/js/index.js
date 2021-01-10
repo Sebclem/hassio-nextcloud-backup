@@ -183,6 +183,21 @@ function listeners() {
     $('#trigger-backup-settings').click(getBackupSettings);
     $('#cron-drop-settings').change(updateDropVisibility);
     $('#save-backup-settings').click(sendBackupSettings);
+    $('#auto_clean_local').change(function () {
+        if (!$(this).is(':checked')) {
+            $('#local-snap-keep').parent().parent().addClass("d-none");
+        } else {
+            $('#local-snap-keep').parent().parent().removeClass("d-none");
+        }
+    });
+    $('#auto_clean_backup').change(function () {
+        if (!$(this).is(':checked')) {
+            $('#backup-snap-keep').parent().parent().addClass("d-none");
+        } else {
+            $('#backup-snap-keep').parent().parent().removeClass("d-none");
+        }
+    });
+
 
     $('#trigger-nextcloud-settings').click(getNextcloudSettings);
     $('#save-nextcloud-settings').click(sendNextcloudSettings);
@@ -347,9 +362,19 @@ function getBackupSettings() {
 
 
         $('#auto_clean_local').prop('checked', data.settings.auto_clean_local === "true");
-        $('#local-snap-keep').val(data.settings.auto_clean_local_keep);
+        let local_snap_keep = $('#local-snap-keep');
+        if (data.settings.auto_clean_local === "true")
+            local_snap_keep.parent().parent().removeClass("d-none");
+        else
+            local_snap_keep.parent().parent().addClass("d-none");
+        local_snap_keep.val(data.settings.auto_clean_local_keep);
         $('#auto_clean_backup').prop('checked', data.settings.auto_clean_backup === "true");
-        $('#backup-snap-keep').val(data.settings.auto_clean_backup_keep);
+        let backup_snap_keep = $('#backup-snap-keep');
+        if (data.settings.auto_clean_backup === "true")
+            backup_snap_keep.parent().parent().removeClass("d-none");
+        else
+            backup_snap_keep.parent().parent().addClass("d-none");
+        backup_snap_keep.val(data.settings.auto_clean_backup_keep);
 
         $('#cron-drop-day').val(data.settings.cron_weekday);
         let folder_html = ""
