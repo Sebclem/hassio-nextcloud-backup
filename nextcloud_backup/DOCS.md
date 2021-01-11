@@ -71,5 +71,5 @@ more severe level, e.g., `debug` also shows `info` messages. By default,
 the `log_level` is set to `info`, which is the recommended setting unless
 you are troubleshooting.
 
-[variable_doc]: https://github.com/Sebclem/hassio-nextcloud-backup/blob/master/nextcloud_backup/namin_template.md
+[variable_doc]: https://github.com/Sebclem/hassio-nextcloud-backup/blob/master/nextcloud_backup/naming_template.md
 [repository]: https://github.com/Sebclem/sebclem-hassio-addon-repository
