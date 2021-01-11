@@ -2,7 +2,7 @@
 
 [![GitHub Release][releases-shield]][releases]
 ![Project Stage][project-stage-shield]
-[![License][license-shield]](LICENSE.md)
+[![License][license-shield]](LICENSE)
 
 ![Supports aarch64 Architecture][aarch64-shield]
 ![Supports amd64 Architecture][amd64-shield]
@@ -23,12 +23,16 @@ Easily backup your Home Assistant snapshots to Nextcloud
 ## About
 
 Easily backup your Home Assistant snapshots to Nextcloud.
-
+Auto backup can be configured via the web interface.
 ### Features
-- Auto Backup : Configure this add-on to automaticly backup your HassIO instance.
-- Auto Clean : You can specify the maximum number of local snapshots and (__ONLY__) auto backuped snapshots.
-- Upload backed-up snapshot to Home assistant.
-> __Info:__<br>
+
+- __Auto Backup__ : Configure this add-on to automatically backup your HassIO instance
+- __Selective Backup__ : You can specify witch folder and add-on you want to backup.
+- __Password protected Backup__ : this add-on can use the Home Assistant snapshot encryption.
+- __Auto Clean__ : You can specify the maximum number of local snapshots and (__ONLY__) auto backed-up snapshots.
+- __Restore__ : Upload backed-up snapshot to Home assistant.
+- __Web UI__ : All the configuration is based on an easy-to-use web interface, no yaml needed.
+> __Info:__
 > Auto Clean is executed after every upload and every day at 00h30
 
 ## Installation
@@ -42,65 +46,10 @@ comparison to installing any other Hass.io add-on.
 1. Check the logs of the "Nextcloud Backup" add-on to see if everything went well.
 1. Open the web UI for the "Nextcloud Backup" to configure the add-on.
 
+> **NOTE**: Do not add this repository to HassOS, please use: `https://github.com/Sebclem/sebclem-hassio-addon-repository`.
 
-**NOTE**: Do not add this repository to HassOS, please use:
-`https://github.com/Sebclem/sebclem-hassio-addon-repository`.
-
-
-## NextCloud config
-
-Firts, you need to configure all your Nextcloud information.
-
-To do this:
-1. Open the add-on Web UI
-1. Open NextCloud config menu (Top right gear, and Nexcloud)
-1. If your NextCloud instance use `HTTPS`, enable the `SSL` lever
-1. Enter the `hostname` of the NextCloud instance. You can specify a custom port by adding `:[port]` at the end of the hostname (`exemple.com:8080`)
-1. Now enter the Username that you when this add-on use.
-1. For password, we highly recommend to use `App Password`.<br>
-    >To generate a `App Password`, go into your personal setting into Nextcloud, Security page. You can generate one via the `Devices & sessions` section. Simply entre a name and hit `Create new app password`
-
-## HassOs Configuration
-
-**Note**: _Remember to restart the add-on when the configuration is changed._
-
-Example add-on configuration:
-
-```json
-{
-  "log_level": "info",
-}
-```
-
-**Note**: _This is just an example, don't copy and paste it! Create your own!_
-
-### Option: `log_level`
-
-The `log_level` option controls the level of log output by the addon and can
-be changed to be more or less verbose, which might be useful when you are
-dealing with an unknown issue. Possible values are:
-
-- `trace`: Show every detail, like all called internal functions.
-- `debug`: Shows detailed debug information.
-- `info`: Normal (usually) interesting events.
-- `warning`: Exceptional occurrences that are not errors.
-- `error`:  Runtime errors that do not require immediate action.
-- `fatal`: Something went terribly wrong. Add-on becomes unusable.
-
-Please note that each level automatically includes log messages from a
-more severe level, e.g., `debug` also shows `info` messages. By default,
-the `log_level` is set to `info`, which is the recommended setting unless
-you are troubleshooting.
-
-### Option: `leave_front_door_open`
-
-Adding this option to the add-on configuration allows you to disable
-authentication on the add-on by setting it to `true` and leaving the
-username and password empty.
-
-**Note**: _We STRONGLY suggest, not to use this, even if this add-on is
-only exposed to your internal network. USE AT YOUR OWN RISK!_
-
+## Configuration
+The configuration documention can be found [here][config_doc]
 
 ## Support
 
@@ -168,7 +117,7 @@ SOFTWARE.
 [forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg
 [forum]: https://community.home-assistant.io/
 [i386-shield]: https://img.shields.io/badge/i386-yes-green.svg
-[issue]: https://github.com/hassio-addons/addon-log-viewer/issues
+[issue]: https://github.com/Sebclem/hassio-nextcloud-backup/issues
 [license-shield]: https://img.shields.io/github/license/Sebclem/hassio-nextcloud-backup.svg
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2021.svg
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-Beta-red.svg
@@ -178,3 +127,5 @@ SOFTWARE.
 [repository]: https://github.com/Sebclem/sebclem-hassio-addon-repository
 [contributors]: https://github.com/Sebclem/hassio-nextcloud-backup/graphs/contributors
 [semver]: https://semver.org/spec/v2.0.0.htm
+[config_doc]: https://github.com/Sebclem/hassio-nextcloud-backup/blob/master/nextcloud_backuo/DOCS.md
+
