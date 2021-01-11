@@ -1,5 +1,5 @@
 # Home Assistant Add-ons: Nextcloud Backup
-![Nextcloud Backup Logo](logo.png)
+![Nextcloud Backup Logo][logo]
 
 [![Release][release-shield]][release] ![Project Stage][project-stage-shield] ![Project Maintenance][maintenance-shield]
 
@@ -34,3 +34,4 @@ Easily backup your Home Assistant snapshots to Nextcloud.
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-Beta-red.svg
 [release-shield]: https://img.shields.io/github/release/Sebclem/hassio-nextcloud-backup.svg
 [release]:  https://github.com/Sebclem/hassio-nextcloud-backup/releases
+[logo]: https://github.com/Sebclem/hassio-nextcloud-backup/raw/master/nextcloud_backup/logo.png
