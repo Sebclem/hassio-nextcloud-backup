@@ -181,6 +181,13 @@ function listeners() {
     $('#btn-clean-now').click(cleanNow);
 
     $('#trigger-backup-settings').click(getBackupSettings);
+    $('#password_protected').change(function () {
+        if (!$(this).is(':checked')) {
+            $('#password_protect_value').parent().parent().addClass('d-none');
+        } else {
+            $('#password_protect_value').parent().parent().removeClass('d-none');
+        }
+    })
     $('#cron-drop-settings').change(updateDropVisibility);
     $('#save-backup-settings').click(sendBackupSettings);
     $('#auto_clean_local').change(function () {
@@ -445,6 +452,8 @@ function sendBackupSettings() {
     let name_template = $('#name-template').val();
     let excluded_folders_nodes = document.querySelectorAll('.folders-box:not(:checked)');
     let exclude_folder = [""];
+    let password_protected = $('#password_protected').is(':checked');
+    let password_protect_value = $('#password_protect_value').val();
     for (let i of excluded_folders_nodes) {
         exclude_folder.push(i.id);
     }
@@ -469,7 +478,9 @@ function sendBackupSettings() {
             auto_clean_backup: auto_clean_backup,
             auto_clean_backup_keep: auto_clean_backup_keep,
             exclude_addon: exclude_addon,
-            exclude_folder: exclude_folder
+            exclude_folder: exclude_folder,
+            password_protected: password_protected,
+            password_protect_value: password_protect_value
         })
         .done(() => {
             create_toast("success", "Backup settings saved !", default_toast_timeout);

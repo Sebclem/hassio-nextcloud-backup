@@ -116,6 +116,25 @@ function check(conf, fallback = false) {
         conf.exclude_addon = []
         needSave = true;
     }
+    if(conf.password_protected == null){
+        if (fallback) {
+            logger.warn("Bad value for 'password_protected', fallback to false ");
+            conf.password_protected = 'false';
+        } else {
+            logger.error("Bad value for 'password_protect_value'");
+            return false;
+        }
+    }
+
+    if(conf.password_protect_value == null){
+        if (fallback) {
+            logger.warn("Bad value for 'password_protect_value', fallback to '' ");
+            conf.password_protect_value = '';
+        } else {
+            logger.error("Bad value for 'password_protect_value'");
+            return false;
+        }
+    }
 
     if (fallback || needSave) {
         setSettings(conf);

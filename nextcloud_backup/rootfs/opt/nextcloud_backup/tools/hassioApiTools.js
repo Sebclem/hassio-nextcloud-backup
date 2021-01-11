@@ -284,6 +284,9 @@ function createNewBackup(name) {
                     folders: folders
                 },
             };
+            if(settingsTools.getSettings().password_protected === "true"){
+                option.json.password = settingsTools.getSettings().password_protect_value
+            }
 
             got.post(`http://hassio/snapshots/new/partial`, option)
                 .then((result) => {

@@ -20,6 +20,50 @@
                         </span>
                     </div>
                 </div>
+                <div class="row mt-2">
+                    <div class="col-lg-10 offset-lg-1 col-12">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" id="password_protected" type="checkbox">
+                            <label class="form-check-label" for="password_protected">Password Protected</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2 d-none">
+                    <div class="col-lg-10 offset-lg-1 col-12">
+                        <label for="password_protect_value" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password_protect_value" min="0">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12 col-lg-6">
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <h5>Folders</h5>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <ul id="folders-div" class="list-group">
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <h5>Addons</h5>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <ul id="addons-div" class="list-group">
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="row mt-2">
                     <div class="col-12 col-lg-10 offset-lg-1">
@@ -62,36 +106,6 @@
                     </div>
                 </div>
                 <div class="row mt-3">
-                    <div class="col-12 col-lg-6">
-                        <div class="row">
-                            <div class="col-12 text-center">
-                                <h5>Folders</h5>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <ul id="folders-div" class="list-group">
-
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-lg-6">
-                        <div class="row">
-                            <div class="col-12 text-center">
-                                <h5>Addons</h5>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <ul id="addons-div" class="list-group">
-
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mt-3">
                     <div class="col-12 text-center">
                         <h4>Auto Clean Settings</h4>
                     </div>
@@ -102,7 +116,8 @@
                             <div class="col-12">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" id="auto_clean_local" type="checkbox">
-                                    <label class="form-check-label" for="auto_clean_local">Auto Clean Local Snapshots</label>
+                                    <label class="form-check-label" for="auto_clean_local">Auto Clean Local
+                                        Snapshots</label>
                                 </div>
                             </div>
                         </div>
@@ -119,10 +134,10 @@
                             <div class="col-12">
                                 <div class="form-check form-switch">
                                     <input class="form-check-input" id="auto_clean_backup" type="checkbox">
-                                    <label class="form-check-label" for="auto_clean_backup">Auto Clean Nextcloud Snapshots</label>
+                                    <label class="form-check-label" for="auto_clean_backup">Auto Clean Nextcloud
+                                        Snapshots</label>
                                 </div>
                             </div>
-
                         </div>
                         <div class="row mt-2">
                             <div class="col-12">
