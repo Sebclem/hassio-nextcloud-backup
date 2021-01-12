@@ -127,5 +127,5 @@ SOFTWARE.
 [repository]: https://github.com/Sebclem/sebclem-hassio-addon-repository
 [contributors]: https://github.com/Sebclem/hassio-nextcloud-backup/graphs/contributors
 [semver]: https://semver.org/spec/v2.0.0.htm
-[config_doc]: https://github.com/Sebclem/hassio-nextcloud-backup/blob/master/nextcloud_backuo/DOCS.md
+[config_doc]: https://github.com/Sebclem/hassio-nextcloud-backup/blob/master/nextcloud_backup/DOCS.md
 
