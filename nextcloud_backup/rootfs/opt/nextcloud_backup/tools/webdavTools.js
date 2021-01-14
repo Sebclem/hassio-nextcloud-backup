@@ -228,7 +228,8 @@ class WebdavTools {
                 options["https"] = { rejectUnauthorized: conf.self_signed === "false" };
             }
             logger.debug(`...URI: ${encodeURI(this.baseUrl.replace(this.host, 'host.hiden') + path)}`);
-            logger.debug(`...rejectUnauthorized: ${options["https"]["rejectUnauthorized"]}`);
+            if (conf.ssl === "true")
+                logger.debug(`...rejectUnauthorized: ${options["https"]["rejectUnauthorized"]}`);
 
             got.stream
                 .put(encodeURI(this.baseUrl + path), options)
@@ -327,7 +328,8 @@ class WebdavTools {
                 options["https"] = { rejectUnauthorized: conf.self_signed === "false" };
             }
             logger.debug(`...URI: ${encodeURI(this.baseUrl.replace(this.host, 'host.hiden') + path)}`);
-            logger.debug(`...rejectUnauthorized: ${options["https"]["rejectUnauthorized"]}`);
+            if (conf.ssl === "true")
+                logger.debug(`...rejectUnauthorized: ${options["https"]["rejectUnauthorized"]}`);
             pipeline(
                 got.stream.get(encodeURI(this.baseUrl + path), options)
                     .on("downloadProgress", (e) => {
