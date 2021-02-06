@@ -105,6 +105,15 @@ function check(conf, fallback = false) {
             return false;
         }
     }
+    if (conf.auto_stop_addon == null) {
+        if (fallback) {
+            logger.warn("Bad value for 'auto_stop_addon', fallback to [] ")
+            conf.auto_stop_addon = []
+        } else {
+            logger.error("Bad value for 'auto_stop_addon'")
+            return false;
+        }
+    }
 
     if (!Array.isArray(conf.exclude_folder)) {
         logger.debug("exclude_folder is not array (Empty value), reset...");

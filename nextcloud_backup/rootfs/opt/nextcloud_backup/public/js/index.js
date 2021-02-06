@@ -397,6 +397,14 @@ function getBackupSettings() {
             addons_html += `<li class="list-group-item"><div class="form-check"><input class="form-check-input addons-box" type="checkbox" id="${thisAddon.slug}" ${exclude ? "" : "checked"}><label class="form-label mb-0" for="${thisAddon.slug}">${thisAddon.name}</label></div></li>`
         }
         $("#addons-div").html(addons_html);
+
+        let addons_stop_html = ""
+        for (let thisAddon of data.addonList) {
+            let on = data.settings.auto_stop_addon.includes(thisAddon.slug);
+            addons_stop_html += `<li class="list-group-item"><div class="form-check"><input class="form-check-input stop-addons-box" type="checkbox" id="${thisAddon.slug}" ${on ? "checked" : ""}><label class="form-label mb-0" for="${thisAddon.slug}">${thisAddon.name}</label></div></li>`
+        }
+        $("#auto-stop-addons-div").html(addons_stop_html);
+
         updateDropVisibility();
         backup_setting_modal.show();
 
@@ -464,6 +472,12 @@ function sendBackupSettings() {
         exclude_addon.push(i.id);
     }
 
+    let stop_addons_nodes = document.querySelectorAll('.stop-addons-box:checked');
+    let stop_addon = [""];
+    for (let i of stop_addons_nodes) {
+        stop_addon.push(i.id);
+    }
+
     loadingModal.show();
     backup_setting_modal.hide();
     $.post('./api/backup-settings',
@@ -479,6 +493,7 @@ function sendBackupSettings() {
             auto_clean_backup_keep: auto_clean_backup_keep,
             exclude_addon: exclude_addon,
             exclude_folder: exclude_folder,
+            auto_stop_addon: stop_addon,
             password_protected: password_protected,
             password_protect_value: password_protect_value
         })
