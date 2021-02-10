@@ -408,8 +408,10 @@ function getBackupSettings() {
 
         let addons_stop_html = ""
         for (let thisAddon of data.addonList) {
-            let on = data.settings.auto_stop_addon.includes(thisAddon.slug);
-            addons_stop_html += `<li class="list-group-item"><div class="form-check"><input class="form-check-input stop-addons-box" type="checkbox" id="${thisAddon.slug}" ${on ? "checked" : ""}><label class="form-label mb-0" for="${thisAddon.slug}">${thisAddon.name}</label></div></li>`
+            if (thisAddon.slug !== "229cc4d7_nextcloud_backup"){
+                let on = data.settings.auto_stop_addon.includes(thisAddon.slug);
+                addons_stop_html += `<li class="list-group-item"><div class="form-check"><input class="form-check-input stop-addons-box" type="checkbox" id="${thisAddon.slug}" ${on ? "checked" : ""}><label class="form-label mb-0" for="${thisAddon.slug}">${thisAddon.name}</label></div></li>`
+            }
         }
         $("#auto-stop-addons-div").html(addons_stop_html);
 
