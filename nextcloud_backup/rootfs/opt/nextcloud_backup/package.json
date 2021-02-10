@@ -6,7 +6,7 @@
     "start": "node ./bin/www "
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.15.1",
+    "@fortawesome/fontawesome-free": "^5.15.2",
     "app-root-path": "^3.0.0",
     "bootstrap": "^5.0.0-beta1",
     "cookie-parser": "^1.4.5",
