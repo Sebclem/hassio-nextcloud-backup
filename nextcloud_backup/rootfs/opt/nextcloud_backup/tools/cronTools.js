@@ -83,21 +83,31 @@ class CronContainer {
     _createBackup() {
         logger.debug("Cron triggered !");
         let status = statusTools.getStatus();
-        if (status.status === "creating" || status.status === "upload" || status.status === "download") return;
-        hassioApiTools
-            .getVersion()
-            .then((version) => {
-                let name = settingsTools.getFormatedName(false, version)
-                hassioApiTools
-                    .createNewBackup(name)
-                    .then((id) => {
-                        hassioApiTools
-                            .downloadSnapshot(id)
-                            .then(() => {
-                                webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.auto + name + ".tar").catch();
-                            }).catch();
-                    }).catch();
-            }).catch();
+        if (status.status === "creating" || status.status === "upload" || status.status === "download" || status.status === "stopping" || status.status === "starting")
+            return;
+        hassioApiTools.stopAddons()
+            .then(() => {
+                hassioApiTools.getVersion()
+                    .then((version) => {
+                        let name = settingsTools.getFormatedName(false, version);
+                        hassioApiTools.createNewBackup(name)
+                            .then((id) => {
+                                hassioApiTools
+                                    .downloadSnapshot(id)
+                                    .then(() => {
+                                        webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.auto + name + ".tar")
+                                            .then(() => {
+                                                hassioApiTools.startAddons().catch(() => {
+                                                });
+                                            });
+                                    });
+                            });
+                    });
+            })
+            .catch(() => {
+                hassioApiTools.startAddons().catch(() => {
+                });
+            });
     }
 
     _clean() {

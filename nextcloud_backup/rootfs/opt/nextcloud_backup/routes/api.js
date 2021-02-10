@@ -142,31 +142,35 @@ router.post("/manual-backup", function (req, res, next) {
 
 router.post("/new-backup", function (req, res, next) {
     let status = statusTools.getStatus();
-    if (status.status === "creating" && status.status === "upload" && status.status === "download") {
+    if (status.status === "creating" || status.status === "upload" || status.status === "download" || status.status === "stopping" || status.status === "starting") {
         res.status(503);
         res.send();
         return;
     }
-    hassioApiTools
-        .getVersion()
-        .then((version) => {
-            let name = settingsTools.getFormatedName(true, version);
-            hassioApiTools
-                .createNewBackup(name)
-                .then((id) => {
-                    hassioApiTools
-                        .downloadSnapshot(id)
-                        .then(() => {
-                            webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.manual + name + ".tar").catch();
-                        })
-                        .catch(() => {
+    hassioApiTools.stopAddons()
+        .then(() => {
+            hassioApiTools.getVersion()
+                .then((version) => {
+                    let name = settingsTools.getFormatedName(true, version);
+                    hassioApiTools.createNewBackup(name)
+                        .then((id) => {
+                            hassioApiTools
+                                .downloadSnapshot(id)
+                                .then(() => {
+                                    webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.manual + name + ".tar")
+                                        .then(() => {
+                                            hassioApiTools.startAddons().catch(() => {
+                                            })
+                                        });
+                                });
                         });
-                })
-                .catch(() => {
                 });
         })
         .catch(() => {
+            hassioApiTools.startAddons().catch(() => {
+            });
         });
+
 
     res.status(201);
     res.send();

@@ -126,6 +126,14 @@ function update_status() {
                     printStatusWithBar('Creating Snapshot', data.progress);
                     buttons.addClass("disabled");
                     break;
+                case "stopping":
+                    printStatusWithBar('Stopping addons', data.progress);
+                    buttons.addClass("disabled");
+                    break;
+                case "starting":
+                    printStatusWithBar('Starting addons', data.progress);
+                    buttons.addClass("disabled");
+                    break;
             }
             if (data.last_backup != null) {
                 let last_back_status = $('#last_back_status');

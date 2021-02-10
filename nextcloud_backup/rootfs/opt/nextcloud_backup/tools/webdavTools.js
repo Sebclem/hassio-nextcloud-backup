@@ -194,13 +194,17 @@ class WebdavTools {
             if (this.client == null) {
                 this.confIsValid()
                     .then(() => {
-                        this._startUpload(id, path).catch((err) => reject(err));
+                        this._startUpload(id, path)
+                            .then(()=> resolve())
+                            .catch((err) => reject(err));
                     })
                     .catch((err) => {
                         reject(err);
                     });
             } else
-                this._startUpload(id, path).catch((err) => reject(err));
+                this._startUpload(id, path)
+                    .then(()=> resolve())
+                    .catch((err) => reject(err));
         });
     }
 

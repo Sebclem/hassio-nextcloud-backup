@@ -284,7 +284,7 @@ function createNewBackup(name) {
                     folders: folders
                 },
             };
-            if(settingsTools.getSettings().password_protected === "true"){
+            if (settingsTools.getSettings().password_protected === "true") {
                 option.json.password = settingsTools.getSettings().password_protect_value
             }
 
@@ -393,12 +393,105 @@ function uploadSnapshot(path) {
                 fs.unlinkSync(path);
                 status.status = "error";
                 status.error_code = 4;
-                status.message = `Fail to upload backup to home assitant (${err}) !`;
+                status.message = `Fail to upload backup to home assistant (${err}) !`;
                 statusTools.setStatus(status);
                 logger.error(status.message);
                 reject(status.message);
             });
     });
+}
+
+function stopAddons() {
+    return new Promise(((resolve, reject) => {
+        logger.info('Stopping addons...')
+        let status = statusTools.getStatus();
+        status.status = "stopping";
+        status.progress = -1;
+        status.message = null;
+        status.error_code = null;
+        statusTools.setStatus(status);
+        let promises = [];
+        let token = process.env.HASSIO_TOKEN;
+        let option = {
+            headers: { "X-HASSIO-KEY": token },
+            responseType: "json",
+        };
+        let addons_slug = settingsTools.getSettings().auto_stop_addon
+        for (let addon of addons_slug) {
+            if (addon !== "") {
+                logger.debug(`... Stopping addon ${addon}`)
+                promises.push(got.post(`http://hassio/addons/${addon}/stop`, option));
+            }
+
+        }
+        Promise.allSettled(promises).then(values => {
+            let error = null;
+            for (let val of values)
+                if (val.status === "rejected")
+                    error = val.reason;
+
+            if (error) {
+                status.status = "error";
+                status.error_code = 8;
+                status.message = `Fail to stop addons(${error}) !`;
+                statusTools.setStatus(status);
+                logger.error(status.message);
+                reject(status.message);
+            } else {
+                logger.info('... Ok')
+                resolve();
+            }
+        });
+    }));
+}
+
+function startAddons() {
+    return new Promise(((resolve, reject) => {
+        logger.info('Starting addons...');
+        let status = statusTools.getStatus();
+        status.status = "starting";
+        status.progress = -1;
+        status.message = null;
+        status.error_code = null;
+        statusTools.setStatus(status);
+        let promises = [];
+        let token = process.env.HASSIO_TOKEN;
+        let option = {
+            headers: { "X-HASSIO-KEY": token },
+            responseType: "json",
+        };
+        let addons_slug = settingsTools.getSettings().auto_stop_addon
+        for (let addon of addons_slug) {
+            if (addon !== "") {
+                logger.debug(`... Starting addon ${addon}`)
+                promises.push(got.post(`http://hassio/addons/${addon}/start`, option));
+            }
+        }
+        Promise.allSettled(promises).then(values => {
+            let error = null;
+            for (let val of values)
+                if (val.status === "rejected")
+                    error = val.reason;
+
+            if (error) {
+                let status = statusTools.getStatus();
+                status.status = "error";
+                status.error_code = 9;
+                status.message = `Fail to start addons (${error}) !`;
+                statusTools.setStatus(status);
+                logger.error(status.message);
+                reject(status.message);
+            } else {
+                logger.info('... Ok')
+                status.status = "idle";
+                status.progress = -1;
+                status.message = null;
+                status.error_code = null;
+                statusTools.setStatus(status);
+                resolve();
+            }
+        });
+    }));
 }
 
 exports.getVersion = getVersion;
@@ -408,4 +501,6 @@ exports.getSnapshots = getSnapshots;
 exports.downloadSnapshot = downloadSnapshot;
 exports.createNewBackup = createNewBackup;
 exports.uploadSnapshot = uploadSnapshot;
+exports.stopAddons = stopAddons;
+exports.startAddons = startAddons;
 exports.clean = clean;
