@@ -19,6 +19,7 @@ ARG BUILD_ARCH
 ARG BUILD_DATE
 ARG BUILD_REF
 ARG BUILD_VERSION
+ARG IMAGE_SOURCE
 
 # Labels
 LABEL \
@@ -36,4 +37,5 @@ LABEL \
     org.label-schema.usage="https://github.com/hassio-addons/addon-example/tree/master/README.md" \
     org.label-schema.vcs-ref=${BUILD_REF} \
     org.label-schema.vcs-url="https://github.com/hassio-addons/addon-example" \
-    org.label-schema.vendor="Sebclem"
+    org.label-schema.vendor="Sebclem"\
+    org.opencontainers.image.source=${IMAGE_SOURCE}

@@ -10,6 +10,7 @@ env:
   TARGET: nextcloud_backup
   IMAGE: "hassio-nextcloud-backup"
   REPOSITORY: ghcr.io/sebclem
+  IMAGE_SOURCE : https://github.com/Sebclem/hassio-nextcloud-backup
 
 
 
@@ -88,4 +89,5 @@ jobs:
           build-args: |
             BUILD_FROM=${{env.BUILD_FROM}}
             BUILD_VERSION=${{env.VERSION}}
+            IMAGE_SOURCE=${{env.IMAGE_SOURCE}}
           file: ./${{env.TARGET}}/Dockerfile
