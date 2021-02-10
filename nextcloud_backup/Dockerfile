@@ -3,14 +3,24 @@ ARG BUILD_FROM=hassioaddons/base:8.0.1
 FROM ${BUILD_FROM}
 
 # Copy root filesystem
-COPY rootfs /
+COPY rootfs/etc /etc/
+COPY rootfs/usr /usr/
 
 # Setup base
 RUN apk add --no-cache \
     nodejs \
     npm
 
+# Copy only package*.json
+COPY rootfs/opt/nextcloud_backup/package*.json /opt/nextcloud_backup/
+
+WORKDIR /opt/nextcloud_backup/
+
+# Install packages
 RUN npm ci --only=production
+
+# Copy all source code
+COPY rootfs/opt/ /opt/
 
 # Build arguments
 ARG BUILD_ARCH
