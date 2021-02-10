@@ -3,7 +3,7 @@
   "version": "0.8.0",
   "private": true,
   "scripts": {
-    "start": "node --inspect=0.0.0.0:9226 ./bin/www "
+    "start": "node ./bin/www "
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",

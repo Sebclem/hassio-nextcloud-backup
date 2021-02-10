@@ -27,15 +27,12 @@
         "log_level": "info"
     },
     "schema": {
-        "log_level": "match(^(trace|debug|info|notice|warning|error|fatal)$)?",
-        "leave_front_door_open": "bool?"
+        "log_level": "match(^(trace|debug|info|notice|warning|error|fatal)$)?"
     },
     "ports": {
-        "3000/tcp": null,
-        "9226/tcp": null
+        "3000/tcp": null
     },
     "ports_description": {
-        "3000/tcp": "Web interface (Not required for Hass.io Ingress)",
-        "9226/tcp": "NodeJS Debuger"
+        "3000/tcp": "Web interface (Not required for Hass.io Ingress)"
     }
 }
