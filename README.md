@@ -31,6 +31,7 @@ Auto backup can be configured via the web interface.
 - __Password protected Backup__ : this add-on can use the Home Assistant snapshot encryption.
 - __Auto Clean__ : You can specify the maximum number of local snapshots and (__ONLY__) auto backed-up snapshots.
 - __Restore__ : Upload backed-up snapshot to Home assistant.
+- __Auto Stop__ : This addon can stop addons before backup and restart them after backup 
 - __Web UI__ : All the configuration is based on an easy-to-use web interface, no yaml needed.
 > __Info:__
 > Auto Clean is executed after every upload and every day at 00h30
