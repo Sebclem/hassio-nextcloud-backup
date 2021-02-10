@@ -10,9 +10,7 @@ RUN apk add --no-cache \
     nodejs \
     npm
 
-WORKDIR /opt/nextcloud_backup
-
-RUN npm install
+RUN npm ci --only=production
 
 # Build arguments
 ARG BUILD_ARCH
