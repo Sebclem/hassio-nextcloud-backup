@@ -48,7 +48,7 @@
 
 
 
-        {{#commit-list commits heading='## ⬆️ Dependency updates' message=':arrow_up:'}
+        {{#commit-list commits heading='## ⬆️ Dependency updates' message=':arrow_up:'}}
             - {{subject}} [`{{shorthash}}`]({{href}}) {{setVar "dep" "true"}}
         {{/commit-list}}
         {{#unless @root.dep }}
