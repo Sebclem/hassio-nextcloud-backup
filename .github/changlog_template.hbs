@@ -1,20 +1,65 @@
 {{#each releases}}
     {{#if @first}}
-        {{#commit-list commits heading='## 🚑 Fixs' message=':ambulance:|fix|bugfix|bug'}}
-            - {{subject}} [`{{shorthash}}`]({{href}})
+        {{#commit-list commits heading='## 🚑 Fixs' message=':ambulance:'}}
+            - {{subject}} [`{{shorthash}}`]({{href}}) {{setVar "fix" "true"}}
         {{/commit-list}}
+        {{#unless @root.fix }}
+            {{#commit-list merges heading='## 🚑 Fixs' message=':ambulance:'}}
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
+            {{/commit-list}}
+        {{/unless}}
+        {{#if @root.fix }}
+            {{#commit-list merges heading='' message=':ambulance:'}}
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
+            {{/commit-list}}
+        {{/if}}
 
 
-        {{#commit-list commits heading='## 🔨 Changes' message=':hammer:|:arrow_up:|:heavy_plus_sign:'}}
-            - {{subject}} [`{{shorthash}}`]({{href}})
+
+        {{#commit-list commits heading='## 🔨 Changes' message=':hammer:|:heavy_plus_sign:'}}
+            - {{subject}} [`{{shorthash}}`]({{href}}) {{setVar "change" "true"}}
         {{/commit-list}}
+        {{#unless @root.change }}
+            {{#commit-list merges heading='## 🔨 Changes' message=':hammer:|:heavy_plus_sign:'}}
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
+            {{/commit-list}}
+        {{/unless}}
+        {{#if @root.change }}
+            {{#commit-list merges heading='' message=':hammer:|:heavy_plus_sign:'}}
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
+            {{/commit-list}}
+        {{/if}}
+
 
 
         {{#commit-list commits heading='## ✏ Enhancements' message=':pencil2:'}}
-            - {{subject}} [`{{shorthash}}`]({{href}})
+            - {{subject}} [`{{shorthash}}`]({{href}}) {{setVar "enhanc" "true"}}
         {{/commit-list}}
-        {{#commit-list commits heading='## ⬆️ Dependency updates' message=':pencil2:'}}
-            - {{subject}} [`{{shorthash}}`]({{href}})
+        {{#unless @root.enhanc }}
+            {{#commit-list merges heading='## ✏ Enhancements' message=':pencil2:'}}
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
+            {{/commit-list}}
+        {{/unless}}
+        {{#if @root.enhanc }}
+            {{#commit-list merges heading='' message=':pencil2:'}}
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
+            {{/commit-list}}
+        {{/if}}
+
+
+
+        {{#commit-list commits heading='## ⬆️ Dependency updates' message=':arrow_up:'}}
+            - {{subject}} [`{{shorthash}}`]({{href}}) {{setVar "dep" "true"}}
         {{/commit-list}}
+        {{#unless @root.dep }}
+            {{#commit-list merges heading='## ⬆️ Dependency updates' message=':arrow_up:'}}
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
+            {{/commit-list}}
+        {{/unless}}
+        {{#if @root.dep }}
+            {{#commit-list merges heading='' message=':arrow_up:'}}
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
+            {{/commit-list}}
+        {{/if}}
     {{/if}}
 {{/each}}

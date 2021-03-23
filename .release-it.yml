@@ -5,7 +5,7 @@ github:
 
 
 git:
-        changelog: "auto-changelog --stdout"
+        changelog: "auto-changelog --stdout --handlebars-setup .github/custom-handlebars.js"
         push: false
         tag: false
         commit: false
