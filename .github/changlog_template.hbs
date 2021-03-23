@@ -33,7 +33,7 @@
 
 
         {{#commit-list commits heading='## ✏ Enhancements' message=':pencil2:'}}
-            - {{subject}} [`{{shorthash}}`]({{href}} {{setVar "enhanc" "true"}}
+            - {{subject}} [`{{shorthash}}`]({{href}}) {{setVar "enhanc" "true"}}
         {{/commit-list}}
         {{#unless @root.enhanc }}
             {{#commit-list merges heading='## ✏ Enhancements' message=':pencil2:'}}
