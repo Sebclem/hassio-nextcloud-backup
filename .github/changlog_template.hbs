@@ -6,12 +6,12 @@
         {{/commit-list}}
         {{#unless @root.fix }}
             {{#commit-list merges heading='## 🚑 Fixs' message=':ambulance:'}}
-                - {{message}} [`{{id}}`]({{href}})
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
             {{/commit-list}}
         {{/unless}}
         {{#if @root.fix }}
             {{#commit-list merges heading='' message=':ambulance:'}}
-                - {{message}} [`{{id}}`]({{href}})
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
             {{/commit-list}}
         {{/if}}
 
@@ -23,12 +23,12 @@
         {{/commit-list}}
         {{#unless @root.change }}
             {{#commit-list merges heading='## 🔨 Changes' message=':hammer:|:heavy_plus_sign:'}}
-                - {{message}} [`{{id}}`]({{href}})
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
             {{/commit-list}}
         {{/unless}}
         {{#if @root.change }}
             {{#commit-list merges heading='' message=':hammer:|:heavy_plus_sign:'}}
-                - {{message}} [`{{id}}`]({{href}})
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
             {{/commit-list}}
         {{/if}}
 
@@ -40,12 +40,12 @@
         {{/commit-list}}
         {{#unless @root.enhanc }}
             {{#commit-list merges heading='## ✏ Enhancements' message=':pencil2:'}}
-                - {{message}} [`{{id}}`]({{href}})
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
             {{/commit-list}}
         {{/unless}}
         {{#if @root.enhanc }}
             {{#commit-list merges heading='' message=':pencil2:'}}
-                - {{message}} [`{{id}}`]({{href}})
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
             {{/commit-list}}
         {{/if}}
 
@@ -57,12 +57,12 @@
         {{/commit-list}}
         {{#unless @root.dep }}
             {{#commit-list merges heading='## ⬆️ Dependency updates' message=':arrow_up:'}}
-                - {{message}} [`{{id}}`]({{href}})
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
             {{/commit-list}}
         {{/unless}}
         {{#if @root.dep }}
             {{#commit-list merges heading='' message=':arrow_up:'}}
-                - {{message}} [`{{id}}`]({{href}})
+                - {{message}} [`{{id}}`]({{href}}) `{{author}}`
             {{/commit-list}}
         {{/if}}
     {{/if}}
