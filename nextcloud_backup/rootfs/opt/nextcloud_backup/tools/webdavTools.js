@@ -87,7 +87,7 @@ class WebdavTools {
                     await this.client.createDirectory(path);
                     logger.debug(`Path ${path} created.`);
                 } catch (error) {
-                    if (error.response.status === 405) logger.debug(`Path ${path} already exist.`);
+                    if (error.status === 405) logger.debug(`Path ${path} already exist.`);
                     else logger.error(error);
                 }
             }
