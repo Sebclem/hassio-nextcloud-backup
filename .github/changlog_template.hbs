@@ -1,33 +1,33 @@
 {{#each releases}}
     {{#if @first}}
-        {{#commit-list commits heading='## 🚑 Fixs' message=':ambulance:|fix|bugfix|bug'}}
+        {{#commit-list commits heading='## 🚑 Fixs' message=':ambulance:'}}
             {{setVar "fix" "true"}}
             - {{subject}} [`{{shorthash}}`]({{href}})
         {{/commit-list}}
         {{#unless @root.fix }}
-            {{#commit-list merges heading='## 🚑 Fixs' message=':ambulance:|fix|bugfix|bug'}}
+            {{#commit-list merges heading='## 🚑 Fixs' message=':ambulance:'}}
                 - {{message}} [`{{id}}`]({{href}})
             {{/commit-list}}
         {{/unless}}
         {{#if @root.fix }}
-            {{#commit-list merges heading='' message=':ambulance:|fix|bugfix|bug'}}
+            {{#commit-list merges heading='' message=':ambulance:'}}
                 - {{message}} [`{{id}}`]({{href}})
             {{/commit-list}}
         {{/if}}
 
 
 
-        {{#commit-list commits heading='## 🔨 Changes' message=':hammer:|:arrow_up:|:heavy_plus_sign:'}}
+        {{#commit-list commits heading='## 🔨 Changes' message=':hammer:|:heavy_plus_sign:'}}
             {{setVar "change" "true"}}
             - {{subject}} [`{{shorthash}}`]({{href}})
         {{/commit-list}}
         {{#unless @root.change }}
-            {{#commit-list merges heading='## 🔨 Changes' message=':hammer:|:arrow_up:|:heavy_plus_sign:'}}
+            {{#commit-list merges heading='## 🔨 Changes' message=':hammer:|:heavy_plus_sign:'}}
                 - {{message}} [`{{id}}`]({{href}})
             {{/commit-list}}
         {{/unless}}
         {{#if @root.change }}
-            {{#commit-list merges heading='' message=':hammer:|:arrow_up:|:heavy_plus_sign:'}}
+            {{#commit-list merges heading='' message=':hammer:|:heavy_plus_sign:'}}
                 - {{message}} [`{{id}}`]({{href}})
             {{/commit-list}}
         {{/if}}
