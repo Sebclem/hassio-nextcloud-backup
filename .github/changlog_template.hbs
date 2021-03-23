@@ -1,8 +1,7 @@
 {{#each releases}}
     {{#if @first}}
         {{#commit-list commits heading='## 🚑 Fixs' message=':ambulance:'}}
-            {{setVar "fix" "true"}}
-            - {{subject}} [`{{shorthash}}`]({{href}})
+            - {{subject}} [`{{shorthash}}`]({{href}}) {{setVar "fix" "true"}}
         {{/commit-list}}
         {{#unless @root.fix }}
             {{#commit-list merges heading='## 🚑 Fixs' message=':ambulance:'}}
@@ -18,8 +17,7 @@
 
 
         {{#commit-list commits heading='## 🔨 Changes' message=':hammer:|:heavy_plus_sign:'}}
-            {{setVar "change" "true"}}
-            - {{subject}} [`{{shorthash}}`]({{href}})
+            - {{subject}} [`{{shorthash}}`]({{href}}) {{setVar "change" "true"}}
         {{/commit-list}}
         {{#unless @root.change }}
             {{#commit-list merges heading='## 🔨 Changes' message=':hammer:|:heavy_plus_sign:'}}
@@ -35,8 +33,7 @@
 
 
         {{#commit-list commits heading='## ✏ Enhancements' message=':pencil2:'}}
-            {{setVar "enhanc" "true"}}
-            - {{subject}} [`{{shorthash}}`]({{href}})
+            - {{subject}} [`{{shorthash}}`]({{href}} {{setVar "enhanc" "true"}}
         {{/commit-list}}
         {{#unless @root.enhanc }}
             {{#commit-list merges heading='## ✏ Enhancements' message=':pencil2:'}}
@@ -51,9 +48,8 @@
 
 
 
-        {{#commit-list commits heading='## ⬆️ Dependency updates' message=':arrow_up:'}}
-            {{setVar "dep" "true"}}
-            - {{subject}} [`{{shorthash}}`]({{href}})
+        {{#commit-list commits heading='## ⬆️ Dependency updates' message=':arrow_up:'}
+            - {{subject}} [`{{shorthash}}`]({{href}}) {{setVar "dep" "true"}}
         {{/commit-list}}
         {{#unless @root.dep }}
             {{#commit-list merges heading='## ⬆️ Dependency updates' message=':arrow_up:'}}
