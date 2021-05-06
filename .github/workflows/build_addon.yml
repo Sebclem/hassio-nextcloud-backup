@@ -90,6 +90,5 @@ jobs:
             BUILD_VERSION=${{env.VERSION}}
             IMAGE_SOURCE=${{env.IMAGE_SOURCE}}
           file: ./${{env.TARGET}}/Dockerfile
-          cache-from: type=registry,ref=${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}:latest
-          cache-to: type=inline
-          context: .
+#          cache-from: type=registry,ref=${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}:latest
+#          cache-to: type=inline
