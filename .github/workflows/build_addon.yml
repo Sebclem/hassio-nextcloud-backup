@@ -82,8 +82,7 @@ jobs:
       - name: Build and push ${{matrix.arch}}
         uses: docker/build-push-action@v2
         with:
-          push: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/tags/*' }}
-          context: ./${{env.TARGET}}
+          push: ${{ github.event_name != 'pull_request' }}
           tags: ${{env.TAGS}}
           labels: io.hass.name=${{env.NAME}}, io.hass.description=${{env.DESCRIPTION}}, io.hass.url=${{env.URL}}, io.hass.arch=${{matrix.arch}}, io.hass.version=${{env.VERSION}}, io.hass.type=addon
           build-args: |
@@ -93,3 +92,4 @@ jobs:
           file: ./${{env.TARGET}}/Dockerfile
           cache-from: type=registry,ref=${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}:latest
           cache-to: type=inline
+          context: ./${{env.TARGET}}/
