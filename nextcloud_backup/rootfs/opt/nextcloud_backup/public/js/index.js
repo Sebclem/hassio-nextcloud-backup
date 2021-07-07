@@ -230,7 +230,7 @@ function restore(id) {
     $.post('./api/restore', { path: id })
         .done(() => {
             console.log("Restore cmd send !");
-            create_toast("success", "Command send !", default_toast_timeout);
+            create_toast("success", "Command sent !", default_toast_timeout);
         })
         .fail((error) => {
             console.log(error);
@@ -285,7 +285,7 @@ function manualBackup(id, name) {
     $.post(`./api/manual-backup?id=${id}&name=${name}`)
         .done(() => {
             console.log("manual bk cmd send !");
-            create_toast("success", "Command send !", default_toast_timeout);
+            create_toast("success", "Command sent !", default_toast_timeout);
         })
         .fail((error) => {
             console.log(error);
@@ -314,7 +314,7 @@ function getNextcloudSettings() {
             nextcloud_setting_modal.show();
         else {
             console.log(error);
-            create_toast("error", "Fail to fetch Nextcloud config !", default_toast_timeout);
+            create_toast("error", "Failed to fetch Nextcloud config !", default_toast_timeout);
         }
     }).always(() => {
         loadingModal.hide();
@@ -325,7 +325,7 @@ function backupNow() {
     loadingModal.show();
     $.post('./api/new-backup')
         .done(() => {
-            create_toast("success", "Command send !", default_toast_timeout);
+            create_toast("success", "Command sent !", default_toast_timeout);
         })
         .fail((error) => {
             console.log(error);
@@ -340,7 +340,7 @@ function cleanNow() {
     loadingModal.show();
     $.post('./api/clean-now')
         .done(() => {
-            create_toast("success", "Command send !", default_toast_timeout);
+            create_toast("success", "Command sent !", default_toast_timeout);
         })
         .fail((error) => {
             console.log(error);
@@ -421,7 +421,7 @@ function getBackupSettings() {
 
     }).fail((error) => {
         console.log(error);
-        create_toast("error", "Fail to fetch Nextcloud config !", default_toast_timeout);
+        create_toast("error", "Failed to fetch Nextcloud config !", default_toast_timeout);
     }).always(() => {
         loadingModal.hide();
     });
