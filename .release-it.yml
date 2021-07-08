@@ -1,11 +1,11 @@
 github:
-        release: true
-        draft: true
-        releaseName: "V${version}"
+  release: true
+  draft: true
+  releaseName: "V${version}"
 
 
 git:
-        changelog: "auto-changelog --stdout --handlebars-setup .github/custom-handlebars.js"
-        push: false
-        tag: false
-        commit: false
+  changelog: "auto-changelog --stdout --handlebars-setup .github/custom-handlebars.js"
+  push: false
+  tag: false
+  commit: false
