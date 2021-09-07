@@ -64,6 +64,10 @@ class CronContainer {
                 cronStr = "" + splited[1] + " " + splited[0] + " " + settings.cron_month_day + " * *";
                 break;
             }
+            case "4": {
+                cronStr = settings.cron_custom;
+                break;
+            }
         }
         logger.info("Starting Cron...");
         this.cronJob = new CronJob(cronStr, this._createBackup, null, false, Intl.DateTimeFormat().resolvedOptions().timeZone);

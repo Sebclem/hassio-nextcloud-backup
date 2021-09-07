@@ -1,6 +1,7 @@
 const fs = require("fs");
 const logger = require("../config/winston");
 const moment = require("moment");
+const CronJob = require("cron").CronJob;
 
 const settingsPath = "/data/backup_conf.json";
 
@@ -20,6 +21,17 @@ function check_cron(conf) {
             return conf.cron_month_day != null && conf.cron_month_day >= 1 && conf.cron_month_day <= 28;
         }
 
+        if (conf.cron_base === "4") {
+            if (conf.cron_custom != null) {
+                try {
+                    new CronJob(conf.cron_custom, () => {});
+                    return true;
+                } catch(e) {
+                    return false;
+                }
+            }else return false;
+        }
+
         if (conf.cron_base === "0") return true;
     } else return false;
 
@@ -35,6 +47,7 @@ function check(conf, fallback = false) {
             conf.cron_hour = "00:00";
             conf.cron_weekday = "0";
             conf.cron_month_day = "1";
+            conf.cron_custom = "5 4 * * *";
         } else {
             logger.error("Bad value for cron settings");
             return [false, "Bad cron settings"];
