@@ -1,4 +1,5 @@
 const fs = require("fs");
+const hassioApiTools = require("./hassioApiTools");
 
 const statusPath = "/data/status.json";
 
@@ -33,10 +34,13 @@ function setStatus(state) {
         let old_state_str = fs.readFileSync(statusPath).toString();
         if(old_state_str !== JSON.stringify(state)){
             fs.writeFileSync(statusPath, JSON.stringify(state));
+            hassioApiTools.publish_state(state);
         }
     }else{
         fs.writeFileSync(statusPath, JSON.stringify(state));
+        hassioApiTools.publish_state(state);
     }
+    
 
 }
 

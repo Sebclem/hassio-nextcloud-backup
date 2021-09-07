@@ -35,6 +35,7 @@ Auto backup can be configured via the web interface.
 - __Restore__ : Upload backed-up snapshot to Home assistant.
 - __Auto Stop__ : This addon can stop addons before backup and restart them after backup 
 - __Web UI__ : All the configuration is based on an easy-to-use web interface, no yaml needed.
+- __Home Assistant State Entities__ : This addon create 2 entite in HA : `binary_sensor.nextcloud_backup_error` and `sensor.nextcloud_backup_status`
 > __Info:__
 > Auto Clean is executed after every upload and every day at 00h30
 

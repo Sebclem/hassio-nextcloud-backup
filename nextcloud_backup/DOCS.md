@@ -42,6 +42,8 @@ You can now configure the automatic backup.
    If enabled, you can specify how much Local Snapshot and Nextcloud Backup you want to keep before deleting the older one.
 > __Info:__
 > Auto Clean is executed after every upload and every day at 00h30
+
+
 ## Home Assitant Os Configuration
 
 **Note**: _Remember to restart the add-on when the configuration is changed._
