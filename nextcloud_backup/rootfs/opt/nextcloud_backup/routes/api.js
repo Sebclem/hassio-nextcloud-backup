@@ -188,13 +188,14 @@ router.get("/backup-settings", function (req, res, next) {
 });
 
 router.post("/backup-settings", function (req, res, next) {
-    if (settingsTools.check(req.body)) {
+    let [result, message] = settingsTools.check(req.body)
+    if (result) {
         settingsTools.setSettings(req.body);
         cronTools.startCron();
         res.send();
     } else {
         res.status(400);
-        res.send();
+        res.send(message);
     }
 });
 

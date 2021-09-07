@@ -1,6 +1,6 @@
 const fs = require("fs");
 const logger = require("../config/winston");
-const moment = require('moment')
+const moment = require("moment");
 
 const settingsPath = "/data/backup_conf.json";
 
@@ -26,143 +26,140 @@ function check_cron(conf) {
     return false;
 }
 
-
 function check(conf, fallback = false) {
     let needSave = false;
     if (!check_cron(conf)) {
         if (fallback) {
-            logger.warn("Bad value for cron settings, fallback to default ")
+            logger.warn("Bad value for cron settings, fallback to default ");
             conf.cron_base = "0";
-            conf.cron_hour = "00:00",
-                conf.cron_weekday = "0",
-                conf.cron_month_day = "1"
+            conf.cron_hour = "00:00";
+            conf.cron_weekday = "0";
+            conf.cron_month_day = "1";
         } else {
-            logger.error("Bad value for cron settings")
-            return false;
+            logger.error("Bad value for cron settings");
+            return [false, "Bad cron settings"];
         }
     }
     if (conf.name_template == null) {
         if (fallback) {
-            logger.warn("Bad value for 'name_template', fallback to default ")
-            conf.name_template = "{type}-{ha_version}-{date}_{hour}"
+            logger.warn("Bad value for 'name_template', fallback to default ");
+            conf.name_template = "{type}-{ha_version}-{date}_{hour}";
         } else {
-            logger.error("Bad value for 'name_template'")
-            return false;
+            logger.error("Bad value for 'name_template'");
+            return [false, "Bad value for 'name_template'"];
         }
     }
     if (conf.auto_clean_local_keep == null || !/^\d+$/.test(conf.auto_clean_local_keep)) {
-
         if (fallback) {
-            logger.warn("Bad value for 'auto_clean_local_keep', fallback to 5 ")
-            conf.auto_clean_local_keep = "5"
+            logger.warn("Bad value for 'auto_clean_local_keep', fallback to 5 ");
+            conf.auto_clean_local_keep = "5";
         } else {
-            logger.error("Bad value for 'auto_clean_local_keep'")
-            return false;
+            logger.error("Bad value for 'auto_clean_local_keep'");
+            return [false, "Bad value for 'auto_clean_local_keep'"];
         }
     }
     if (conf.auto_clean_backup_keep == null || !/^\d+$/.test(conf.auto_clean_backup_keep)) {
         if (fallback) {
-            logger.warn("Bad value for 'auto_clean_backup_keep', fallback to 5 ")
-            conf.auto_clean_backup_keep = "5"
+            logger.warn("Bad value for 'auto_clean_backup_keep', fallback to 5 ");
+            conf.auto_clean_backup_keep = "5";
         } else {
-            logger.error("Bad value for 'auto_clean_backup_keep'")
-            return false;
+            logger.error("Bad value for 'auto_clean_backup_keep'");
+            return [false, "Bad value for 'auto_clean_backup_keep'"];
         }
     }
     if (conf.auto_clean_local == null) {
         if (fallback) {
-            logger.warn("Bad value for 'auto_clean_local', fallback to false ")
-            conf.auto_clean_local = "false"
+            logger.warn("Bad value for 'auto_clean_local', fallback to false ");
+            conf.auto_clean_local = "false";
         } else {
-            logger.error("Bad value for 'auto_clean_local'")
-            return false;
+            logger.error("Bad value for 'auto_clean_local'");
+            return [false, "Bad value for 'auto_clean_local'"];
         }
     }
     if (conf.auto_clean_backup == null) {
         if (fallback) {
-            logger.warn("Bad value for 'auto_clean_backup', fallback to false ")
-            conf.auto_clean_backup = "false"
+            logger.warn("Bad value for 'auto_clean_backup', fallback to false ");
+            conf.auto_clean_backup = "false";
         } else {
-            logger.error("Bad value for 'auto_clean_backup'")
-            return false;
+            logger.error("Bad value for 'auto_clean_backup'");
+            return [false, "Bad value for 'auto_clean_backup'"];
         }
     }
     if (conf.exclude_addon == null) {
         if (fallback) {
-            logger.warn("Bad value for 'exclude_addon', fallback to [] ")
-            conf.exclude_addon = []
+            logger.warn("Bad value for 'exclude_addon', fallback to [] ");
+            conf.exclude_addon = [];
         } else {
-            logger.error("Bad value for 'exclude_addon'")
-            return false;
+            logger.error("Bad value for 'exclude_addon'");
+            return [false, "Bad value for 'exclude_addon'"];
         }
     }
     if (conf.exclude_folder == null) {
         if (fallback) {
-            logger.warn("Bad value for 'exclude_folder', fallback to [] ")
-            conf.exclude_folder = []
+            logger.warn("Bad value for 'exclude_folder', fallback to [] ");
+            conf.exclude_folder = [];
         } else {
-            logger.error("Bad value for 'exclude_folder'")
-            return false;
+            logger.error("Bad value for 'exclude_folder'");
+            return [false, "Bad value for 'exclude_folder'"];
         }
     }
     if (conf.auto_stop_addon == null) {
         if (fallback) {
-            logger.warn("Bad value for 'auto_stop_addon', fallback to [] ")
-            conf.auto_stop_addon = []
+            logger.warn("Bad value for 'auto_stop_addon', fallback to [] ");
+            conf.auto_stop_addon = [];
         } else {
-            logger.error("Bad value for 'auto_stop_addon'")
-            return false;
+            logger.error("Bad value for 'auto_stop_addon'");
+            return [false, "Bad value for 'auto_stop_addon'"];
         }
     }
 
     if (!Array.isArray(conf.exclude_folder)) {
         logger.debug("exclude_folder is not array (Empty value), reset...");
-        conf.exclude_folder = []
+        conf.exclude_folder = [];
         needSave = true;
     }
     if (!Array.isArray(conf.exclude_addon)) {
         logger.debug("exclude_addon is not array (Empty value), reset...");
-        conf.exclude_addon = []
+        conf.exclude_addon = [];
         needSave = true;
     }
-    if(conf.password_protected == null){
+    if (conf.password_protected == null) {
         if (fallback) {
             logger.warn("Bad value for 'password_protected', fallback to false ");
-            conf.password_protected = 'false';
+            conf.password_protected = "false";
         } else {
             logger.error("Bad value for 'password_protect_value'");
-            return false;
+            return [false, "Bad value for 'password_protect_value'"];
         }
     }
 
-    if(conf.password_protect_value == null){
+    if (conf.password_protect_value == null) {
         if (fallback) {
             logger.warn("Bad value for 'password_protect_value', fallback to '' ");
-            conf.password_protect_value = '';
+            conf.password_protect_value = "";
         } else {
             logger.error("Bad value for 'password_protect_value'");
-            return false;
+            return [false, "Bad value for 'password_protect_value'"];
         }
     }
 
     if (fallback || needSave) {
         setSettings(conf);
     }
-    return true
-
+    return [true, null];
 }
 
 function getFormatedName(is_manual, ha_version) {
     let setting = getSettings();
     let template = setting.name_template;
-    template = template.replace('{type_low}', is_manual ? 'manual' : 'auto');
-    template = template.replace('{type}', is_manual ? 'Manual' : 'Auto');
-    template = template.replace('{ha_version}', ha_version);
-    let mmt = moment()
-    template = template.replace('{hour_12}', mmt.format('hhmmA'));
-    template = template.replace('{hour}', mmt.format('HHmm'));
-    template = template.replace('{date}', mmt.format('YYYY-MM-DD'));
-    return template
+    template = template.replace("{type_low}", is_manual ? "manual" : "auto");
+    template = template.replace("{type}", is_manual ? "Manual" : "Auto");
+    template = template.replace("{ha_version}", ha_version);
+    let mmt = moment();
+    template = template.replace("{hour_12}", mmt.format("hhmmA"));
+    template = template.replace("{hour}", mmt.format("HHmm"));
+    template = template.replace("{date}", mmt.format("YYYY-MM-DD"));
+    return template;
 }
 
 function getSettings() {
