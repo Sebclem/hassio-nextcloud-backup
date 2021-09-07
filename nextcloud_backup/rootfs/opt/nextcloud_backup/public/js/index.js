@@ -25,13 +25,13 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function updateDynamicListeners() {
-    $('.local-snap-listener').click(function () {
+    $('.local-snap-listener').on('click', function () {
         let id = this.getAttribute('data-id');
         console.log(id);
     });
     let manual_back_list = $('.manual-back-list');
-    manual_back_list.unbind();
-    manual_back_list.click(function () {
+    manual_back_list.off();
+    manual_back_list.on("click", function () {
         let id = this.getAttribute('data-id');
         let name = this.getAttribute('data-name');
         manualBackup(id, name);
@@ -185,27 +185,27 @@ function printStatusWithBar(status, progress) {
 }
 
 function listeners() {
-    $('#btn-backup-now').click(backupNow);
-    $('#btn-clean-now').click(cleanNow);
+    $('#btn-backup-now').on('click', backupNow);
+    $('#btn-clean-now').on('click',cleanNow);
 
-    $('#trigger-backup-settings').click(getBackupSettings);
-    $('#password_protected').change(function () {
+    $('#trigger-backup-settings').on('click', getBackupSettings);
+    $('#password_protected').on('change', function () {
         if (!$(this).is(':checked')) {
             $('#password_protect_value').parent().parent().addClass('d-none');
         } else {
             $('#password_protect_value').parent().parent().removeClass('d-none');
         }
     })
-    $('#cron-drop-settings').change(updateDropVisibility);
+    $('#cron-drop-settings').on('change', updateDropVisibility);
     $('#save-backup-settings').click(sendBackupSettings);
-    $('#auto_clean_local').change(function () {
+    $('#auto_clean_local').on('change', function () {
         if (!$(this).is(':checked')) {
             $('#local-snap-keep').parent().parent().addClass("d-none");
         } else {
             $('#local-snap-keep').parent().parent().removeClass("d-none");
         }
     });
-    $('#auto_clean_backup').change(function () {
+    $('#auto_clean_backup').on('change', function () {
         if (!$(this).is(':checked')) {
             $('#backup-snap-keep').parent().parent().addClass("d-none");
         } else {
@@ -216,7 +216,7 @@ function listeners() {
 
     $('#trigger-nextcloud-settings').click(getNextcloudSettings);
     $('#save-nextcloud-settings').click(sendNextcloudSettings);
-    $('#ssl').change(function () {
+    $('#ssl').on('change', function () {
         let div = $('#self_signed').parent().parent();
         if ($('#ssl').is(':checked'))
             div.removeClass("invisible")
