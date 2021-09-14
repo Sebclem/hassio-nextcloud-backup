@@ -77,7 +77,7 @@ class CronContainer {
 
     updateNextDate() {
         let date;
-        if (this.cronJob == null) date = "Not configured";
+        if (this.cronJob == null) date = null;
         else date = this.cronJob.nextDate().format("MMM D, YYYY HH:mm");
         let status = statusTools.getStatus();
         status.next_backup = date;

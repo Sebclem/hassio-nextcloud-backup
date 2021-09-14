@@ -550,8 +550,8 @@ function publish_state(state){
             error_code: state.error_code,
             message: state.message,
             icon: icon,
-            last_backup: state.last_backup == null ? "" : new Date(state.last_backup).toISOString(),
-            next_backup: state.next_backup == null ? "" : new Date(state.next_backup).toISOString()
+            last_backup: state.last_backup == null || state.last_backup == "" ? "" : new Date(state.last_backup).toISOString(),
+            next_backup: state.next_backup == null || state.next_backup == "" ? "" : new Date(state.next_backup).toISOString()
         },
     }
     option.json = data_state_sensor
