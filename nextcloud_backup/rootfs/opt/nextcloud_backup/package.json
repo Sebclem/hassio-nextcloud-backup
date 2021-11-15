@@ -16,7 +16,7 @@
     "express": "~4.17.1",
     "form-data": "^4.0.0",
     "got": "^11.8.2",
-    "http-errors": "~1.8.0",
+    "http-errors": "~1.8.1",
     "jquery": "^3.6.0",
     "moment": "^2.29.1",
     "morgan": "~1.10.0",
