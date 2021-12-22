@@ -21,7 +21,7 @@ function updatetNextDate() {
 
 class CronContainer {
     constructor() {
-        this.cronJob = null;
+        this.cronJobs = [];
         this.cronClean = null;
     }
 
@@ -33,52 +33,70 @@ class CronContainer {
             this.cronClean = new CronJob("0 1 * * *", this._clean, null, false, Intl.DateTimeFormat().resolvedOptions().timeZone);
             this.cronClean.start();
         }
-        if (this.cronJob != null) {
-            logger.info("Stopping Cron...");
-            this.cronJob.stop();
-            this.cronJob = null;
-        }
+  
         if (!settingsTools.check_cron(settingsTools.getSettings())) {
             logger.warn("No Cron settings available.");
             return;
         }
 
-        switch (settings.cron_base) {
-            case "0":
-                logger.warn("No Cron settings available.");
-                return;
-            case "1": {
-                let splited = settings.cron_hour.split(":");
-                cronStr = "" + splited[1] + " " + splited[0] + " * * *";
-                break;
-            }
-
-            case "2": {
-                let splited = settings.cron_hour.split(":");
-                cronStr = "" + splited[1] + " " + splited[0] + " * * " + settings.cron_weekday;
-                break;
-            }
-
-            case "3": {
-                let splited = settings.cron_hour.split(":");
-                cronStr = "" + splited[1] + " " + splited[0] + " " + settings.cron_month_day + " * *";
-                break;
-            }
-            case "4": {
-                cronStr = settings.cron_custom;
-                break;
+        if(this.cronJobs.length != 0){
+            this._clean_cron_jobs();
+        }
+        
+        if (settings.cron.length == 0){
+            logger.warn("No Cron settings available.");
+        }
+        else {
+            let i = 0;
+            for(let cron of settings.cron){
+                logger.info(`Starting cron #${i} ...`)
+                switch (cron.cron_base) {
+                    case "1": {
+                        let splited = cron.cron_hour.split(":");
+                        cronStr = "" + splited[1] + " " + splited[0] + " * * *";
+                        break;
+                    }
+        
+                    case "2": {
+                        let splited = cron.cron_hour.split(":");
+                        cronStr = "" + splited[1] + " " + splited[0] + " * * " + cron.cron_weekday;
+                        break;
+                    }
+        
+                    case "3": {
+                        let splited = cron.cron_hour.split(":");
+                        cronStr = "" + splited[1] + " " + splited[0] + " " + cron.cron_month_day + " * *";
+                        break;
+                    }
+                    case "4": {
+                        cronStr = cron.cron_custom;
+                        break;
+                    }
+                }
+                this.cronJobs.push(new CronJob(cronStr, this._createBackup, null, true, Intl.DateTimeFormat().resolvedOptions().timeZone));
+                i ++ ;
             }
         }
-        logger.info("Starting Cron...");
-        this.cronJob = new CronJob(cronStr, this._createBackup, null, false, Intl.DateTimeFormat().resolvedOptions().timeZone);
-        this.cronJob.start();
+        
         this.updateNextDate();
     }
 
     updateNextDate() {
         let date;
-        if (this.cronJob == null) date = null;
-        else date = this.cronJob.nextDate().format("MMM D, YYYY HH:mm");
+        if (this.cronJobs.length == 0) 
+            date = null;
+        else {
+            let last_date = null;
+            for(let item of this.cronJobs){
+                if(last_date == null)
+                    last_date = item.nextDate();
+                else{
+                    if(last_date > item.nextDate())
+                        last_date = item.nextDate();
+                }
+            }
+            date = last_date.format("MMM D, YYYY HH:mm");
+        }
         let status = statusTools.getStatus();
         status.next_backup = date;
         statusTools.setStatus(status);
@@ -123,6 +141,16 @@ class CronContainer {
         if (autoCleanCloud != null && autoCleanCloud === "true") {
             webdav.clean().catch();
         }
+    }
+
+    _clean_cron_jobs(){
+        let i = 0;
+        for(let elem of this.cronJobs){
+            logger.info(`Stopping Crong job #${i}`)
+            elem.stop();
+            i++;
+        }
+        this.cronJobs = []
     }
 }
 

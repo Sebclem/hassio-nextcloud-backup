@@ -32,8 +32,8 @@ function getStatus() {
 function setStatus(state) {
     if (fs.existsSync(statusPath)) {
         let old_state_str = fs.readFileSync(statusPath).toString();
-        if(old_state_str !== JSON.stringify(state)){
-            fs.writeFileSync(statusPath, JSON.stringify(state));
+        if(old_state_str !== JSON.stringify(state, null, 2)){
+            fs.writeFileSync(statusPath, JSON.stringify(state, null, 2));
             hassioApiTools.publish_state(state);
         }
     }else{

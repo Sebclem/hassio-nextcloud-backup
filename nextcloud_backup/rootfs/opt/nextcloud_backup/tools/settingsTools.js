@@ -6,48 +6,92 @@ const CronJob = require("cron").CronJob;
 const settingsPath = "/data/backup_conf.json";
 
 function check_cron(conf) {
-    if (conf.cron_base != null) {
-        if (conf.cron_base === "1" || conf.cron_base === "2" || conf.cron_base === "3") {
-            if (conf.cron_hour != null && conf.cron_hour.match(/\d\d:\d\d/)) {
-                if (conf.cron_base === "1") return true;
-            } else return false;
-        }
+    if (conf.cron != null) {
+        if (!Array.isArray(conf.cron))
+            return false;
 
-        if (conf.cron_base === "2") {
-            return conf.cron_weekday != null && conf.cron_weekday >= 0 && conf.cron_weekday <= 6;
-        }
-
-        if (conf.cron_base === "3") {
-            return conf.cron_month_day != null && conf.cron_month_day >= 1 && conf.cron_month_day <= 28;
-        }
-
-        if (conf.cron_base === "4") {
-            if (conf.cron_custom != null) {
-                try {
-                    new CronJob(conf.cron_custom, () => {});
-                    return true;
-                } catch(e) {
-                    return false;
+        for (let elem of conf.cron){
+            if (elem.cron_base != null) {
+                if (elem.cron_base === "1" || elem.cron_base === "2" || elem.cron_base === "3") {
+                    if (elem.cron_hour != null && elem.cron_hour.match(/\d\d:\d\d/)) {
+                        if (elem.cron_base === "1") 
+                            continue;
+                    }
+                    else
+                        return false;
                 }
-            }else return false;
+    
+                if (elem.cron_base === "2") {
+                    if( elem.cron_weekday != null && elem.cron_weekday >= 0 && elem.cron_weekday <= 6)
+                        continue;
+                    else
+                        return false;
+                }
+    
+                if (elem.cron_base === "3") {
+                    if( elem.cron_month_day != null && elem.cron_month_day >= 1 && elem.cron_month_day <= 28)
+                        continue;
+                    else
+                        return false
+                }
+    
+                if (elem.cron_base === "4") {
+                    if (elem.cron_custom != null) {
+                        try {
+                            new CronJob(elem.cron_custom, () => { });
+                            continue;
+                        } catch (e) {
+                            return false;
+                        }
+                    }
+                    else
+                        return false;
+                }
+            } 
+            else
+                return false
         }
+        
+    }
+    else 
+        return false;
 
-        if (conf.cron_base === "0") return true;
-    } else return false;
+    return true;
+}
 
-    return false;
+
+function migrate_cron_conf(conf) {
+    let obj = {
+        cron_base: conf.cron_base,
+        cron_hour: conf.cron_hour,
+        cron_weekday: conf.cron_weekday,
+        cron_month_day: conf.cron_month_day,
+        cron_custom: conf.cron_custom,
+    }
+    conf.cron = [obj];
+    delete conf.cron_base;
+    delete conf.cron_hour;
+    delete conf.cron_weekday;
+    delete conf.cron_month_day;
+    delete conf.cron_custom;
+    return conf
 }
 
 function check(conf, fallback = false) {
     let needSave = false;
+
+    if (conf.cron == null && !Array.isArray(conf.cron) && conf.cron_base != null) {
+        // Migrate to new cron conf format
+        logger.warn("Migrating to new cron conf format !")
+        conf = migrate_cron_conf(conf);
+        needSave = true;
+    }
+
+
     if (!check_cron(conf)) {
         if (fallback) {
             logger.warn("Bad value for cron settings, fallback to default ");
-            conf.cron_base = "0";
-            conf.cron_hour = "00:00";
-            conf.cron_weekday = "0";
-            conf.cron_month_day = "1";
-            conf.cron_custom = "5 4 * * *";
+            conf.cron = []
         } else {
             logger.error("Bad value for cron settings");
             return [false, "Bad cron settings"];
@@ -184,7 +228,7 @@ function getSettings() {
 }
 
 function setSettings(settings) {
-    fs.writeFileSync(settingsPath, JSON.stringify(settings));
+    fs.writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
 }
 
 exports.getSettings = getSettings;
