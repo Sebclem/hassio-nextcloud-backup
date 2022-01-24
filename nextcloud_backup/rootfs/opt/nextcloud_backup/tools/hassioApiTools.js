@@ -500,72 +500,72 @@ function startAddons() {
 
 function publish_state(state){
 
-    let data_error_sensor = {
-        state: state.status == "error" ? "on" : "off",
-        attributes: {
-            friendly_name: "Nexcloud Backup Error",
-            device_class: "problem",
-            error_code: state.error_code,
-            message: state.message,
-            icon: state.status == "error" ? "mdi:cloud-alert" : "mdi:cloud-check"
-        },
-    }
+    // let data_error_sensor = {
+    //     state: state.status == "error" ? "on" : "off",
+    //     attributes: {
+    //         friendly_name: "Nexcloud Backup Error",
+    //         device_class: "problem",
+    //         error_code: state.error_code,
+    //         message: state.message,
+    //         icon: state.status == "error" ? "mdi:cloud-alert" : "mdi:cloud-check"
+    //     },
+    // }
 
 
-    let token = process.env.HASSIO_TOKEN;
-    let option = {
-        headers: { "Authorization": `Bearer ${token}` },
-        responseType: "json",
-        json: data_error_sensor
-    };
-    got.post(`http://hassio/core/api/states/binary_sensor.nextcloud_backup_error`, option)
-    .then((result) => {
-        logger.debug('Home assistant sensor updated (error status)');
-    })
-    .catch((error) => {
-        logger.error(error);
-    });
+    // let token = process.env.HASSIO_TOKEN;
+    // let option = {
+    //     headers: { "Authorization": `Bearer ${token}` },
+    //     responseType: "json",
+    //     json: data_error_sensor
+    // };
+    // got.post(`http://hassio/core/api/states/binary_sensor.nextcloud_backup_error`, option)
+    // .then((result) => {
+    //     logger.debug('Home assistant sensor updated (error status)');
+    // })
+    // .catch((error) => {
+    //     logger.error(error);
+    // });
 
-    let icon = ""
-    switch(state.status){
-        case "error":
-            icon = "mdi:cloud-alert";
-            break;
-        case "download":
-        case "download-b":
-            icon = "mdi:cloud-download";
-            break;
-        case "upload":
-        case "upload-b":
-            icon = "mdi:cloud-upload";
-            break;
-        case "idle":
-            icon = "mdi:cloud-check";
-            break;
-        default:
-            icon = "mdi:cloud-sync";
-            break;
-    }
+    // let icon = ""
+    // switch(state.status){
+    //     case "error":
+    //         icon = "mdi:cloud-alert";
+    //         break;
+    //     case "download":
+    //     case "download-b":
+    //         icon = "mdi:cloud-download";
+    //         break;
+    //     case "upload":
+    //     case "upload-b":
+    //         icon = "mdi:cloud-upload";
+    //         break;
+    //     case "idle":
+    //         icon = "mdi:cloud-check";
+    //         break;
+    //     default:
+    //         icon = "mdi:cloud-sync";
+    //         break;
+    // }
 
-    let data_state_sensor = {
-        state: state.status,
-        attributes: {
-            friendly_name: "Nexcloud Backup Status",
-            error_code: state.error_code,
-            message: state.message,
-            icon: icon,
-            last_backup: state.last_backup == null || state.last_backup == "" ? "" : new Date(state.last_backup).toISOString(),
-            next_backup: state.next_backup == null || state.next_backup == "" ? "" : new Date(state.next_backup).toISOString()
-        },
-    }
-    option.json = data_state_sensor
-    got.post(`http://hassio/core/api/states/sensor.nextcloud_backup_status`, option)
-    .then((result) => {
-        logger.debug('Home assistant sensor updated (status)');
-    })
-    .catch((error) => {
-        logger.error(error);
-    });
+    // let data_state_sensor = {
+    //     state: state.status,
+    //     attributes: {
+    //         friendly_name: "Nexcloud Backup Status",
+    //         error_code: state.error_code,
+    //         message: state.message,
+    //         icon: icon,
+    //         last_backup: state.last_backup == null || state.last_backup == "" ? "" : new Date(state.last_backup).toISOString(),
+    //         next_backup: state.next_backup == null || state.next_backup == "" ? "" : new Date(state.next_backup).toISOString()
+    //     },
+    // }
+    // option.json = data_state_sensor
+    // got.post(`http://hassio/core/api/states/sensor.nextcloud_backup_status`, option)
+    // .then((result) => {
+    //     logger.debug('Home assistant sensor updated (status)');
+    // })
+    // .catch((error) => {
+    //     logger.error(error);
+    // });
 }
 
 exports.getVersion = getVersion;
