@@ -19,7 +19,7 @@ function getVersion() {
         let token = process.env.HASSIO_TOKEN;
         let status = statusTools.getStatus();
         let option = {
-            headers: { "X-HASSIO-KEY": token },
+            headers: { "Authorization": `Bearer ${token}` },
             responseType: "json",
         };
 
@@ -50,7 +50,7 @@ function getAddonList() {
         let token = process.env.HASSIO_TOKEN;
         let status = statusTools.getStatus();
         let option = {
-            headers: { "X-HASSIO-KEY": token },
+            headers: { "Authorization": `Bearer ${token}` },
             responseType: "json",
         };
 
@@ -97,6 +97,8 @@ function getAddonToBackup() {
                     if (!excluded_addon.includes(addon.slug))
                         slugs.push(addon.slug)
                 }
+                logger.debug("Addon to backup:")
+                logger.debug(slugs)
                 resolve(slugs)
             })
             .catch(() => reject());
@@ -136,6 +138,8 @@ function getFolderToBackup() {
         if (!excluded_folder.includes(folder.slug))
             slugs.push(folder.slug)
     }
+    logger.debug("Folders to backup:");
+    logger.debug(slugs)
     return slugs;
 }
 
@@ -144,11 +148,11 @@ function getSnapshots() {
         let token = process.env.HASSIO_TOKEN;
         let status = statusTools.getStatus();
         let option = {
-            headers: { "X-HASSIO-KEY": token },
+            headers: { "Authorization": `Bearer ${token}` },
             responseType: "json",
         };
 
-        got("http://hassio/snapshots", option)
+        got("http://hassio/backups", option)
             .then((result) => {
                 if (status.error_code === 1) {
                     status.status = "idle";
@@ -156,7 +160,7 @@ function getSnapshots() {
                     status.error_code = null;
                     statusTools.setStatus(status);
                 }
-                let snaps = result.body.data.snapshots;
+                let snaps = result.body.data.backups;
                 resolve(snaps);
             })
             .catch((error) => {
@@ -184,11 +188,11 @@ function downloadSnapshot(id) {
                 status.progress = 0;
                 statusTools.setStatus(status);
                 let option = {
-                    headers: { "X-HASSIO-KEY": token },
+                    headers: { "Authorization": `Bearer ${token}` },
                 };
 
                 pipeline(
-                    got.stream.get(`http://hassio/snapshots/${id}/download`, option)
+                    got.stream.get(`http://hassio/backups/${id}/download`, option)
                         .on("downloadProgress", (e) => {
                             let percent = Math.round(e.percent * 100) / 100;
                             if (status.progress !== percent) {
@@ -233,11 +237,11 @@ function dellSnap(id) {
                 let token = process.env.HASSIO_TOKEN;
 
                 let option = {
-                    headers: { "X-HASSIO-KEY": token },
+                    headers: { "Authorization": `Bearer ${token}` },
                     responseType: "json",
                 };
 
-                got.post(`http://hassio/snapshots/${id}/remove`, option)
+                got.post(`http://hassio/backups/${id}/remove`, option)
                     .then(() => resolve())
                     .catch(() => reject());
             })
@@ -251,11 +255,11 @@ function checkSnap(id) {
     return new Promise((resolve, reject) => {
         let token = process.env.HASSIO_TOKEN;
         let option = {
-            headers: { "X-HASSIO-KEY": token },
+            headers: { "Authorization": `Bearer ${token}` },
             responseType: "json",
         };
 
-        got(`http://hassio/snapshots/${id}/info`, option)
+        got(`http://hassio/backups/${id}/info`, option)
             .then((result) => {
                 logger.debug(`Snapshot size: ${result.body.data.size}`);
                 resolve();
@@ -275,7 +279,7 @@ function createNewBackup(name) {
         getAddonToBackup().then((addons) => {
             let folders = getFolderToBackup();
             let option = {
-                headers: { "X-HASSIO-KEY": token },
+                headers: { "Authorization": `Bearer ${token}` },
                 responseType: "json",
                 timeout: create_snap_timeout,
                 json: {
@@ -288,7 +292,7 @@ function createNewBackup(name) {
                 option.json.password = settingsTools.getSettings().password_protect_value
             }
 
-            got.post(`http://hassio/snapshots/new/partial`, option)
+            got.post(`http://hassio/backups/new/partial`, option)
                 .then((result) => {
                     logger.info(`Snapshot created with id ${result.body.data.slug}`);
                     resolve(result.body.data.slug);
@@ -354,11 +358,11 @@ function uploadSnapshot(path) {
             body: form,
             username: this.username,
             password: this.password,
-            headers: { "X-HASSIO-KEY": token },
+            headers: { "Authorization": `Bearer ${token}` },
         };
 
         got.stream
-            .post(`http://hassio/snapshots/new/upload`, options)
+            .post(`http://hassio/backups/new/upload`, options)
             .on("uploadProgress", (e) => {
                 let percent = e.percent;
                 if (status.progress !== percent) {
@@ -413,7 +417,7 @@ function stopAddons() {
         let promises = [];
         let token = process.env.HASSIO_TOKEN;
         let option = {
-            headers: { "X-HASSIO-KEY": token },
+            headers: { "Authorization": `Bearer ${token}` },
             responseType: "json",
         };
         let addons_slug = settingsTools.getSettings().auto_stop_addon
