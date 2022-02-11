@@ -241,9 +241,12 @@ function dellSnap(id) {
                     responseType: "json",
                 };
 
-                got.post(`http://hassio/backups/${id}/remove`, option)
+                got.delete(`http://hassio/backups/${id}`, option)
                     .then(() => resolve())
-                    .catch(() => reject());
+                    .catch((e) => {
+                        logger.error(e)
+                        reject();
+                    });
             })
             .catch(() => {
                 reject();
