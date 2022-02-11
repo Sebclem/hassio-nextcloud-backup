@@ -31,7 +31,7 @@ Easily backup your Home Assistant snapshots to Nextcloud.
 [docs]: https://github.com/Sebclem/hassio-nextcloud-backup/blob/master/README.md
 [forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg
 [forum]: https://community.home-assistant.io/
-[maintenance-shield]: https://img.shields.io/maintenance/yes/2021.svg
+[maintenance-shield]: https://img.shields.io/maintenance/yes/2022.svg
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-Beta-red.svg
 [release-shield]: https://img.shields.io/github/release/Sebclem/hassio-nextcloud-backup.svg
 [release]:  https://github.com/Sebclem/hassio-nextcloud-backup/releases
