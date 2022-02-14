@@ -11,7 +11,8 @@ const statusTools = require("./status");
 const settingsTools = require("./settingsTools");
 const logger = require("../config/winston");
 
-const create_snap_timeout = 90 * 60 * 1000;
+// Default timout to 90min
+const create_snap_timeout = parseInt(process.env.CREATE_BACKUP_TIMEOUT) || ( 90 * 60 * 1000 ); 
 
 
 function getVersion() {

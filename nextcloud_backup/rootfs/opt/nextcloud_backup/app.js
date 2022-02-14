@@ -70,8 +70,13 @@ app.use(function (err, req, res, next) {
         Init app
 ----------------------------------------------------------
 */
+
 const fs = require("fs");
 const newlog = require("./config/winston");
+
+newlog.info(`Log level: ${ process.env.LOG_LEVEL }`);
+newlog.info(`Backup timeout: ${ parseInt(process.env.CREATE_BACKUP_TIMEOUT) || ( 90 * 60 * 1000 ) }`)
+
 if (!fs.existsSync("/data")) fs.mkdirSync("/data");
 const statusTools = require("./tools/status");
 statusTools.init();

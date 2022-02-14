@@ -2,7 +2,7 @@
     "name": "Nextcloud Backup",
     "version": "dev",
     "slug": "nextcloud_backup",
-    "description": "Easily backup your Home Assistant snapshots to Nextcloud",
+    "description": "Easily upload your Home Assistant backups to Nextcloud",
     "url": "https://github.com/Sebclem/hassio-nextcloud-backup",
     "webui": "[PROTO:ssl]://[HOST]:[PORT:3000]/",
     "ingress": true,
@@ -24,15 +24,17 @@
     "hassio_role": "admin",
     "homeassistant_api": true,
     "options": {
-        "log_level": "info"
+        "log_level": "info",
+        "create_backup_timeout": 5400000
     },
     "schema": {
-        "log_level": "match(^(trace|debug|info|notice|warning|error|fatal)$)?"
+        "log_level": "list(trace|debug|info|notice|warning|error|fatal)",
+        "create_backup_timeout": "int"
     },
     "ports": {
         "3000/tcp": null
     },
     "ports_description": {
-        "3000/tcp": "Web interface (Not required for Hass.io Ingress)"
+        "3000/tcp": "Web interface (Not required for Home Assistant Ingress)"
     }
 }
