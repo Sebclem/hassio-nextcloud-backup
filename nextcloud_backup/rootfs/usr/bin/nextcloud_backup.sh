@@ -14,4 +14,11 @@ if bashio::config.exists 'log_level'; then
 else
   LOG_LEVEL='info'
 fi
-LOG_LEVEL=$LOG_LEVEL npm start
+
+if bashio::config.exists 'create_backup_timeout'; then
+  CREATE_BACKUP_TIMEOUT=$(bashio::config 'create_backup_timeout')
+else
+  CREATE_BACKUP_TIMEOUT='info'
+fi
+
+LOG_LEVEL=$LOG_LEVEL CREATE_BACKUP_TIMEOUT=$CREATE_BACKUP_TIMEOUT npm start
