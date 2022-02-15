@@ -1,5 +1,5 @@
-const fs = require("fs");
-const hassioApiTools = require("./hassioApiTools");
+import fs from "fs"
+import * as hassioApiTools from "./hassioApiTools.js";
 
 const statusPath = "/data/status.json";
 
@@ -9,7 +9,7 @@ let baseStatus = {
     next_backup: null,
 };
 
-function init() {
+export function init() {
     if (!fs.existsSync(statusPath)) {
         fs.writeFileSync(statusPath, JSON.stringify(baseStatus));
     } else {
@@ -22,14 +22,14 @@ function init() {
     }
 }
 
-function getStatus() {
+export function getStatus() {
     if (!fs.existsSync(statusPath)) {
         fs.writeFileSync(statusPath, JSON.stringify(baseStatus));
     }
     return JSON.parse(fs.readFileSync(statusPath).toString());
 }
 
-function setStatus(state) {
+export function setStatus(state) {
     if (fs.existsSync(statusPath)) {
         let old_state_str = fs.readFileSync(statusPath).toString();
         if(old_state_str !== JSON.stringify(state)){
@@ -43,7 +43,3 @@ function setStatus(state) {
     
 
 }
-
-exports.init = init;
-exports.getStatus = getStatus;
-exports.setStatus = setStatus;

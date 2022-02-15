@@ -1,20 +1,18 @@
-const express = require("express");
-const router = express.Router();
-const moment = require("moment");
-const statusTools = require("../tools/status");
-const WebdavTools = require("../tools/webdavTools");
-const webdav = new WebdavTools().getInstance();
-const settingsTools = require("../tools/settingsTools");
-const pathTools = require("../tools/pathTools");
-const hassioApiTools = require("../tools/hassioApiTools");
-const humanFileSize = require("../tools/toolbox").humanFileSize;
+import express from 'express';
+import moment from "moment";
+import * as statusTools from "../tools/status.js"
+import webdav from "../tools/webdavTools.js"
+import * as settingsTools from "../tools/settingsTools.js"
+import * as pathTools from "../tools/pathTools.js"
+import * as hassioApiTools from "../tools/hassioApiTools.js"
+import { humanFileSize } from "../tools/toolbox.js";
+import cronTools from "../tools/cronTools.js"
+import logger from "../config/winston.js"
 
-const cronTools = require("../tools/cronTools");
-
-const logger = require("../config/winston");
+var router = express.Router();
 
 router.get("/status", (req, res, next) => {
-    cronTools.updatetNextDate();
+    cronTools.updateNextDate();
     let status = statusTools.getStatus();
     res.json(status);
 });
@@ -191,7 +189,7 @@ router.post("/backup-settings", function (req, res, next) {
     let [result, message] = settingsTools.check(req.body)
     if (result) {
         settingsTools.setSettings(req.body);
-        cronTools.startCron();
+        cronTools.init();
         res.send();
     } else {
         res.status(400);
@@ -225,5 +223,5 @@ router.post("/restore", function (req, res, next) {
     }
 });
 
-module.exports = router;
+export default router;
     

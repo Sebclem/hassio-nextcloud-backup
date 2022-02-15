@@ -1,11 +1,26 @@
-const createError = require("http-errors");
-const express = require("express");
-const path = require("path");
-const cookieParser = require("cookie-parser");
-const logger = require("morgan");
+import createError from "http-errors";
+import express from "express";
+import path from "path";
+import cookieParser from "cookie-parser";
+import logger from "morgan";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import fs from "fs"
+import newlog from "./config/winston.js"
+import * as statusTools from "./tools/status.js"
+import * as hassioApiTools from "./tools/hassioApiTools.js"
+import webdav from "./tools/webdavTools.js"
+import * as settingsTools from "./tools/settingsTools.js"
+import cronTools from "./tools/cronTools.js"
 
-const indexRouter = require("./routes/index");
-const apiRouter = require("./routes/api");
+import indexRouter from "./routes/index.js"
+import apiRouter from "./routes/api.js"
+
+
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 // view engine setup
@@ -71,17 +86,15 @@ app.use(function (err, req, res, next) {
 ----------------------------------------------------------
 */
 
-const fs = require("fs");
-const newlog = require("./config/winston");
+
 
 newlog.info(`Log level: ${ process.env.LOG_LEVEL }`);
 newlog.info(`Backup timeout: ${ parseInt(process.env.CREATE_BACKUP_TIMEOUT) || ( 90 * 60 * 1000 ) }`)
 
 if (!fs.existsSync("/data")) fs.mkdirSync("/data");
-const statusTools = require("./tools/status");
 statusTools.init();
 newlog.info("Satus : \x1b[32mGo !\x1b[0m");
-const hassioApiTools = require("./tools/hassioApiTools");
+
 hassioApiTools.getSnapshots().then(
     () => {
         newlog.info("Hassio API : \x1b[32mGo !\x1b[0m");
@@ -92,8 +105,6 @@ hassioApiTools.getSnapshots().then(
     }
 );
 
-const WebdavTools = require("./tools/webdavTools");
-const webdav = new WebdavTools().getInstance();
 webdav.confIsValid().then(
     () => {
         newlog.info("Nextcloud connection : \x1b[32mGo !\x1b[0m");
@@ -103,11 +114,9 @@ webdav.confIsValid().then(
         newlog.error("... " + err);
     }
 );
-const settingTool = require('./tools/settingsTools')
-settingTool.check(settingTool.getSettings(), true);
-const cronTools = require("./tools/cronTools");
-cronTools.startCron();
+
+settingsTools.check(settingsTools.getSettings(), true);
+cronTools.init();
 
 
-
-module.exports = app;
+export default app;

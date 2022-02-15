@@ -243,7 +243,6 @@ function sendNextcloudSettings() {
             console.log("Saved");
             $("#nextcloud_settings_message").parent().addClass("d-none");
             create_toast("success", "Nextcloud settings saved !", default_toast_timeout);
-            0;
         })
         .fail((data) => {
             let nextcloud_settings_message = $("#nextcloud_settings_message");

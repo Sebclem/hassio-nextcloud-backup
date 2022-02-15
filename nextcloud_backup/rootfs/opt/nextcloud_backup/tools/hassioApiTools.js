@@ -1,15 +1,16 @@
-const fs = require("fs");
+import fs from "fs"
+import moment from "moment";
+import stream from "stream"
+import { promisify } from "util";
+import got from "got";
+import FormData from "form-data";
+import * as statusTools from "../tools/status.js"
+import * as settingsTools from "../tools/settingsTools.js"
 
-const moment = require("moment");
-const stream = require("stream");
-const { promisify } = require("util");
+import logger from "../config/winston.js"
 
 const pipeline = promisify(stream.pipeline);
-const got = require("got");
-const FormData = require("form-data");
-const statusTools = require("./status");
-const settingsTools = require("./settingsTools");
-const logger = require("../config/winston");
+
 
 // Default timout to 90min
 const create_snap_timeout = parseInt(process.env.CREATE_BACKUP_TIMEOUT) || ( 90 * 60 * 1000 ); 
@@ -285,7 +286,9 @@ function createNewBackup(name) {
             let option = {
                 headers: { "Authorization": `Bearer ${token}` },
                 responseType: "json",
-                timeout: create_snap_timeout,
+                timeout: {
+                    response: create_snap_timeout
+                },
                 json: {
                     name: name,
                     addons: addons,
@@ -572,14 +575,16 @@ function publish_state(state){
     // });
 }
 
-exports.getVersion = getVersion;
-exports.getAddonList = getAddonList;
-exports.getFolderList = getFolderList;
-exports.getSnapshots = getSnapshots;
-exports.downloadSnapshot = downloadSnapshot;
-exports.createNewBackup = createNewBackup;
-exports.uploadSnapshot = uploadSnapshot;
-exports.stopAddons = stopAddons;
-exports.startAddons = startAddons;
-exports.clean = clean;
-exports.publish_state = publish_state;
+export { 
+    getVersion, 
+    getAddonList, 
+    getFolderList, 
+    getSnapshots, 
+    downloadSnapshot, 
+    createNewBackup, 
+    uploadSnapshot, 
+    stopAddons, 
+    startAddons, 
+    clean, 
+    publish_state 
+}

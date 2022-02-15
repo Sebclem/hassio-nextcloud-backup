@@ -2,8 +2,9 @@
   "name": "nexcloud-backup",
   "version": "0.8.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "start": "node ./bin/www "
+    "start": "node ./bin/www.js "
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.0.0",
@@ -15,7 +16,7 @@
     "ejs": "~3.1.6",
     "express": "~4.17.2",
     "form-data": "^4.0.0",
-    "got": "^11.8.2",
+    "got": "12.0.1",
     "http-errors": "~2.0.0",
     "jquery": "^3.6.0",
     "moment": "^2.29.1",
