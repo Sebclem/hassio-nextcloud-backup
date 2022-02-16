@@ -160,9 +160,9 @@ router.post("/new-backup", function (req, res, next) {
                                             hassioApiTools.startAddons().catch(() => {
                                             })
                                         });
-                                });
-                        });
-                });
+                                }).catch(()=>{});
+                        }).catch(()=>{});
+                }).catch(()=>{});;
         })
         .catch(() => {
             hassioApiTools.startAddons().catch(() => {
