@@ -70,12 +70,7 @@ class WebdavTools {
         });
     }
     __cant_connect_status(err){
-        let status = statusTools.getStatus();
-        status.status = "error";
-        status.error_code = 3;
-        status.message = "Can't connect to Nextcloud (" + err + ") !";
-        statusTools.setStatus(status);
-        logger.error("Can't connect to Nextcloud (" + err + ") !");
+        statusTools.setError(`Can't connect to Nextcloud (${err})`, 3);
     }
 
     async __createRoot() {
