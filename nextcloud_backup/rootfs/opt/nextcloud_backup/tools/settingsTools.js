@@ -1,7 +1,8 @@
-const fs = require("fs");
-const logger = require("../config/winston");
-const moment = require("moment");
-const CronJob = require("cron").CronJob;
+import fs from "fs"
+import moment from "moment";
+import { CronJob } from "cron";
+
+import logger from "../config/winston.js"
 
 const settingsPath = "/data/backup_conf.json";
 
@@ -24,6 +25,7 @@ function check_cron(conf) {
         if (conf.cron_base === "4") {
             if (conf.cron_custom != null) {
                 try {
+                    // TODO Need to be destroy
                     new CronJob(conf.cron_custom, () => {});
                     return true;
                 } catch(e) {
@@ -187,8 +189,4 @@ function setSettings(settings) {
     fs.writeFileSync(settingsPath, JSON.stringify(settings));
 }
 
-exports.getSettings = getSettings;
-exports.setSettings = setSettings;
-exports.check = check;
-exports.check_cron = check_cron;
-exports.getFormatedName = getFormatedName;
+export { getSettings, setSettings, check, check_cron, getFormatedName };

@@ -4,9 +4,11 @@
  * Module dependencies.
  */
 
-var app = require('../app');
-var debug = require('debug')('nexcloud-backup:server');
-var http = require('http');
+import app from "../app.js"
+import http from "http"
+import _debug from 'debug';
+const debug = _debug('nexcloud-backup:server');
+
 
 /**
  * Get port from environment and store in Express.

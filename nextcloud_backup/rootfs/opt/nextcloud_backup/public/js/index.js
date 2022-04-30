@@ -29,13 +29,15 @@ function updateDynamicListeners() {
         console.log(id);
     });
     let manual_back_list = $(".manual-back-list");
-    manual_back_list.off();
+    manual_back_list.unbind();
     manual_back_list.on("click", function () {
         let id = this.getAttribute("data-id");
         let name = this.getAttribute("data-name");
         manualBackup(id, name);
     });
-    $(".restore").click(function () {
+    let restore_btn = $(".restore");
+    restore_btn.unbind();
+    restore_btn.click(function () {
         let to_restore = this.getAttribute("data-id");
         console.log(to_restore);
         restore(to_restore);
@@ -243,7 +245,6 @@ function sendNextcloudSettings() {
             console.log("Saved");
             $("#nextcloud_settings_message").parent().addClass("d-none");
             create_toast("success", "Nextcloud settings saved !", default_toast_timeout);
-            0;
         })
         .fail((data) => {
             let nextcloud_settings_message = $("#nextcloud_settings_message");

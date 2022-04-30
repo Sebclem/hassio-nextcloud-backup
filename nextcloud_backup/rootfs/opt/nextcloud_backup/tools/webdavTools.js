@@ -1,20 +1,21 @@
-const { createClient } = require("webdav");
-const fs = require("fs");
-const moment = require("moment");
-const https = require("https");
+import { createClient } from "webdav";
+import fs from "fs"
+import moment from "moment";
+import https from "https"
+import path from "path";
+import got from "got";
+import stream from "stream";
+import { promisify } from "util";
 
-const statusTools = require("./status");
+import * as statusTools from "../tools/status.js"
+import * as settingsTools from "../tools/settingsTools.js"
+import * as pathTools from "../tools/pathTools.js"
+import * as hassioApiTools from "../tools/hassioApiTools.js"
+import logger from "../config/winston.js"
+
 const endpoint = "/remote.php/webdav";
 const configPath = "/data/webdav_conf.json";
-const path = require("path");
-const settingsTools = require("./settingsTools");
-const pathTools = require("./pathTools");
-const hassioApiTools = require("./hassioApiTools");
-const logger = require("../config/winston");
 
-const got = require("got");
-const stream = require("stream");
-const { promisify } = require("util");
 const pipeline = promisify(stream.pipeline);
 
 class WebdavTools {
@@ -69,12 +70,7 @@ class WebdavTools {
         });
     }
     __cant_connect_status(err){
-        let status = statusTools.getStatus();
-        status.status = "error";
-        status.error_code = 3;
-        status.message = "Can't connect to Nextcloud (" + err + ") !";
-        statusTools.setStatus(status);
-        logger.error("Can't connect to Nextcloud (" + err + ") !");
+        statusTools.setError(`Can't connect to Nextcloud (${err})`, 3);
     }
 
     async __createRoot() {
@@ -427,16 +423,5 @@ function cleanTempFolder() {
     });
 }
 
-class Singleton {
-    constructor() {
-        if (!Singleton.instance) {
-            Singleton.instance = new WebdavTools();
-        }
-    }
-
-    getInstance() {
-        return Singleton.instance;
-    }
-}
-
-module.exports = Singleton;
+const INSTANCE = new WebdavTools();
+export default INSTANCE;

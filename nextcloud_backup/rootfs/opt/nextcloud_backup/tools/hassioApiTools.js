@@ -1,23 +1,24 @@
-const fs = require("fs");
+import fs from "fs"
+import moment from "moment";
+import stream from "stream"
+import { promisify } from "util";
+import got from "got";
+import FormData from "form-data";
+import * as statusTools from "../tools/status.js"
+import * as settingsTools from "../tools/settingsTools.js"
 
-const moment = require("moment");
-const stream = require("stream");
-const { promisify } = require("util");
+import logger from "../config/winston.js"
 
 const pipeline = promisify(stream.pipeline);
-const got = require("got");
-const FormData = require("form-data");
-const statusTools = require("./status");
-const settingsTools = require("./settingsTools");
-const logger = require("../config/winston");
 
-// Default timout to 90min
-const create_snap_timeout = parseInt(process.env.CREATE_BACKUP_TIMEOUT) || ( 90 * 60 * 1000 ); 
+const token = process.env.SUPERVISOR_TOKEN;
+
+// Default timeout to 90min
+const create_snap_timeout = parseInt(process.env.CREATE_BACKUP_TIMEOUT) || (90 * 60 * 1000);
 
 
 function getVersion() {
     return new Promise((resolve, reject) => {
-        let token = process.env.HASSIO_TOKEN;
         let status = statusTools.getStatus();
         let option = {
             headers: { "Authorization": `Bearer ${token}` },
@@ -36,19 +37,14 @@ function getVersion() {
                 resolve(version);
             })
             .catch((error) => {
-                status.status = "error";
-                status.message = "Fail to fetch HA Version (" + error.message + ")";
-                status.error_code = 1;
-                statusTools.setStatus(status);
-                logger.error(status.message);
-                reject(error.message);
+                statusTools.setError(`Fail to fetch HA Version (${error.message})`, 1);
+                reject(`Fail to fetch HA Version (${error.message})`);
             });
     });
 }
 
 function getAddonList() {
     return new Promise((resolve, reject) => {
-        let token = process.env.HASSIO_TOKEN;
         let status = statusTools.getStatus();
         let option = {
             headers: { "Authorization": `Bearer ${token}` },
@@ -78,12 +74,8 @@ function getAddonList() {
                 resolve(installed);
             })
             .catch((error) => {
-                status.status = "error";
-                status.message = "Fail to fetch addons list (" + error.message + ")";
-                status.error_code = 1;
-                statusTools.setStatus(status);
-                logger.error(status.message);
-                reject(error.message);
+                statusTools.setError(`Fail to fetch addons list (${error.message})`, 1);
+                reject(`Fail to fetch addons list (${error.message})`);
             });
     });
 }
@@ -146,7 +138,6 @@ function getFolderToBackup() {
 
 function getSnapshots() {
     return new Promise((resolve, reject) => {
-        let token = process.env.HASSIO_TOKEN;
         let status = statusTools.getStatus();
         let option = {
             headers: { "Authorization": `Bearer ${token}` },
@@ -165,12 +156,8 @@ function getSnapshots() {
                 resolve(snaps);
             })
             .catch((error) => {
-                status.status = "error";
-                status.message = "Fail to fetch Hassio snapshots (" + error.message + ")";
-                status.error_code = 1;
-                statusTools.setStatus(status);
-                logger.error(status.message);
-                reject(error.message);
+                statusTools.setError(`Fail to fetch Hassio backups (${error.message})`, 1);
+                reject(`Fail to fetch Hassio backups (${error.message})`);
             });
     });
 }
@@ -181,7 +168,6 @@ function downloadSnapshot(id) {
         if (!fs.existsSync("./temp/")) fs.mkdirSync("./temp/");
         let tmp_file = `./temp/${id}.tar`;
         let stream = fs.createWriteStream(tmp_file);
-        let token = process.env.HASSIO_TOKEN;
         let status = statusTools.getStatus();
         checkSnap(id)
             .then(() => {
@@ -203,29 +189,21 @@ function downloadSnapshot(id) {
                         }),
                     stream
                 )
-                    .then((res) => {
+                    .then(() => {
                         logger.info("Download success !");
                         status.progress = 1;
                         statusTools.setStatus(status);
                         logger.debug("Snapshot dl size : " + fs.statSync(tmp_file).size / 1024 / 1024);
                         resolve();
                     })
-                    .catch((err) => {
+                    .catch((error) => {
                         fs.unlinkSync(tmp_file);
-                        status.status = "error";
-                        status.message = "Fail to download Hassio snapshot (" + err.message + ")";
-                        status.error_code = 7;
-                        statusTools.setStatus(status);
-                        logger.error(status.message);
-                        reject(err.message);
+                        statusTools.setError(`Fail to download Hassio backup (${error.message})`, 7);
+                        reject(`Fail to download Hassio backup (${error.message})`);
                     });
             })
-            .catch((err) => {
-                status.status = "error";
-                status.message = "Fail to download Hassio snapshot. Not found ?";
-                status.error_code = 7;
-                statusTools.setStatus(status);
-                logger.error(status.message);
+            .catch(() => {
+                statusTools.setError("Fail to download Hassio backup. Not found ?", 7);
                 reject();
             });
     });
@@ -235,8 +213,6 @@ function dellSnap(id) {
     return new Promise((resolve, reject) => {
         checkSnap(id)
             .then(() => {
-                let token = process.env.HASSIO_TOKEN;
-
                 let option = {
                     headers: { "Authorization": `Bearer ${token}` },
                     responseType: "json",
@@ -257,7 +233,6 @@ function dellSnap(id) {
 
 function checkSnap(id) {
     return new Promise((resolve, reject) => {
-        let token = process.env.HASSIO_TOKEN;
         let option = {
             headers: { "Authorization": `Bearer ${token}` },
             responseType: "json",
@@ -279,20 +254,23 @@ function createNewBackup(name) {
         status.progress = -1;
         statusTools.setStatus(status);
         logger.info("Creating new snapshot...");
-        let token = process.env.HASSIO_TOKEN;
         getAddonToBackup().then((addons) => {
             let folders = getFolderToBackup();
             let option = {
                 headers: { "Authorization": `Bearer ${token}` },
                 responseType: "json",
-                timeout: create_snap_timeout,
+                timeout: {
+                    response: create_snap_timeout
+                },
                 json: {
                     name: name,
                     addons: addons,
                     folders: folders
                 },
             };
-            if (settingsTools.getSettings().password_protected === "true") {
+            let password_protected = settingsTools.getSettings().password_protected;
+            logger.debug(`Is password protected ? ${password_protected}`)
+            if ( password_protected === "true") {
                 option.json.password = settingsTools.getSettings().password_protect_value
             }
 
@@ -302,12 +280,8 @@ function createNewBackup(name) {
                     resolve(result.body.data.slug);
                 })
                 .catch((error) => {
-                    status.status = "error";
-                    status.message = "Can't create new snapshot (" + error.message + ")";
-                    status.error_code = 5;
-                    statusTools.setStatus(status);
-                    logger.error(status.message);
-                    reject(status.message);
+                    statusTools.setError(`Can't create new snapshot (${error.message})`, 5);
+                    reject(`Can't create new snapshot (${error.message})`);
                 });
 
         }).catch(reject);
@@ -337,8 +311,9 @@ function clean() {
                 logger.info("Local clean done.");
                 resolve();
             })
-            .catch(() => {
-                reject();
+            .catch((e) => {
+                statusTools.setError(`Fail to clean backups (${e}) !`, 6);
+                reject(`Fail to clean backups (${e}) !`);
             });
     });
 }
@@ -353,15 +328,11 @@ function uploadSnapshot(path) {
         statusTools.setStatus(status);
         logger.info("Uploading backup...");
         let stream = fs.createReadStream(path);
-        let token = process.env.HASSIO_TOKEN;
-
         let form = new FormData();
         form.append("file", stream);
 
         let options = {
             body: form,
-            username: this.username,
-            password: this.password,
             headers: { "Authorization": `Bearer ${token}` },
         };
 
@@ -399,19 +370,15 @@ function uploadSnapshot(path) {
             })
             .on("error", (err) => {
                 fs.unlinkSync(path);
-                status.status = "error";
-                status.error_code = 4;
-                status.message = `Fail to upload backup to home assistant (${err}) !`;
-                statusTools.setStatus(status);
-                logger.error(status.message);
-                reject(status.message);
+                statusTools.setError(`Fail to upload backup to home assistant (${err}) !`, 4);
+                reject(`Fail to upload backup to home assistant (${err}) !`);
             });
     });
 }
 
 function stopAddons() {
     return new Promise(((resolve, reject) => {
-        logger.info('Stopping addons...')
+        logger.info('Stopping addons...');
         let status = statusTools.getStatus();
         status.status = "stopping";
         status.progress = -1;
@@ -419,7 +386,6 @@ function stopAddons() {
         status.error_code = null;
         statusTools.setStatus(status);
         let promises = [];
-        let token = process.env.HASSIO_TOKEN;
         let option = {
             headers: { "Authorization": `Bearer ${token}` },
             responseType: "json",
@@ -427,7 +393,7 @@ function stopAddons() {
         let addons_slug = settingsTools.getSettings().auto_stop_addon
         for (let addon of addons_slug) {
             if (addon !== "") {
-                logger.debug(`... Stopping addon ${addon}`)
+                logger.debug(`... Stopping addon ${addon}`);
                 promises.push(got.post(`http://hassio/addons/${addon}/stop`, option));
             }
 
@@ -439,14 +405,11 @@ function stopAddons() {
                     error = val.reason;
 
             if (error) {
-                status.status = "error";
-                status.error_code = 8;
-                status.message = `Fail to stop addons(${error}) !`;
-                statusTools.setStatus(status);
+                statusTools.setError(`Fail to stop addons(${error}) !`, 8);
                 logger.error(status.message);
                 reject(status.message);
             } else {
-                logger.info('... Ok')
+                logger.info('... Ok');
                 resolve();
             }
         });
@@ -463,7 +426,6 @@ function startAddons() {
         status.error_code = null;
         statusTools.setStatus(status);
         let promises = [];
-        let token = process.env.HASSIO_TOKEN;
         let option = {
             headers: { "Authorization": `Bearer ${token}` },
             responseType: "json",
@@ -482,12 +444,7 @@ function startAddons() {
                     error = val.reason;
 
             if (error) {
-                let status = statusTools.getStatus();
-                status.status = "error";
-                status.error_code = 9;
-                status.message = `Fail to start addons (${error}) !`;
-                statusTools.setStatus(status);
-                logger.error(status.message);
+                statusTools.setError(`Fail to start addons (${error}) !`, 9)
                 reject(status.message);
             } else {
                 logger.info('... Ok')
@@ -502,7 +459,7 @@ function startAddons() {
     }));
 }
 
-function publish_state(state){
+function publish_state(state) {
 
     // let data_error_sensor = {
     //     state: state.status == "error" ? "on" : "off",
@@ -516,7 +473,6 @@ function publish_state(state){
     // }
 
 
-    // let token = process.env.HASSIO_TOKEN;
     // let option = {
     //     headers: { "Authorization": `Bearer ${token}` },
     //     responseType: "json",
@@ -572,14 +528,16 @@ function publish_state(state){
     // });
 }
 
-exports.getVersion = getVersion;
-exports.getAddonList = getAddonList;
-exports.getFolderList = getFolderList;
-exports.getSnapshots = getSnapshots;
-exports.downloadSnapshot = downloadSnapshot;
-exports.createNewBackup = createNewBackup;
-exports.uploadSnapshot = uploadSnapshot;
-exports.stopAddons = stopAddons;
-exports.startAddons = startAddons;
-exports.clean = clean;
-exports.publish_state = publish_state;
+export {
+    getVersion,
+    getAddonList,
+    getFolderList,
+    getSnapshots,
+    downloadSnapshot,
+    createNewBackup,
+    uploadSnapshot,
+    stopAddons,
+    startAddons,
+    clean,
+    publish_state
+}

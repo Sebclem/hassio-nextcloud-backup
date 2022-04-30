@@ -1,23 +1,13 @@
-const CronJob = require("cron").CronJob;
+import { CronJob } from "cron"
+import * as settingsTools from "./settingsTools.js"
+import * as hassioApiTools from "./hassioApiTools.js"
+import * as statusTools from "./status.js"
+import * as pathTools from "./pathTools.js"
+import webdav from "./webdavTools.js"
 
-const settingsTools = require("./settingsTools");
-const WebdavTools = require("./webdavTools");
-const webdav = new WebdavTools().getInstance();
-const hassioApiTools = require("./hassioApiTools");
-const statusTools = require("./status");
-const pathTools = require("./pathTools");
 
-const logger = require("../config/winston");
+import logger from "../config/winston.js"
 
-function startCron() {
-    let cronContainer = new Singleton().getInstance();
-    cronContainer.init();
-}
-
-function updatetNextDate() {
-    let cronContainer = new Singleton().getInstance();
-    cronContainer.updateNextDate();
-}
 
 class CronContainer {
     constructor() {
@@ -126,17 +116,6 @@ class CronContainer {
     }
 }
 
-class Singleton {
-    constructor() {
-        if (!Singleton.instance) {
-            Singleton.instance = new CronContainer();
-        }
-    }
+const INSTANCE = new CronContainer();
+export default INSTANCE;
 
-    getInstance() {
-        return Singleton.instance;
-    }
-}
-
-exports.startCron = startCron;
-exports.updatetNextDate = updatetNextDate;
