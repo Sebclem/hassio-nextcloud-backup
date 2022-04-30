@@ -11,14 +11,14 @@ import logger from "../config/winston.js"
 
 const pipeline = promisify(stream.pipeline);
 
+const token = process.env.SUPERVISOR_TOKEN;
 
-// Default timout to 90min
+// Default timeout to 90min
 const create_snap_timeout = parseInt(process.env.CREATE_BACKUP_TIMEOUT) || (90 * 60 * 1000);
 
 
 function getVersion() {
     return new Promise((resolve, reject) => {
-        let token = process.env.HASSIO_TOKEN;
         let status = statusTools.getStatus();
         let option = {
             headers: { "Authorization": `Bearer ${token}` },
@@ -45,7 +45,6 @@ function getVersion() {
 
 function getAddonList() {
     return new Promise((resolve, reject) => {
-        let token = process.env.HASSIO_TOKEN;
         let status = statusTools.getStatus();
         let option = {
             headers: { "Authorization": `Bearer ${token}` },
@@ -139,7 +138,6 @@ function getFolderToBackup() {
 
 function getSnapshots() {
     return new Promise((resolve, reject) => {
-        let token = process.env.HASSIO_TOKEN;
         let status = statusTools.getStatus();
         let option = {
             headers: { "Authorization": `Bearer ${token}` },
@@ -170,7 +168,6 @@ function downloadSnapshot(id) {
         if (!fs.existsSync("./temp/")) fs.mkdirSync("./temp/");
         let tmp_file = `./temp/${id}.tar`;
         let stream = fs.createWriteStream(tmp_file);
-        let token = process.env.HASSIO_TOKEN;
         let status = statusTools.getStatus();
         checkSnap(id)
             .then(() => {
@@ -216,7 +213,6 @@ function dellSnap(id) {
     return new Promise((resolve, reject) => {
         checkSnap(id)
             .then(() => {
-                let token = process.env.HASSIO_TOKEN;
 
                 let option = {
                     headers: { "Authorization": `Bearer ${token}` },
@@ -238,7 +234,6 @@ function dellSnap(id) {
 
 function checkSnap(id) {
     return new Promise((resolve, reject) => {
-        let token = process.env.HASSIO_TOKEN;
         let option = {
             headers: { "Authorization": `Bearer ${token}` },
             responseType: "json",
@@ -260,7 +255,6 @@ function createNewBackup(name) {
         status.progress = -1;
         statusTools.setStatus(status);
         logger.info("Creating new snapshot...");
-        let token = process.env.HASSIO_TOKEN;
         getAddonToBackup().then((addons) => {
             let folders = getFolderToBackup();
             let option = {
@@ -333,8 +327,6 @@ function uploadSnapshot(path) {
         statusTools.setStatus(status);
         logger.info("Uploading backup...");
         let stream = fs.createReadStream(path);
-        let token = process.env.HASSIO_TOKEN;
-
         let form = new FormData();
         form.append("file", stream);
 
@@ -395,7 +387,6 @@ function stopAddons() {
         status.error_code = null;
         statusTools.setStatus(status);
         let promises = [];
-        let token = process.env.HASSIO_TOKEN;
         let option = {
             headers: { "Authorization": `Bearer ${token}` },
             responseType: "json",
@@ -436,7 +427,6 @@ function startAddons() {
         status.error_code = null;
         statusTools.setStatus(status);
         let promises = [];
-        let token = process.env.HASSIO_TOKEN;
         let option = {
             headers: { "Authorization": `Bearer ${token}` },
             responseType: "json",
@@ -484,7 +474,6 @@ function publish_state(state) {
     // }
 
 
-    // let token = process.env.HASSIO_TOKEN;
     // let option = {
     //     headers: { "Authorization": `Bearer ${token}` },
     //     responseType: "json",
