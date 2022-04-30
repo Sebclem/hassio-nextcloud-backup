@@ -128,9 +128,15 @@ router.post("/manual-backup", function (req, res, next) {
     hassioApiTools
         .downloadSnapshot(id)
         .then(() => {
-            webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.manual + name + ".tar").catch();
-            res.status(201);
-            res.send();
+            webdav.uploadFile(id, webdav.getConf().back_dir + pathTools.manual + name + ".tar").then(()=>{
+                res.status(201);
+                res.send();
+            }).catch(()=>{
+                    res.status(500);
+                    res.send();
+            }
+            );
+
         })
         .catch(() => {
             res.status(500);
@@ -159,10 +165,10 @@ router.post("/new-backup", function (req, res, next) {
                                         .then(() => {
                                             hassioApiTools.startAddons().catch(() => {
                                             })
-                                        });
+                                        }).catch(()=>{});
                                 }).catch(()=>{});
                         }).catch(()=>{});
-                }).catch(()=>{});;
+                }).catch(()=>{});
         })
         .catch(() => {
             hassioApiTools.startAddons().catch(() => {
