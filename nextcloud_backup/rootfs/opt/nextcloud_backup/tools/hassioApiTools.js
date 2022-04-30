@@ -189,20 +189,20 @@ function downloadSnapshot(id) {
                         }),
                     stream
                 )
-                    .then((res) => {
+                    .then(() => {
                         logger.info("Download success !");
                         status.progress = 1;
                         statusTools.setStatus(status);
                         logger.debug("Snapshot dl size : " + fs.statSync(tmp_file).size / 1024 / 1024);
                         resolve();
                     })
-                    .catch((err) => {
+                    .catch((error) => {
                         fs.unlinkSync(tmp_file);
                         statusTools.setError(`Fail to download Hassio backup (${error.message})`, 7);
                         reject(`Fail to download Hassio backup (${error.message})`);
                     });
             })
-            .catch((err) => {
+            .catch(() => {
                 statusTools.setError("Fail to download Hassio backup. Not found ?", 7);
                 reject();
             });
@@ -213,7 +213,6 @@ function dellSnap(id) {
     return new Promise((resolve, reject) => {
         checkSnap(id)
             .then(() => {
-
                 let option = {
                     headers: { "Authorization": `Bearer ${token}` },
                     responseType: "json",
@@ -332,8 +331,6 @@ function uploadSnapshot(path) {
 
         let options = {
             body: form,
-            username: this.username,
-            password: this.password,
             headers: { "Authorization": `Bearer ${token}` },
         };
 
