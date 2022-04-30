@@ -268,7 +268,9 @@ function createNewBackup(name) {
                     folders: folders
                 },
             };
-            if (settingsTools.getSettings().password_protected === "true") {
+            let password_protected = settingsTools.getSettings().password_protected;
+            logger.debug(`Is password protected ? ${password_protected}`)
+            if ( password_protected === "true") {
                 option.json.password = settingsTools.getSettings().password_protect_value
             }
 
