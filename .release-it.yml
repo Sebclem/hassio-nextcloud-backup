@@ -9,3 +9,6 @@ git:
   push: false
   tag: false
   commit: false
+
+npm:
+  publish: false
