@@ -6,8 +6,11 @@ COPY rootfs/etc /etc/
 COPY rootfs/usr /usr/
 
 # Setup base
-RUN apk add --no-cache \
-    nodejs-current 
+RUN apk add --no-cache nodejs-current
+
+# Fix for arm/v7
+RUN mkdir -p  /usr/local/sbin/
+RUN ln -s /usr/bin/node /usr/local/sbin/node
 
 # Copy only package*.json
 COPY rootfs/opt/nextcloud_backup/package*.json /opt/nextcloud_backup/
