@@ -1,5 +1,4 @@
-ARG BUILD_FROM=hassioaddons/base:8.0.1
-# hadolint ignore=DL3006
+ARG BUILD_FROM=ghcr.io/hassio-addons/base/amd64:11.1.2
 FROM ${BUILD_FROM}
 
 # Copy root filesystem
@@ -8,16 +7,19 @@ COPY rootfs/usr /usr/
 
 # Setup base
 RUN apk add --no-cache \
-    nodejs \
-    npm
+    nodejs-current 
 
 # Copy only package*.json
 COPY rootfs/opt/nextcloud_backup/package*.json /opt/nextcloud_backup/
+COPY rootfs/opt/nextcloud_backup/.yarnrc.yml /opt/nextcloud_backup/
 
 WORKDIR /opt/nextcloud_backup/
 
+# Enable Yarn
+RUN corepack enable
+
 # Install packages
-RUN npm ci --only=production
+RUN yarn install
 
 # Copy all source code
 COPY rootfs/opt/ /opt/
