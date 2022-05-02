@@ -1,6 +1,5 @@
 import { createClient } from "webdav";
 import fs from "fs"
-import moment from "moment";
 import https from "https"
 import path from "path";
 import got from "got";
@@ -12,6 +11,7 @@ import * as settingsTools from "../tools/settingsTools.js"
 import * as pathTools from "../tools/pathTools.js"
 import * as hassioApiTools from "../tools/hassioApiTools.js"
 import logger from "../config/winston.js"
+import {DateTime} from "luxon";
 
 const endpoint = "/remote.php/webdav";
 const configPath = "/data/webdav_conf.json";
@@ -258,7 +258,7 @@ class WebdavTools {
                         status.progress = -1;
                         status.message = null;
                         status.error_code = null;
-                        status.last_backup = moment().format("MMM D, YYYY HH:mm");
+                        status.last_backup = DateTime.now().toFormat("dd MMM yyyy, HH:mm")
                         statusTools.setStatus(status);
                         cleanTempFolder();
                         let autoCleanCloud = settingsTools.getSettings().auto_clean_backup;
@@ -316,7 +316,7 @@ class WebdavTools {
             logger.info("Downloading backup...");
             if (!fs.existsSync("./temp/"))
                 fs.mkdirSync("./temp/");
-            let tmpFile = `./temp/restore_${moment().format("MMM-DD-YYYY_HH_mm")}.tar`;
+            let tmpFile = `./temp/restore_${DateTime.now().toFormat("MMM-dd-yyyy_HH_mm")}.tar`;
             let stream = fs.createWriteStream(tmpFile);
             let conf = this.getConf();
             let options = {
@@ -383,10 +383,7 @@ class WebdavTools {
                         return;
                     }
                     contents.sort((a, b) => {
-                        if (moment(a.lastmod).isBefore(moment(b.lastmod)))
-                            return 1;
-                        else
-                            return -1;
+                        return a.date < b.date ? 1 : -1
                     });
 
                     let toDel = contents.slice(limit);

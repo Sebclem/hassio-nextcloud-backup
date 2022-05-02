@@ -1,8 +1,8 @@
 import fs from "fs"
-import moment from "moment";
 import { CronJob } from "cron";
 
 import logger from "../config/winston.js"
+import {DateTime} from "luxon";
 
 const settingsPath = "/data/backup_conf.json";
 
@@ -170,10 +170,10 @@ function getFormatedName(is_manual, ha_version) {
     template = template.replace("{type_low}", is_manual ? "manual" : "auto");
     template = template.replace("{type}", is_manual ? "Manual" : "Auto");
     template = template.replace("{ha_version}", ha_version);
-    let mmt = moment();
-    template = template.replace("{hour_12}", mmt.format("hhmmA"));
-    template = template.replace("{hour}", mmt.format("HHmm"));
-    template = template.replace("{date}", mmt.format("YYYY-MM-DD"));
+    const now = DateTime.now().setLocale('en');
+    template = template.replace("{hour_12}", now.toFormat("hhmma"));
+    template = template.replace("{hour}", now.toFormat("HHmm"));
+    template = template.replace("{date}", now.toFormat("yyyy-MM-dd"));
     return template;
 }
 

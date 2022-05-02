@@ -1,5 +1,5 @@
 import fs from "fs"
-import moment from "moment";
+
 import stream from "stream"
 import { promisify } from "util";
 import got from "got";
@@ -8,6 +8,7 @@ import * as statusTools from "../tools/status.js"
 import * as settingsTools from "../tools/settingsTools.js"
 
 import logger from "../config/winston.js"
+import {DateTime} from "luxon";
 
 const pipeline = promisify(stream.pipeline);
 
@@ -300,9 +301,7 @@ function clean() {
                     return;
                 }
                 snaps.sort((a, b) => {
-                    if (moment(a.date).isBefore(moment(b.date))) return 1;
-                    else
-                        return -1;
+                    return a.date < b.date ? 1 : -1
                 });
                 let toDel = snaps.slice(limit);
                 for (let i of toDel) {

@@ -1,5 +1,4 @@
 import express from 'express';
-import moment from "moment";
 import * as statusTools from "../tools/status.js"
 import webdav from "../tools/webdavTools.js"
 import * as settingsTools from "../tools/settingsTools.js"
@@ -8,6 +7,7 @@ import * as hassioApiTools from "../tools/hassioApiTools.js"
 import { humanFileSize } from "../tools/toolbox.js";
 import cronTools from "../tools/cronTools.js"
 import logger from "../config/winston.js"
+import {DateTime} from "luxon";
 
 var router = express.Router();
 
@@ -21,14 +21,10 @@ router.get("/formated-local-snap", function (req, res, next) {
     hassioApiTools.getSnapshots()
         .then((snaps) => {
             snaps.sort((a, b) => {
-                if (moment(a.date).isBefore(moment(b.date))) {
-                    return 1;
-                } else {
-                    return -1;
-                }
+                return a.date < b.date ? 1 : -1
             });
 
-            res.render("localSnaps", { snaps: snaps, moment: moment });
+            res.render("localSnaps", { snaps: snaps, DateTime: DateTime });
         })
         .catch((err) => {
                 logger.error(err);
@@ -47,17 +43,17 @@ router.get("/formated-backup-manual", function (req, res, next) {
         .getFolderContent(webdav.getConf().back_dir + pathTools.manual)
         .then((contents) => {
             contents.sort((a, b) => {
-                if (moment(a.lastmod).isBefore(moment(b.lastmod))) return 1;
-                else return -1;
+                return a.date < b.date ? 1 : -1
             });
             //TODO Remove this when bug is fixed, etag contain '&quot;' at start and end ?
             for (let backup of contents) {
                 backup.etag = backup.etag.replace(/&quot;/g, '');
             }
-            res.render("backupSnaps", { backups: contents, moment: moment, humanFileSize: humanFileSize });
+            res.render("backupSnaps", { backups: contents, DateTime: DateTime, humanFileSize: humanFileSize });
         })
-        .catch(() => {
-            res.send("");
+        .catch((err) => {
+            res.status(500)
+            res.send(err);
         });
 });
 
@@ -71,17 +67,17 @@ router.get("/formated-backup-auto", function (req, res, next) {
         .getFolderContent(url)
         .then((contents) => {
             contents.sort((a, b) => {
-                if (moment(a.lastmod).isBefore(moment(b.lastmod))) return 1;
-                else return -1;
+                return a.date < b.date ? 1 : -1
             });
             //TODO Remove this when bug is fixed, etag contain '&quot;' at start and end ?
             for (let backup of contents) {
                 backup.etag = backup.etag.replace(/&quot;/g, '');
             }
-            res.render("backupSnaps", { backups: contents, moment: moment, humanFileSize: humanFileSize });
+            res.render("backupSnaps", { backups: contents, DateTime: DateTime, humanFileSize: humanFileSize });
         })
-        .catch(() => {
-            res.send("");
+        .catch((err) => {
+            res.status(500)
+            res.send(err);
         });
 });
 

@@ -8,7 +8,7 @@
                data-bs-target="#modal-<%= backups[index].etag %>">
                 <%= backups[index].basename %>
                 <span class="badge bg-primary">
-                    <%= moment(backups[index].lastmod).format('MMM D, YYYY HH:mm') %>
+                    <%= DateTime.fromRFC2822(backups[index].lastmod).toFormat("MMM dd, yyyy HH:mm") %>
                 </span>
             </a>
 
@@ -34,7 +34,7 @@
                                 <label for="date-<%= backups[index].etag %>" class="form-label">Date</label>
                                 <input disabled type="text" class="form-control bg-secondary border-dark text-accent"
                                        id="date-<%= backups[index].etag %>"
-                                       value="<%= moment(backups[index].lastmod).format('MMM D, YYYY HH:mm') %>"/>
+                                       value="<%= DateTime.fromRFC2822(backups[index].lastmod).toFormat("MMM dd, yyyy HH:mm") %>"/>
 
                             </div>
                             <div class="input-field col s12">

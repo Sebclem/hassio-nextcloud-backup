@@ -68,7 +68,7 @@ class CronContainer {
     updateNextDate() {
         let date;
         if (this.cronJob == null) date = null;
-        else date = this.cronJob.nextDate().format("MMM D, YYYY HH:mm");
+        else date = this.cronJob.nextDate().setLocale("en").toFormat("dd MMM yyyy, HH:mm");
         let status = statusTools.getStatus();
         status.next_backup = date;
         statusTools.setStatus(status);

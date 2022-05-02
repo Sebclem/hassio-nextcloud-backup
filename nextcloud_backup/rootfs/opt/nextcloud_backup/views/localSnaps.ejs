@@ -8,7 +8,7 @@
                data-bs-target="#modal-<%= snaps[index].slug %>">
                 <%= snaps[index].name ? snaps[index].name : snaps[index].slug %>
                 <span class="badge bg-primary">
-                    <%= moment(snaps[index].date).format('MMM D, YYYY HH:mm') %>
+                    <%= DateTime.fromISO(snaps[index].date).toFormat("MMM dd, yyyy HH:mm") %>
                 </span>
             </a>
 
@@ -32,7 +32,7 @@
                             <div class="mb-3">
                                 <label for="date-<%= snaps[index].slug %>" class="form-label">Date</label>
                                 <input disabled type="text" class="form-control bg-secondary border-dark text-accent" id="date-<%= snaps[index].slug %>"
-                                       value="<%= moment(snaps[index].date).format('MMM D, YYYY HH:mm') %>"/>
+                                       value="<%= DateTime.fromISO(snaps[index].date).setLocale("en").toFormat("MMM dd, yyyy HH:mm") %>"/>
 
                             </div>
 
