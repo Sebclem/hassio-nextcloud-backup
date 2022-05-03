@@ -22,7 +22,7 @@ function getVersion() {
     return new Promise((resolve, reject) => {
         let status = statusTools.getStatus();
         let option = {
-            headers: { "Authorization": `Bearer ${token}` },
+            headers: { "authorization": `Bearer ${token}` },
             responseType: "json",
         };
 
@@ -48,7 +48,7 @@ function getAddonList() {
     return new Promise((resolve, reject) => {
         let status = statusTools.getStatus();
         let option = {
-            headers: { "Authorization": `Bearer ${token}` },
+            headers: { "authorization": `Bearer ${token}` },
             responseType: "json",
         };
 
@@ -141,7 +141,7 @@ function getSnapshots() {
     return new Promise((resolve, reject) => {
         let status = statusTools.getStatus();
         let option = {
-            headers: { "Authorization": `Bearer ${token}` },
+            headers: { "authorization": `Bearer ${token}` },
             responseType: "json",
         };
 
@@ -215,7 +215,7 @@ function dellSnap(id) {
         checkSnap(id)
             .then(() => {
                 let option = {
-                    headers: { "Authorization": `Bearer ${token}` },
+                    headers: { "authorization": `Bearer ${token}` },
                     responseType: "json",
                 };
 
@@ -235,7 +235,7 @@ function dellSnap(id) {
 function checkSnap(id) {
     return new Promise((resolve, reject) => {
         let option = {
-            headers: { "Authorization": `Bearer ${token}` },
+            headers: { "authorization": `Bearer ${token}` },
             responseType: "json",
         };
 
@@ -258,7 +258,7 @@ function createNewBackup(name) {
         getAddonToBackup().then((addons) => {
             let folders = getFolderToBackup();
             let option = {
-                headers: { "Authorization": `Bearer ${token}` },
+                headers: { "authorization": `Bearer ${token}` },
                 responseType: "json",
                 timeout: {
                     response: create_snap_timeout
@@ -332,7 +332,7 @@ function uploadSnapshot(path) {
 
         let options = {
             body: form,
-            headers: { "Authorization": `Bearer ${token}` },
+            headers: { "authorization": `Bearer ${token}` },
         };
 
         got.stream
@@ -386,7 +386,7 @@ function stopAddons() {
         statusTools.setStatus(status);
         let promises = [];
         let option = {
-            headers: { "Authorization": `Bearer ${token}` },
+            headers: { "authorization": `Bearer ${token}` },
             responseType: "json",
         };
         let addons_slug = settingsTools.getSettings().auto_stop_addon
@@ -426,7 +426,7 @@ function startAddons() {
         statusTools.setStatus(status);
         let promises = [];
         let option = {
-            headers: { "Authorization": `Bearer ${token}` },
+            headers: { "authorization": `Bearer ${token}` },
             responseType: "json",
         };
         let addons_slug = settingsTools.getSettings().auto_stop_addon
@@ -473,7 +473,7 @@ function publish_state(state) {
 
 
     // let option = {
-    //     headers: { "Authorization": `Bearer ${token}` },
+    //     headers: { "authorization": `Bearer ${token}` },
     //     responseType: "json",
     //     json: data_error_sensor
     // };

@@ -214,6 +214,7 @@ class WebdavTools {
             statusTools.setStatus(status);
             logger.info("Uploading snap...");
             let tmpFile = `./temp/${id}.tar`;
+            let stats = fs.statSync(tmpFile);
             let stream = fs.createReadStream(tmpFile);
             let conf = this.getConf();
             let options = {
@@ -221,7 +222,8 @@ class WebdavTools {
                 // username: this.username,
                 // password: encodeURIComponent(this.password),
                 headers: {
-                    'Authorization': 'Basic ' + Buffer.from(this.username + ':' + this.password).toString('base64')
+                    'authorization': 'Basic ' + Buffer.from(this.username + ':' + this.password).toString('base64'),
+                    'content-length': String(stats.size)
                 }
             };
             if (conf.ssl === "true") {
@@ -321,7 +323,7 @@ class WebdavTools {
             let conf = this.getConf();
             let options = {
                 headers: {
-                    'Authorization': 'Basic ' + Buffer.from(this.username + ':' + this.password).toString('base64')
+                    'authorization': 'Basic ' + Buffer.from(this.username + ':' + this.password).toString('base64')
                 }
             };
             if (conf.ssl === "true") {
