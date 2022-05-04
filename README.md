@@ -35,7 +35,7 @@ Auto backup can be configured via the web interface.
 - __Restore__ : Upload backed-up snapshot to Home assistant.
 - __Auto Stop__ : This addon can stop addons before backup and restart them after backup 
 - __Web UI__ : All the configuration is based on an easy-to-use web interface, no yaml needed.
-- __Home Assistant State Entities__ : This addon create 2 entite in HA : `binary_sensor.nextcloud_backup_error` and `sensor.nextcloud_backup_status`
+- ~~__Home Assistant State Entities__ : This addon create 2 entite in HA : `binary_sensor.nextcloud_backup_error` and `sensor.nextcloud_backup_status`~~
 > __Info:__
 > Auto Clean is executed after every upload and every day at 00h30
 
@@ -85,30 +85,6 @@ The original setup of this repository is by [Sebastien Clement][Sebclem].
 For a full list of all authors and contributors,
 check [the contributor's page][contributors].
 
-
-## License
-
-MIT License
-
-Copyright (c) 2022 Sébastien Clément
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 
 [aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
