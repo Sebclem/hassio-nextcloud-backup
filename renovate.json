@@ -8,9 +8,9 @@
       "matchStrings": [
         "(?<currentValue>.*)\\s"
       ],
-      "depNameTemplate": "ghcr.io/hassio-addons/base/amd64"
+      "depNameTemplate": "ghcr.io/hassio-addons/base/amd64",
       "datasourceTemplate": "docker",
       "versioningTemplate": "semver"
     }
-  ],
+  ]
 }
