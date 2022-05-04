@@ -407,7 +407,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"auto-changelog@npm:^2.4.0":
+"auto-changelog@npm:2.4.0":
   version: 2.4.0
   resolution: "auto-changelog@npm:2.4.0"
   dependencies:
@@ -1523,8 +1523,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "hassio-nextcloud-backup@workspace:."
   dependencies:
-    auto-changelog: ^2.4.0
-    release-it: ^15.0.0
+    auto-changelog: 2.4.0
+    release-it: 15.0.0
   languageName: unknown
   linkType: soft
 
@@ -2868,7 +2868,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"release-it@npm:^15.0.0":
+"release-it@npm:15.0.0":
   version: 15.0.0
   resolution: "release-it@npm:15.0.0"
   dependencies:
