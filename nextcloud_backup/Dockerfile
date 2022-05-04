@@ -15,6 +15,7 @@ RUN ln -s /usr/bin/node /usr/local/sbin/node
 # Copy only package*.json
 COPY rootfs/opt/nextcloud_backup/package*.json /opt/nextcloud_backup/
 COPY rootfs/opt/nextcloud_backup/.yarnrc.yml /opt/nextcloud_backup/
+COPY rootfs/opt/nextcloud_backup/.yarn/releases/* /opt/nextcloud_backup/.yarn/releases/
 
 WORKDIR /opt/nextcloud_backup/
 
