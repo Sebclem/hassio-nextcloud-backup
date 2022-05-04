@@ -1,0 +1,17 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "commitMessagePrefix": ":arrow_up:",
+  "regexManagers": [
+    {
+      "fileMatch": ["nextcloud_backup/.base_version"],
+      "matchStrings": [
+        "(?<currentValue>.*)\\s"
+      ],
+      "depNameTemplate": "ghcr.io/hassio-addons/base/amd64",
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "semver"
+    }
+  ]
+}
