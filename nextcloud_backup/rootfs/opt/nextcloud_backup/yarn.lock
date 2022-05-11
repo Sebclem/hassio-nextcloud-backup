@@ -505,14 +505,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ejs@npm:3.1.7":
-  version: 3.1.7
-  resolution: "ejs@npm:3.1.7"
+"ejs@npm:3.1.8":
+  version: 3.1.8
+  resolution: "ejs@npm:3.1.8"
   dependencies:
     jake: ^10.8.5
   bin:
     ejs: bin/cli.js
-  checksum: fe40764af39955ce8f8b116716fc8b911959946698edb49ecab85df597746c07aa65d5b74ead28a1e2ffa75b0f92d9bedd752f1c29437da6137b3518271e988c
+  checksum: 1d40d198ad52e315ccf37e577bdec06e24eefdc4e3c27aafa47751a03a0c7f0ec4310254c9277a5f14763c3cd4bbacce27497332b2d87c74232b9b1defef8efc
   languageName: node
   linkType: hard
 
@@ -1091,7 +1091,7 @@ __metadata:
     cookie-parser: 1.4.6
     cron: 2.0.0
     debug: 4.3.4
-    ejs: 3.1.7
+    ejs: 3.1.8
     express: 4.18.1
     form-data: 4.0.0
     got: 12.0.4
