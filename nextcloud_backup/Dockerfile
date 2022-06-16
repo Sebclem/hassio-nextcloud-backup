@@ -1,4 +1,4 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/base/amd64:11.1.2
+ARG BUILD_FROM=ghcr.io/hassio-addons/base/amd64:12.2.0
 FROM ${BUILD_FROM}
 
 # Copy root filesystem
