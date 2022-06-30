@@ -1108,7 +1108,7 @@ __metadata:
     luxon: 2.4.0
     morgan: 1.10.0
     webdav: 4.10.0
-    winston: 3.8.0
+    winston: 3.8.1
   languageName: unknown
   linkType: soft
 
@@ -1528,9 +1528,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"winston@npm:3.8.0":
-  version: 3.8.0
-  resolution: "winston@npm:3.8.0"
+"winston@npm:3.8.1":
+  version: 3.8.1
+  resolution: "winston@npm:3.8.1"
   dependencies:
     "@dabh/diagnostics": ^2.0.2
     async: ^3.2.3
@@ -1542,7 +1542,7 @@ __metadata:
     stack-trace: 0.0.x
     triple-beam: ^1.3.0
     winston-transport: ^4.5.0
-  checksum: a091fe4959c04cdab5be823b702c5231a9e5eaec2a892e865dae8cb296e5ab0ac4bba004714b3e48e1efc5679355bbbad2f9fc4db1a23d8ebb22f9025831be2d
+  checksum: 14637222a4239f1ee7e629dbbf0c65161abe95eeb7acd275caf210c5d47d93254fdb007291ea75b5e241d4bb6dd3c29d000bd04ae5420a347711ae7cd0b2da88
   languageName: node
   linkType: hard
 
