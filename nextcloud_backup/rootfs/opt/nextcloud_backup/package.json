@@ -19,7 +19,7 @@
     "got": "12.1.0",
     "http-errors": "2.0.0",
     "jquery": "3.6.0",
-    "luxon": "2.4.0",
+    "luxon": "2.5.0",
     "morgan": "1.10.0",
     "webdav": "4.10.0",
     "winston": "3.8.0"

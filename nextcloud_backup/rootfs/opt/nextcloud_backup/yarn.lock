@@ -938,10 +938,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"luxon@npm:2.4.0":
-  version: 2.4.0
-  resolution: "luxon@npm:2.4.0"
-  checksum: 6071028d65cc3d3bdab5e6a3995dd97411c92bb3b3163a02deb7b7014318ad3a6fd750ae77131c42141b717c14aef8880d3130f265281d500ef2365f7265b3f3
+"luxon@npm:2.5.0":
+  version: 2.5.0
+  resolution: "luxon@npm:2.5.0"
+  checksum: 2fccce6bbdfc8f13c5a8c148ff045ab3b10f4f80cac28dd92575588fffce9b2d7197096d7fedcc61a6245b59f4233507797f530e63f22b9ae4c425dff2909ae3
   languageName: node
   linkType: hard
 
@@ -1105,7 +1105,7 @@ __metadata:
     got: 12.1.0
     http-errors: 2.0.0
     jquery: 3.6.0
-    luxon: 2.4.0
+    luxon: 2.5.0
     morgan: 1.10.0
     webdav: 4.10.0
     winston: 3.8.0
