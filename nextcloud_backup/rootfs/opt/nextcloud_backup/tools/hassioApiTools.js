@@ -61,18 +61,12 @@ function getAddonList() {
                     statusTools.setStatus(status);
                 }
                 let addons = result.body.data.addons;
-                let installed = [];
-                for (let current of addons) {
-                    if (current.installed === true) {
-                        installed.push({ slug: current.slug, name: current.name })
-                    }
-                }
-                installed.sort((a, b) => {
+                addons.sort((a, b) => {
                     let textA = a.name.toUpperCase();
                     let textB = b.name.toUpperCase();
                     return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
                 });
-                resolve(installed);
+                resolve(addons);
             })
             .catch((error) => {
                 statusTools.setError(`Fail to fetch addons list (${error.message})`, 1);
