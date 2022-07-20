@@ -3,7 +3,7 @@
   "packageManager": "yarn@3.2.1",
   "devDependencies": {
     "auto-changelog": "2.4.0",
-    "release-it": "15.1.1"
+    "release-it": "15.1.3"
   },
   "scripts": {
     "release": "release-it"
