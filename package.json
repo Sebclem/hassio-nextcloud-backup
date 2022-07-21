@@ -1,6 +1,6 @@
 {
   "name": "hassio-nextcloud-backup",
-  "packageManager": "yarn@3.2.1",
+  "packageManager": "yarn@3.2.2",
   "devDependencies": {
     "auto-changelog": "2.4.0",
     "release-it": "15.1.1"
