@@ -1,17 +1,19 @@
 import * as hassioApiTools from "./hassioApiTools.js";
 import logger from "../config/winston.js"
+import { type Status } from "../types/status.js";
 
-
-let status = {
+let status: Status = {
     status: "idle",
-    last_backup: null,
-    next_backup: null,
+    last_backup: undefined,
+    next_backup: undefined,
+    progress: -1,
 };
 
 export function init() {
     if (status.status !== "idle") {
         status.status = "idle";
-        status.message = null;
+        status.message = undefined;
+        status.progress = -1;
     }
 }
 
@@ -19,15 +21,15 @@ export function getStatus() {
     return status;
 }
 
-export function setStatus(new_state) {
-    let old_state_str = JSON.stringify(status);
+export function setStatus(new_state: Status) {
+    const old_state_str = JSON.stringify(status);
     if(old_state_str !== JSON.stringify(new_state)){
         status = new_state;
         hassioApiTools.publish_state(status);
     }
 }
 
-export function setError(message, error_code){
+export function setError(message: string, error_code: number){
     // Check if we don't have another error stored
     if (status.status != "error") {
         status.status = "error"

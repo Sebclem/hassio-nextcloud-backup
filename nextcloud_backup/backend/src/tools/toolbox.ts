@@ -1,5 +1,5 @@
 // Found on Stackoverflow, perfect code :D https://stackoverflow.com/a/14919494/8654475
-function humanFileSize(bytes, si = false, dp = 1) {
+function humanFileSize(bytes: number, si = false, dp = 1) {
     const thresh = si ? 1000 : 1024;
 
     if (Math.abs(bytes) < thresh) {
