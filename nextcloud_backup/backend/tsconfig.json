@@ -1,0 +1,11 @@
+{
+  "extends": "@tsconfig/recommended/tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "outDir": "./dist",
+    "module": "ES2022",
+    "moduleResolution": "NodeNext",
+    "target": "es6",
+  },
+  "include": ["src/**/*"]
+}
