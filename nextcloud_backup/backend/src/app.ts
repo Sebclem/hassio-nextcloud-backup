@@ -5,10 +5,9 @@ import cookieParser from "cookie-parser";
 import fs from "fs"
 import newlog from "./config/winston.js"
 import * as statusTools from "./tools/status.js"
-import * as hassioApiTools from "./tools/hassioApiTools.js"
 import * as settingsTools from "./tools/settingsTools.js"
 import cronTools from "./tools/cronTools.js"
-import webdav from "./tools/webdavTools.js";
+import webdav from "./services/webdavService.js";
 
 import apiRouter from "./routes/api.js"
 import { fileURLToPath } from "url";
@@ -71,15 +70,17 @@ if (!fs.existsSync("/data")) fs.mkdirSync("/data");
 statusTools.init();
 newlog.info("Satus : \x1b[32mGo !\x1b[0m");
 
-hassioApiTools.getSnapshots().then(
-    () => {
-        newlog.info("Hassio API : \x1b[32mGo !\x1b[0m");
-    },
-    (err) => {
-        newlog.error("Hassio API : \x1b[31;1mFAIL !\x1b[0m");
-        newlog.error("... " + err);
-    }
-);
+
+// TODO Change this
+// hassioApiTools.getSnapshots().then(
+//     () => {
+//         newlog.info("Hassio API : \x1b[32mGo !\x1b[0m");
+//     },
+//     (err) => {
+//         newlog.error("Hassio API : \x1b[31;1mFAIL !\x1b[0m");
+//         newlog.error("... " + err);
+//     }
+// );
 
 webdav.confIsValid().then(
     () => {

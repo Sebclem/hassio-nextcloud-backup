@@ -3,7 +3,7 @@ import * as settingsTools from "./settingsTools.js";
 import * as hassioApiTools from "./hassioApiTools.js";
 import * as statusTools from "./status.js";
 import * as pathTools from "./pathTools.js";
-import webdav from "./webdavTools.js";
+import webdav from "../services/webdavService.js";
 
 import logger from "../config/winston.js";
 
