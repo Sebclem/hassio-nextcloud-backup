@@ -1,4 +1,4 @@
-import * as hassioApiTools from "./hassioApiTools.js";
+import { publish_state } from "../services/homeAssistantService.js";
 import logger from "../config/winston.js"
 import { type Status } from "../types/status.js";
 
@@ -25,7 +25,7 @@ export function setStatus(new_state: Status) {
     const old_state_str = JSON.stringify(status);
     if(old_state_str !== JSON.stringify(new_state)){
         status = new_state;
-        hassioApiTools.publish_state(status);
+        publish_state(status);
     }
 }
 

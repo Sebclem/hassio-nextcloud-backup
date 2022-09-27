@@ -6,11 +6,12 @@ const maxMessageLength = 255;
 class MessageManager {
   private messages: Message[] = [];
 
-  public addMessage(type: MessageType, message: string, detail?: string) {
+  public addMessage(type: MessageType, message: string, detail?: string, isImportant = false) {
     this.messages.push({
       message: message,
       type: type,
       time: DateTime.now(),
+      viewed: !isImportant,
       detail: detail
     });
     if (this.messages.length > maxMessageLength) {
@@ -19,7 +20,7 @@ class MessageManager {
   }
 
   public error(message: string, detail?: string) {
-    this.addMessage(MessageType.ERROR, message, detail);
+    this.addMessage(MessageType.ERROR, message, detail, true);
   }
 
   public warn(message: string, detail?: string) {

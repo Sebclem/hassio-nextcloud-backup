@@ -6,6 +6,7 @@
     "module": "ES2022",
     "moduleResolution": "NodeNext",
     "target": "es6",
+    "sourceMap": true,
   },
   "include": ["src/**/*"]
 }

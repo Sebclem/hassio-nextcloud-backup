@@ -1,12 +1,12 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@fortawesome/fontawesome-free': 6.1.2
   '@tsconfig/recommended': ^1.0.1
   '@types/cookie-parser': ^1.4.3
   '@types/cron': ^2.0.0
   '@types/errorhandler': ^1.5.0
   '@types/express': ^4.17.14
+  '@types/figlet': ^1.5.5
   '@types/http-errors': ^1.8.2
   '@types/luxon': ^3.0.1
   '@types/morgan': ^1.9.3
@@ -14,46 +14,44 @@ specifiers:
   '@typescript-eslint/eslint-plugin': ^5.38.0
   '@typescript-eslint/parser': ^5.38.0
   app-root-path: 3.0.0
-  bootstrap: 5.2.0
   concurrently: 6.0.2
   cookie-parser: 1.4.6
   cron: 2.1.0
   debug: 4.3.4
-  ejs: 3.1.8
+  dotenv: ^16.0.2
   errorhandler: ^1.5.1
   eslint: 7.19.0
   express: 4.18.1
+  figlet: ^1.5.2
   form-data: 4.0.0
   got: 12.3.0
   http-errors: 2.0.0
   jquery: 3.6.0
+  kleur: ^4.1.5
   luxon: 3.0.1
   morgan: 1.10.0
-  nodemon: ^2.0.7
-  swagger-ui-express: ^4.5.0
+  nodemon: ^2.0.20
   ts-node: ^10.9.1
   typescript: ^4.8.3
   webdav: 4.10.0
   winston: 3.8.1
 
 dependencies:
-  '@fortawesome/fontawesome-free': 6.1.2
   '@typescript-eslint/eslint-plugin': 5.38.0_icxzmwhpfrmelnyzbhqbg2q4qi
   app-root-path: 3.0.0
-  bootstrap: 5.2.0
   cookie-parser: 1.4.6
   cron: 2.1.0
   debug: 4.3.4
-  ejs: 3.1.8
   errorhandler: 1.5.1
   express: 4.18.1
+  figlet: 1.5.2
   form-data: 4.0.0
   got: 12.3.0
   http-errors: 2.0.0
   jquery: 3.6.0
+  kleur: 4.1.5
   luxon: 3.0.1
   morgan: 1.10.0
-  swagger-ui-express: 4.5.0_express@4.18.1
   webdav: 4.10.0_debug@4.3.4
   winston: 3.8.1
 
@@ -63,12 +61,14 @@ devDependencies:
   '@types/cron': 2.0.0
   '@types/errorhandler': 1.5.0
   '@types/express': 4.17.14
+  '@types/figlet': 1.5.5
   '@types/http-errors': 1.8.2
   '@types/luxon': 3.0.1
   '@types/morgan': 1.9.3
   '@types/node': 18.7.18
   '@typescript-eslint/parser': 5.38.0_xkpbw63dclu5vuec6llpbh3ip4
   concurrently: 6.0.2
+  dotenv: 16.0.2
   eslint: 7.19.0
   nodemon: 2.0.20
   ts-node: 10.9.1_bidgzm5cq2du6gnjtweqqjrrn4
@@ -130,12 +130,6 @@ packages:
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
       - supports-color
-
-  /@fortawesome/fontawesome-free/6.1.2:
-    resolution: {integrity: sha512-XwWADtfdSN73/udaFm+1mnGIj/ShDZNFMe/PRoqv3FhQ4GNI2PUN70yFTPsjq65Lw2C9i4TG5/hTbxXIXVCiqQ==}
-    engines: {node: '>=6'}
-    requiresBuild: true
-    dev: false
 
   /@jridgewell/resolve-uri/3.1.0:
     resolution: {integrity: sha512-F2msla3tad+Mfht5cJq7LSXcdudKTWCVYUgw6pLFOOHSTtZlj6SWNYAp+AhuqLmWdBO2X5hPrLcu8cVP8fy28w==}
@@ -259,6 +253,10 @@ packages:
       '@types/express-serve-static-core': 4.17.31
       '@types/qs': 6.9.7
       '@types/serve-static': 1.15.0
+    dev: true
+
+  /@types/figlet/1.5.5:
+    resolution: {integrity: sha512-0sMBeFoqdGgdXoR/hgKYSWMpFufSpToosNsI2VgmkPqZJgeEXsXNu2hGr0FN401dBro2tNO5y2D6uw3UxVaxbg==}
     dev: true
 
   /@types/http-cache-semantics/4.0.1:
@@ -603,12 +601,6 @@ packages:
       - supports-color
     dev: false
 
-  /bootstrap/5.2.0:
-    resolution: {integrity: sha512-qlnS9GL6YZE6Wnef46GxGv1UpGGzAwO0aPL1yOjzDIJpeApeMvqV24iL+pjr2kU4dduoBA9fINKWKgMToobx9A==}
-    peerDependencies:
-      '@popperjs/core': ^2.11.5
-    dev: false
-
   /brace-expansion/1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
     dependencies:
@@ -919,16 +911,13 @@ packages:
     dependencies:
       esutils: 2.0.3
 
+  /dotenv/16.0.2:
+    resolution: {integrity: sha512-JvpYKUmzQhYoIFgK2MOnF3bciIZoItIIoryihy0rIA+H4Jy0FmgyKYAHCTN98P5ybGSJcIFbh6QKeJdtZd1qhA==}
+    engines: {node: '>=12'}
+    dev: true
+
   /ee-first/1.1.1:
     resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
-    dev: false
-
-  /ejs/3.1.8:
-    resolution: {integrity: sha512-/sXZeMlhS0ArkfX2Aw780gJzXSMPnKjtspYZv+f3NiKLlubezAHDU5+9xz6gd3/NhG3txQCo6xlglmTS+oTGEQ==}
-    engines: {node: '>=0.10.0'}
-    hasBin: true
-    dependencies:
-      jake: 10.8.5
     dev: false
 
   /emoji-regex/8.0.0:
@@ -1178,17 +1167,16 @@ packages:
     resolution: {integrity: sha512-OP2IUU6HeYKJi3i0z4A19kHMQoLVs4Hc+DPqqxI2h/DPZHTm/vjsfC6P0b4jCMy14XizLBqvndQ+UilD7707Jw==}
     dev: false
 
+  /figlet/1.5.2:
+    resolution: {integrity: sha512-WOn21V8AhyE1QqVfPIVxe3tupJacq1xGkPTB4iagT6o+P2cAgEOOwIxMftr4+ZCTI6d551ij9j61DFr0nsP2uQ==}
+    engines: {node: '>= 0.4.0'}
+    dev: false
+
   /file-entry-cache/6.0.1:
     resolution: {integrity: sha512-7Gps/XWymbLk2QLYK4NzpMOrYjMhdIxXuIvy2QBsLE6ljuodKvdkWs/cpyJJ3CVIVpH0Oi1Hvg1ovbMzLdFBBg==}
     engines: {node: ^10.12.0 || >=12.0.0}
     dependencies:
       flat-cache: 3.0.4
-
-  /filelist/1.0.4:
-    resolution: {integrity: sha512-w1cEuf3S+DrLCQL7ET6kz+gmlJdbq9J7yXCSjK/OZCPA+qEN1WyF4ZAf0YYJa4/shHJra2t/d/r8SV4Ji+x+8Q==}
-    dependencies:
-      minimatch: 5.1.0
-    dev: false
 
   /fill-range/7.0.1:
     resolution: {integrity: sha512-qOo9F+dMUmC2Lcb4BbVvnKJxTPjCm+RRpe4gDuGrzkL7mEVl/djYSu2OdQ2Pa302N4oqkSg9ir6jaLWJ2USVpQ==}
@@ -1505,17 +1493,6 @@ packages:
   /isexe/2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
 
-  /jake/10.8.5:
-    resolution: {integrity: sha512-sVpxYeuAhWt0OTWITwT98oyV0GsXyMlXCF+3L1SuafBVUIr/uILGRB+NqwkzhgXKvoJpDIpQvqkUALgdmQsQxw==}
-    engines: {node: '>=10'}
-    hasBin: true
-    dependencies:
-      async: 3.2.4
-      chalk: 4.1.2
-      filelist: 1.0.4
-      minimatch: 3.1.2
-    dev: false
-
   /jquery/3.6.0:
     resolution: {integrity: sha512-JVzAR/AjBvVt2BmYhxRCSYysDsPcssdmTFnzyLEts9qNwmjmu4JTAMYubEfwVOSwpQ1I1sKKFcxhZCI2buerfw==}
     dev: false
@@ -1551,6 +1528,11 @@ packages:
     resolution: {integrity: sha512-2YvuMsA+jnFGtBareKqgANOEKe1mk3HKiXu2fRmAfyxG0MJAywNhi5ttWA3PMjl4NmpyjZNbFifR2vNjW1znfA==}
     dependencies:
       json-buffer: 3.0.1
+    dev: false
+
+  /kleur/4.1.5:
+    resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
+    engines: {node: '>=6'}
     dev: false
 
   /kuler/2.0.0:
@@ -2223,20 +2205,6 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
     dev: true
-
-  /swagger-ui-dist/4.14.0:
-    resolution: {integrity: sha512-TBzhheU15s+o54Cgk9qxuYcZMiqSm/SkvKnapoGHOF66kz0Y5aGjpzj5BT/vpBbn6rTPJ9tUYXQxuDWfsjiGMw==}
-    dev: false
-
-  /swagger-ui-express/4.5.0_express@4.18.1:
-    resolution: {integrity: sha512-DHk3zFvsxrkcnurGvQlAcLuTDacAVN1JHKDgcba/gr2NFRE4HGwP1YeHIXMiGznkWR4AeS7X5vEblNn4QljuNA==}
-    engines: {node: '>= v0.10.32'}
-    peerDependencies:
-      express: '>=4.0.0'
-    dependencies:
-      express: 4.18.1
-      swagger-ui-dist: 4.14.0
-    dev: false
 
   /table/6.8.0:
     resolution: {integrity: sha512-s/fitrbVeEyHKFa7mFdkuQMWlH1Wgw/yEXMt5xACT4ZpzWFluehAxRtUUQKPuWhaLAWhFcVx6w3oC8VKaUfPGA==}
