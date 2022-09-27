@@ -10,10 +10,13 @@ import * as settingsTools from "../tools/settingsTools.js";
 import * as statusTools from "../tools/status.js";
 import { NewPartialBackupPayload } from "../types/services/ha_os_payload.js";
 import {
+  AddonData,
   AddonModel,
+  BackupData,
   BackupDetailModel,
   BackupModel,
-  CoreInfoBody
+  CoreInfoBody,
+  SupervisorResponse,
 } from "../types/services/ha_os_response.js";
 import { Status } from "../types/status.js";
 
@@ -26,8 +29,8 @@ const create_snap_timeout = process.env.CREATE_BACKUP_TIMEOUT
   ? parseInt(process.env.CREATE_BACKUP_TIMEOUT)
   : 90 * 60 * 1000;
 
-function getVersion(): Promise<Response<CoreInfoBody>> {
-  return got<CoreInfoBody>("http://hassio/core/info", {
+function getVersion(): Promise<Response<SupervisorResponse<CoreInfoBody>>> {
+  return got<SupervisorResponse<CoreInfoBody>>("http://hassio/core/info", {
     headers: { authorization: `Bearer ${token}` },
     responseType: "json",
   }).then(
@@ -41,19 +44,22 @@ function getVersion(): Promise<Response<CoreInfoBody>> {
       );
       logger.error(`Fail to fetch Home Assistant version`);
       logger.error(error);
-      return error;
+      return Promise.reject(error);
     }
   );
 }
 
-function getAddonList(): Promise<Response<{ addons: AddonModel[] }>> {
+function getAddonList(): Promise<Response<SupervisorResponse<AddonData>>> {
   const option: OptionsOfJSONResponseBody = {
     headers: { authorization: `Bearer ${token}` },
     responseType: "json",
   };
-  return got<{ addons: AddonModel[] }>("http://hassio/addons", option).then(
+  return got<SupervisorResponse<AddonData>>(
+    "http://hassio/addons",
+    option
+  ).then(
     (result) => {
-      result.body.addons.sort((a, b) => {
+      result.body.data.addons.sort((a, b) => {
         const textA = a.name.toUpperCase();
         const textB = b.name.toUpperCase();
         return textA < textB ? -1 : textA > textB ? 1 : 0;
@@ -64,22 +70,20 @@ function getAddonList(): Promise<Response<{ addons: AddonModel[] }>> {
       messageManager.error("Fail to fetch addons list", error?.message);
       logger.error(`Fail to fetch addons list (${error?.message})`);
       logger.error(error);
-      return error;
+      return Promise.reject(error);
     }
   );
 }
 
-function getAddonToBackup() {
+function getAddonToBackup(addons: AddonModel[]) {
   const excluded_addon = settingsTools.getSettings().exclude_addon;
-  return getAddonList().then((response) => {
-    const slugs: string[] = [];
-    for (const addon of response.body.addons) {
-      if (!excluded_addon.includes(addon.slug)) slugs.push(addon.slug);
-    }
-    logger.debug("Addon to backup:");
-    logger.debug(slugs);
-    return slugs;
-  });
+  const slugs: string[] = [];
+  for (const addon of addons) {
+    if (!excluded_addon.includes(addon.slug)) slugs.push(addon.slug);
+  }
+  logger.debug("Addon to backup:");
+  logger.debug(slugs);
+  return slugs;
 }
 
 function getFolderList() {
@@ -119,18 +123,21 @@ function getFolderToBackup() {
   return slugs;
 }
 
-function getBackups(): Promise<Response<{ backups: BackupModel[] }>> {
+function getBackups(): Promise<Response<SupervisorResponse<BackupData>>> {
   const option: OptionsOfJSONResponseBody = {
     headers: { authorization: `Bearer ${token}` },
     responseType: "json",
   };
-  return got<{ backups: BackupModel[] }>("http://hassio/backups", option).then(
+  return got<SupervisorResponse<BackupData>>(
+    "http://hassio/backups",
+    option
+  ).then(
     (result) => {
       return result;
     },
     (error) => {
       messageManager.error("Fail to fetch Hassio backups", error?.message);
-      return error;
+      return Promise.reject(error);
     }
   );
 }
@@ -177,12 +184,12 @@ function downloadSnapshot(id: string): Promise<string> {
         "Fail to download Home Assistant backup",
         reason.message
       );
-      return reason;
+      return Promise.reject(reason);
     }
   );
 }
 
-function delSnap(id: string): Promise<Response<string>> {
+function delSnap(id: string) {
   const option = {
     headers: { authorization: `Bearer ${token}` },
   };
@@ -197,23 +204,23 @@ function delSnap(id: string): Promise<Response<string>> {
       );
       logger.error("Fail to retrive Homme assistant backup detail.");
       logger.error(reason);
-      return reason;
+      return Promise.reject(reason);
     }
   );
 }
 
-function checkSnap(id: string): Promise<Response<BackupDetailModel>> {
+function checkSnap(id: string) {
   const option: OptionsOfJSONResponseBody = {
     headers: { authorization: `Bearer ${token}` },
     responseType: "json",
   };
-  return got<BackupDetailModel>(
+  return got<SupervisorResponse<BackupDetailModel>>(
     `http://hassio/backups/${id}/info`,
     option
   ).then(
     (result) => {
       logger.info("Backup found !");
-      logger.debug(`Backup size: ${result.body.size}`);
+      logger.debug(`Backup size: ${result.body.data.size}`);
       return result;
     },
     (reason) => {
@@ -223,7 +230,7 @@ function checkSnap(id: string): Promise<Response<BackupDetailModel>> {
       );
       logger.error("Fail to retrive Homme assistant backup detail");
       logger.error(reason);
-      return reason;
+      return Promise.reject(reason);
     }
   );
 }
@@ -232,7 +239,7 @@ function createNewBackup(
   name: string,
   addonSlugs: string[],
   folders: string[]
-): Promise<Response<{ slug: string }>> {
+) {
   const status = statusTools.getStatus();
   status.status = "creating";
   status.progress = -1;
@@ -258,17 +265,20 @@ function createNewBackup(
     json: body,
   };
   return got
-    .post<{ slug: string }>(`http://hassio/backups/new/partial`, option)
+    .post<SupervisorResponse<{ slug: string }>>(
+      `http://hassio/backups/new/partial`,
+      option
+    )
     .then(
       (result) => {
-        logger.info(`Snapshot created with id ${result.body.slug}`);
+        logger.info(`Snapshot created with id ${result.body.data.slug}`);
         return result;
       },
       (reason) => {
         messageManager.error("Fail to create new backup.", reason.message);
         logger.error("Fail to create new backup");
         logger.error(reason);
-        return reason;
+        return Promise.reject(reason);
       }
     );
 }

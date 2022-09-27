@@ -1,3 +1,9 @@
+
+export interface SupervisorResponse<T> {
+  result: string;
+  data: T;
+}
+
 export interface CoreInfoBody {
   version: string;
   version_latest: string;
@@ -15,6 +21,11 @@ export interface CoreInfoBody {
   audio_output: string;
 }
 
+export interface AddonData {
+  addons: AddonModel[];
+}
+
+
 export interface AddonModel {
   name: string;
   slug: string;
@@ -30,6 +41,11 @@ export interface AddonModel {
   logo: boolean;
   state: string;
 }
+
+export interface BackupData {
+  backups: BackupModel[]
+}
+
 
 export interface BackupModel {
   slug: string;
