@@ -1,9 +1,9 @@
 import express from "express";
 import * as haOsService from "../services/homeAssistantService.js"
 
-const router = express.Router();
+const homeAssistantRouter = express.Router();
 
-router.get("/backups/", (req, res, next) => {
+homeAssistantRouter.get("/backups/", (req, res, next) => {
   haOsService.getBackups()
     .then((value)=>{
       res.json(value.body.data.backups);
@@ -14,6 +14,5 @@ router.get("/backups/", (req, res, next) => {
 });
 
 
-router.get("")
 
-export default router;
+export default homeAssistantRouter;
