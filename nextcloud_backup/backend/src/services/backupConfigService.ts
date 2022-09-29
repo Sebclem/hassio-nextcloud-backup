@@ -1,8 +1,8 @@
 import fs from "fs";
 import Joi from "joi"
 import logger from "../config/winston.js";
-import { backupConfigValidation } from "../types/services/backupConfigValidation.js"
 import { BackupConfig } from "../types/services/backupConfig.js"
+import backupConfigValidation from "../types/services/backupConfigValidation.js";
 
 
 const backupConfigPath = "/data/backupConfigV2.json";
