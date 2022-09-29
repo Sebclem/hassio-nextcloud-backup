@@ -39,7 +39,7 @@ const AutoCleanConfig = {
   }),
 };
 
-export const backupConfigValidation = {
+const backupConfigValidation = {
   nameTemplate: Joi.string().required().not().empty(),
   cron: Joi.array().items(CronConfigValidation).required(),
   autoClean: Joi.object({
@@ -60,3 +60,5 @@ export const backupConfigValidation = {
     }),
   }),
 };
+
+export default backupConfigValidation;
