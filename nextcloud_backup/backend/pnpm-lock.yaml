@@ -22,6 +22,7 @@ specifiers:
   errorhandler: ^1.5.1
   eslint: 7.19.0
   express: 4.18.1
+  fast-xml-parser: ^4.0.10
   figlet: ^1.5.2
   form-data: 4.0.0
   got: 12.3.0
@@ -45,6 +46,7 @@ dependencies:
   debug: 4.3.4
   errorhandler: 1.5.1
   express: 4.18.1
+  fast-xml-parser: 4.0.10
   figlet: 1.5.2
   form-data: 4.0.0
   got: 12.3.0
@@ -1179,6 +1181,13 @@ packages:
 
   /fast-xml-parser/3.21.1:
     resolution: {integrity: sha512-FTFVjYoBOZTJekiUsawGsSYV9QL0A+zDYCRj7y34IO6Jg+2IMYEtQa+bbictpdpV8dHxXywqU7C0gRDEOFtBFg==}
+    hasBin: true
+    dependencies:
+      strnum: 1.0.5
+    dev: false
+
+  /fast-xml-parser/4.0.10:
+    resolution: {integrity: sha512-mYMMIk7Ho1QOiedyvafdyPamn1Vlda+5n95lcn0g79UiCQoLQ2xfPQ8m3pcxBMpVaftYXtoIE2wrNTjmLQnnkg==}
     hasBin: true
     dependencies:
       strnum: 1.0.5

@@ -4,6 +4,21 @@ import messageManager from "../tools/messageManager.js";
 import { WebdavConfig } from "../types/services/webdavConfig.js";
 import { getEndpoint } from "./webdavConfigService.js";
 import * as pathTools from "../tools/pathTools.js";
+import { XMLParser } from "fast-xml-parser";
+import { WebdavBackup } from "../types/services/webdav.js";
+import { DateTime } from "luxon";
+
+const PROPFIND_BODY =
+'<?xml version="1.0" encoding="utf-8" ?>\
+<d:propfind xmlns:d="DAV:">\
+  <d:prop>\
+        <d:getlastmodified />\
+        <d:getetag />\
+        <d:getcontenttype />\
+        <d:resourcetype />\
+        <d:getcontentlength />\
+  </d:prop>\
+</d:propfind>';
 
 export function checkWebdavLogin(config: WebdavConfig) {
   const endpoint = getEndpoint(config);
@@ -75,6 +90,59 @@ function createDirectory(path: string, config: WebdavConfig) {
         Buffer.from(config.username + ":" + config.password).toString("base64"),
     },
   });
+}
+
+export function getBackups(folder: string, config: WebdavConfig) {
+  const endpoint = getEndpoint(config);
+  return got(config.url + endpoint + config.backupDir + folder, {
+    method: "PROPFIND" as Method,
+    headers: {
+      authorization:
+        "Basic " +
+        Buffer.from(config.username + ":" + config.password).toString("base64"),
+      Depth: "1",
+    },
+    body: PROPFIND_BODY,
+  }).then(
+    (value) => {
+      return parseXmlBackupData(value.body);
+    },
+    (reason) => {
+      messageManager.error(
+        `Fail to retrive webdav backups in ${folder} folder`
+      );
+      logger.error(`Fail to retrive webdav backups in ${folder} folder`);
+      logger.error(reason);
+      return Promise.reject(reason);
+    }
+  );
+}
+
+
+function parseXmlBackupData(body: string){
+  const parser = new XMLParser();
+  const data = parser.parse(body);
+  const multistatus = data["d:multistatus"];
+  const backups: WebdavBackup[] = [];
+  if(Array.isArray(multistatus["d:response"])){
+    for(const elem of multistatus["d:response"]){
+      // If array -> base folder, ignoring it
+      if(!Array.isArray(elem["d:propstat"])){
+        const propstat = elem["d:propstat"];
+        const id = propstat["d:prop"]["d:getetag"].replaceAll("\"", "");
+        const href = decodeURI(elem["d:href"]);
+        const name = href.split("/").slice(-1)[0];
+        const lastEdit = DateTime.fromHTTP(propstat["d:prop"]["d:getlastmodified"]);
+        backups.push({
+          id: id,
+          lastEdit: lastEdit,
+          size: propstat["d:prop"]["d:getcontentlenght"],
+          name: name
+        })
+      }
+    }
+  }
+  return backups;
 }
 
 // import fs from "fs";
