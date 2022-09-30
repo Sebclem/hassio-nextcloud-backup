@@ -3,8 +3,12 @@ import logger from "./config/winston.js";
 import * as homeAssistantService from "./services/homeAssistantService.js";
 import * as settingsTools from "./tools/settingsTools.js";
 import * as statusTools from "./tools/status.js";
-import kleur from 'kleur';
-
+import kleur from "kleur";
+import { checkWebdavLogin, createBackupFolder } from "./services/webdavService.js";
+import {
+  getWebdavConfig,
+  validateWebdavConfig,
+} from "./services/webdavConfigService.js";
 
 function postInit() {
   logger.info(`Log level: ${process.env.LOG_LEVEL}`);
@@ -31,15 +35,34 @@ function postInit() {
     }
   );
 
-  // webdav.confIsValid().then(
-  //     () => {
-  //         newlog.info("Nextcloud connection : \x1b[32mGo !\x1b[0m");
-  //     },
-  //     (err) => {
-  //         newlog.error("Nextcloud connection : \x1b[31;1mFAIL !\x1b[0m");
-  //         newlog.error("... " + err);
-  //     }
-  // );
+  const webdavConf = getWebdavConfig();
+  validateWebdavConfig(webdavConf).then(
+    () => {
+      logger.info("Webdav config: " + kleur.green().bold("Go !"));
+      checkWebdavLogin(webdavConf).then(
+        () => {
+          logger.info("Webdav : " + kleur.green().bold("Go !"));
+          createBackupFolder(webdavConf).then(
+            () => {
+              logger.info("Webdav fodlers: " + kleur.green().bold("Go !"));
+            },
+            (reason) => {
+              logger.error("Webdav folders: " + kleur.red().bold("FAIL !"));
+              logger.error(reason);
+            }
+          );
+        },
+        (reason) => {
+          logger.error("Webdav : " + kleur.red().bold("FAIL !"));
+          logger.error(reason);
+        }
+      );
+    },
+    (reason) => {
+      logger.error("Webdav config: " + kleur.red().bold("FAIL !"));
+      logger.error(reason);
+    }
+  );
 
   settingsTools.check(settingsTools.getSettings(), true);
   // cronTools.init();

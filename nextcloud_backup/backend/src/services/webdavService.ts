@@ -1,3 +1,82 @@
+import got, { HTTPError, Method } from "got";
+import logger from "../config/winston.js";
+import messageManager from "../tools/messageManager.js";
+import { WebdavConfig } from "../types/services/webdavConfig.js";
+import { getEndpoint } from "./webdavConfigService.js";
+import * as pathTools from "../tools/pathTools.js";
+
+export function checkWebdavLogin(config: WebdavConfig) {
+  const endpoint = getEndpoint(config);
+  return got(config.url + endpoint, {
+    method: "OPTIONS",
+    headers: {
+      authorization:
+        "Basic " +
+        Buffer.from(config.username + ":" + config.password).toString("base64"),
+    },
+  }).then(
+    (response) => {
+      return response;
+    },
+    (reason) => {
+      messageManager.error("Fail to connect to Webdav", reason?.message);
+      logger.error(`Fail to connect to Webdav`);
+      logger.error(reason);
+      return Promise.reject(reason);
+    }
+  );
+}
+
+export async function createBackupFolder(conf: WebdavConfig) {
+  const root_splited = conf.backupDir.split("/").splice(1);
+  let path = "/";
+  for (const elem of root_splited) {
+    if (elem != "") {
+      path = path + elem + "/";
+      try {
+        await createDirectory(path, conf);
+        logger.debug(`Path ${path} created.`);
+      } catch (error) {
+        if (error instanceof HTTPError && error.response.statusCode == 405)
+          logger.debug(`Path ${path} already exist.`);
+        else {
+          messageManager.error("Fail to create webdav root folder");
+          logger.error("Fail to create webdav root folder");
+          logger.error(error);
+          return Promise.reject(error);
+        }
+      }
+    }
+  }
+  for (const elem of [pathTools.auto, pathTools.manual]) {
+    try {
+      await createDirectory(conf.backupDir + elem, conf);
+      logger.debug(`Path ${conf.backupDir + elem} created.`);
+    } catch (error) {
+      if (error instanceof HTTPError && error.response.statusCode == 405) {
+        logger.debug(`Path ${conf.backupDir + elem} already exist.`);
+      } else {
+        messageManager.error("Fail to create webdav root folder");
+        logger.error("Fail to create webdav root folder");
+        logger.error(error);
+        return Promise.reject(error);
+      }
+    }
+  }
+}
+
+function createDirectory(path: string, config: WebdavConfig) {
+  const endpoint = getEndpoint(config);
+  return got(config.url + endpoint + path, {
+    method: "MKCOL" as Method,
+    headers: {
+      authorization:
+        "Basic " +
+        Buffer.from(config.username + ":" + config.password).toString("base64"),
+    },
+  });
+}
+
 // import fs from "fs";
 // import got from "got";
 // import https from "https";
