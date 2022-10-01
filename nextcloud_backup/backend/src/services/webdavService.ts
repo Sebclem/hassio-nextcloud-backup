@@ -1,15 +1,17 @@
+import { XMLParser } from "fast-xml-parser";
+import { createReadStream, statSync, unlinkSync } from "fs";
 import got, { HTTPError, Method } from "got";
+import { DateTime } from "luxon";
 import logger from "../config/winston.js";
 import messageManager from "../tools/messageManager.js";
+import * as pathTools from "../tools/pathTools.js";
+import * as statusTools from "../tools/status.js";
+import { WebdavBackup } from "../types/services/webdav.js";
 import { WebdavConfig } from "../types/services/webdavConfig.js";
 import { getEndpoint } from "./webdavConfigService.js";
-import * as pathTools from "../tools/pathTools.js";
-import { XMLParser } from "fast-xml-parser";
-import { WebdavBackup } from "../types/services/webdav.js";
-import { DateTime } from "luxon";
 
 const PROPFIND_BODY =
-'<?xml version="1.0" encoding="utf-8" ?>\
+  '<?xml version="1.0" encoding="utf-8" ?>\
 <d:propfind xmlns:d="DAV:">\
   <d:prop>\
         <d:getlastmodified />\
@@ -118,31 +120,97 @@ export function getBackups(folder: string, config: WebdavConfig) {
   );
 }
 
-
-function parseXmlBackupData(body: string){
+function parseXmlBackupData(body: string) {
   const parser = new XMLParser();
   const data = parser.parse(body);
   const multistatus = data["d:multistatus"];
   const backups: WebdavBackup[] = [];
-  if(Array.isArray(multistatus["d:response"])){
-    for(const elem of multistatus["d:response"]){
+  if (Array.isArray(multistatus["d:response"])) {
+    for (const elem of multistatus["d:response"]) {
       // If array -> base folder, ignoring it
-      if(!Array.isArray(elem["d:propstat"])){
+      if (!Array.isArray(elem["d:propstat"])) {
         const propstat = elem["d:propstat"];
-        const id = propstat["d:prop"]["d:getetag"].replaceAll("\"", "");
+        const id = propstat["d:prop"]["d:getetag"].replaceAll('"', "");
         const href = decodeURI(elem["d:href"]);
         const name = href.split("/").slice(-1)[0];
-        const lastEdit = DateTime.fromHTTP(propstat["d:prop"]["d:getlastmodified"]);
+        const lastEdit = DateTime.fromHTTP(
+          propstat["d:prop"]["d:getlastmodified"]
+        );
         backups.push({
           id: id,
           lastEdit: lastEdit,
           size: propstat["d:prop"]["d:getcontentlenght"],
-          name: name
-        })
+          name: name,
+        });
       }
     }
   }
   return backups;
+}
+
+export function webdabUploadFile(
+  localPath: string,
+  webdavPath: string,
+  config: WebdavConfig
+) {
+  return new Promise((resolve, reject) => {
+    logger.info(`Uploading ${localPath} to webdav...`);
+    const stats = statSync(localPath);
+    const stream = createReadStream(localPath);
+    const options = {
+      body: stream,
+      headers: {
+        authorization:
+          "Basic " +
+          Buffer.from(config.username + ":" + config.password).toString(
+            "base64"
+          ),
+        "content-length": String(stats.size),
+      },
+      https: { rejectUnauthorized: !config.allowSelfSignedCerts },
+    };
+    const url =
+      config.url + getEndpoint(config) + config.backupDir + webdavPath;
+
+    logger.debug(`...URI: ${encodeURI(url)}`);
+    logger.debug(`...rejectUnauthorized: ${options.https?.rejectUnauthorized}`);
+    const status = statusTools.getStatus();
+    got.stream
+      .put(encodeURI(url), options)
+      .on("uploadProgress", (e) => {
+        const percent = e.percent;
+        if (status.progress !== percent) {
+          status.progress = percent;
+          statusTools.setStatus(status);
+        }
+        if (percent >= 1) {
+          logger.info("Upload done...");
+        }
+      })
+      .on("response", (res) => {
+        if (res.statusCode != 201 && res.statusCode != 204) {
+          messageManager.error(
+            "Fail to upload file to webdav.",
+            `Status code: ${res.statusCode}`
+          );
+          logger.error(
+            `Fail to upload file to webdav, Status code: ${res.statusCode}`
+          );
+          logger.error(status.message);
+          unlinkSync(localPath);
+          reject(res);
+        } else {
+          logger.info(`...Upload finish ! (status: ${res.statusCode})`);
+          unlinkSync(localPath);
+          resolve(undefined);
+        }
+      })
+      .on("error", (err) => {
+        logger.error(status.message);
+        logger.error(err.stack);
+        reject(status.message);
+      });
+  });
 }
 
 // import fs from "fs";
@@ -608,18 +676,6 @@ function parseXmlBackupData(body: string){
 //         });
 //     });
 //   }
-// }
-
-// function cleanTempFolder() {
-//   fs.readdir("./temp/", (err, files) => {
-//     if (err) throw err;
-
-//     for (const file of files) {
-//       fs.unlink(path.join("./temp/", file), (err) => {
-//         if (err) throw err;
-//       });
-//     }
-//   });
 // }
 
 // const INSTANCE = new WebdavTools();
