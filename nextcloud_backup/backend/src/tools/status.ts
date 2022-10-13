@@ -1,6 +1,6 @@
 import { publish_state } from "../services/homeAssistantService.js";
 import logger from "../config/winston.js"
-import { type Status } from "../types/status.js";
+import type { Status } from "../types/status.js";
 
 let status: Status = {
     status: "idle",

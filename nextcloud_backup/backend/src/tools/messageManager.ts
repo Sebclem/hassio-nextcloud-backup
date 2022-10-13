@@ -34,6 +34,10 @@ class MessageManager {
   public success(message: string, detail?: string) {
     this.addMessage(MessageType.SUCCESS, message, detail);
   }
+
+  public get(){
+    return this.messages;
+  }
 }
 
 
