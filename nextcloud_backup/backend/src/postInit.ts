@@ -9,6 +9,7 @@ import {
   getWebdavConfig,
   validateWebdavConfig,
 } from "./services/webdavConfigService.js";
+import messageManager from "./tools/messageManager.js";
 
 function postInit() {
   logger.info(`Log level: ${process.env.LOG_LEVEL}`);
@@ -61,11 +62,18 @@ function postInit() {
     (reason) => {
       logger.error("Webdav config: " + kleur.red().bold("FAIL !"));
       logger.error(reason);
+      messageManager.error("Invalid webdav config", reason.message);
     }
   );
 
   settingsTools.check(settingsTools.getSettings(), true);
   // cronTools.init();
+
+  messageManager.error("this is error");
+  messageManager.info("This is info");
+  messageManager.warn("re gerg rg ergrge r ");
+  messageManager.success("zefzegz gze gerg erg zegfze gerg erg aeferg erg erg er");
+  
 }
 
 export default postInit;

@@ -7,6 +7,8 @@
     "moduleResolution": "NodeNext",
     "target": "es6",
     "sourceMap": true,
+    "importsNotUsedAsValues": "error",
+    "strict": true,
   },
   "include": ["src/**/*"]
 }

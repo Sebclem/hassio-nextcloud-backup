@@ -6,8 +6,8 @@ import logger from "../config/winston.js";
 import messageManager from "../tools/messageManager.js";
 import * as pathTools from "../tools/pathTools.js";
 import * as statusTools from "../tools/status.js";
-import { WebdavBackup } from "../types/services/webdav.js";
-import { WebdavConfig } from "../types/services/webdavConfig.js";
+import type { WebdavBackup } from "../types/services/webdav.js";
+import type { WebdavConfig } from "../types/services/webdavConfig.js";
 import { getEndpoint } from "./webdavConfigService.js";
 
 const PROPFIND_BODY =

@@ -1,15 +1,14 @@
-import type { DateTime } from "luxon";
+
 
 export enum MessageType {
   ERROR = "ERROR",
   WARN = "WARN",
   INFO = "INFO",
-  SUCCESS = "SUCCESS"
+  SUCCESS = "SUCCESS",
 }
 
-
 export interface Message {
-  time: DateTime;
+  time: string;
   type: MessageType;
   message: string;
   viewed: boolean;

@@ -8,8 +8,8 @@ import logger from "../config/winston.js";
 import messageManager from "../tools/messageManager.js";
 import * as settingsTools from "../tools/settingsTools.js";
 import * as statusTools from "../tools/status.js";
-import { NewPartialBackupPayload } from "../types/services/ha_os_payload.js";
-import {
+import type { NewPartialBackupPayload } from "../types/services/ha_os_payload.js";
+import type {
   AddonData,
   AddonModel,
   BackupData,
@@ -18,7 +18,7 @@ import {
   CoreInfoBody,
   SupervisorResponse,
 } from "../types/services/ha_os_response.js";
-import { Status } from "../types/status.js";
+import type { Status } from "../types/status.js";
 
 const pipeline = promisify(stream.pipeline);
 

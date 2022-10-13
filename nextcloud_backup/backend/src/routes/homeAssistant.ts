@@ -14,5 +14,4 @@ homeAssistantRouter.get("/backups/", (req, res, next) => {
 });
 
 
-
 export default homeAssistantRouter;

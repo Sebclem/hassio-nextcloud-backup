@@ -3,7 +3,7 @@ import fs from "fs";
 
 import { DateTime } from "luxon";
 import logger from "../config/winston.js";
-import { Settings } from "../types/settings.js";
+import type { Settings } from "../types/settings.js";
 
 const settingsPath = "/data/backup_conf.json";
 
