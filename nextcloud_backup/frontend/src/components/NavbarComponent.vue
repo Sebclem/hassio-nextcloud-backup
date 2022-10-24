@@ -12,19 +12,33 @@
     <v-btn icon id="message-btn">
       <v-icon>mdi-bell</v-icon>
     </v-btn>
-    <v-btn icon @click="emit('settingClick')">
-      <v-icon>mdi-cog</v-icon>
-    </v-btn>
+    <v-menu width="210px">
+      <template v-slot:activator="{ props }">
+        <v-btn icon v-bind="props">
+          <v-icon>mdi-cog</v-icon>
+        </v-btn>
+      </template>
+      <v-list>
+        <v-list-item
+          title="Cloud settings"
+          @click="dialogStatusStore.webdav = true"
+          prepend-icon="mdi-cloud"
+        ></v-list-item>
+        <v-list-item
+          title="Backup settings"
+          prepend-icon="mdi-rotate-left"
+          @click="dialogStatusStore.backup = true"
+        ></v-list-item>
+      </v-list>
+    </v-menu>
   </v-app-bar>
 </template>
 
 <script setup lang="ts">
+import { useDialogStatusStore } from "@/stores/dialogStatus";
 import logoUrl from "../assets/logo.svg";
 
-const emit = defineEmits<{
-  (e: "settingClick"): void;
-  (e: "notificationClick"): void;
-}>();
+const dialogStatusStore = useDialogStatusStore();
 </script>
 <style scoped>
 .shake {

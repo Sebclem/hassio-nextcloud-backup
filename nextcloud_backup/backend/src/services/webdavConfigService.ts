@@ -14,7 +14,9 @@ const NEXTCLOUD_ENDPOINT = "/remote.php/dav/files/$username";
 
 export function validateWebdavConfig(config: WebdavConfig) {
   const validator = Joi.object(WebdavConfigValidation);
-  return validator.validateAsync(config);
+  return validator.validateAsync(config, {
+    abortEarly: false
+  });
 }
 
 export function saveWebdavConfig(config: WebdavConfig) {

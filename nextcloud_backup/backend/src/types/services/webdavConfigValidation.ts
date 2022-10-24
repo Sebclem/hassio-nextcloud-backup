@@ -3,7 +3,7 @@ import { WebdavEndpointType } from "./webdavConfig.js";
 
 
 const WebdavConfigValidation = {
-  url: Joi.string().not().empty().required(),
+  url: Joi.string().not().empty().uri().required(),
   username: Joi.string().not().empty().required(),
   password: Joi.string().not().empty().required(),
   backupDir: Joi.string().required(),
