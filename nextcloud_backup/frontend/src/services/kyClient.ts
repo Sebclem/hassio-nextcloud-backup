@@ -1,7 +1,6 @@
 import ky from "ky";
-
 const kyClient = ky.create({
-  prefixUrl: "http://localhost:3000/v2/api",
+  prefixUrl: `${import.meta.env.VITE_API_URL}v2/api`,
 });
 
 export default kyClient;

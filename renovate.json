@@ -2,7 +2,8 @@
   "extends": [
     "config:base",
     ":prHourlyLimitNone",
-    ":prConcurrentLimitNone"
+    ":prConcurrentLimitNone",
+    "group:allNonMajor"
   ],
   "commitMessagePrefix": ":arrow_up:",
   "regexManagers": [
@@ -15,5 +16,8 @@
       "datasourceTemplate": "docker",
       "versioningTemplate": "semver"
     }
-  ]
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true
+  }
 }

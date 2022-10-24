@@ -10,7 +10,9 @@ const backupConfigPath = "/data/backupConfigV2.json";
 
 export function validateBackupConfig(config: BackupConfig){
   const validator = Joi.object(backupConfigValidation);
-  return validator.validateAsync(config);
+  return validator.validateAsync(config, {
+    abortEarly: false
+  });
 }
 
 export function saveBackupConfig(config: BackupConfig){
