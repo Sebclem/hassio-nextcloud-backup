@@ -67,11 +67,14 @@
 
 <script setup lang="ts">
 import { getMessages } from "@/services/messageService";
-import { MessageType, type Message } from "@/types/messages";
+import { useMessageStore } from "@/stores/message";
+import { MessageType } from "@/types/messages";
 import { DateTime } from "luxon";
+import { storeToRefs } from "pinia";
 import { onBeforeUnmount, ref } from "vue";
 
-const messages = ref<Message[]>([]);
+const messagesStore = useMessageStore();
+const { messages } = storeToRefs(messagesStore);
 
 const interval = setInterval(refreshMessages, 1000);
 

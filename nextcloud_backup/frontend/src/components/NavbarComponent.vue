@@ -9,8 +9,10 @@
       </div>
     </v-app-bar-title>
     <v-spacer></v-spacer>
-    <v-btn icon id="message-btn">
-      <v-icon>mdi-bell</v-icon>
+    <v-btn icon id="message-btn" >
+      <v-badge color="error" :content="countUnreadMessages">
+        <v-icon :class="{ shake: haveUnreadMessages }">mdi-bell</v-icon>
+      </v-badge>
     </v-btn>
     <v-menu width="210px">
       <template v-slot:activator="{ props }">
@@ -36,9 +38,13 @@
 
 <script setup lang="ts">
 import { useDialogStatusStore } from "@/stores/dialogStatus";
+import { useMessageStore } from "@/stores/message";
+import { storeToRefs } from "pinia";
 import logoUrl from "../assets/logo.svg";
 
 const dialogStatusStore = useDialogStatusStore();
+const messagesStore = useMessageStore();
+const { haveUnreadMessages, countUnreadMessages } = storeToRefs(messagesStore);
 </script>
 <style scoped>
 .shake {

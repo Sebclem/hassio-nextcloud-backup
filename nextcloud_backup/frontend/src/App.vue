@@ -1,11 +1,9 @@
 <template>
   <v-app>
     <navbar-component></navbar-component>
-    <v-main>
-      
-      <message-bar></message-bar>
-      <webdav-settings-menu></webdav-settings-menu>
-    </v-main>
+    <message-bar></message-bar>
+    <webdav-settings-menu></webdav-settings-menu>
+    <v-main> </v-main>
   </v-app>
 </template>
 
