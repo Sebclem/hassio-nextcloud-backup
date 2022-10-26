@@ -11,6 +11,8 @@
           hide-details="auto"
           v-model="data.url"
           :error-messages="errors.url"
+          :loading="loading"
+          color="orange"
         ></v-text-field>
       </v-col>
     </v-row>
@@ -24,6 +26,8 @@
           hide-details="auto"
           v-model="data.webdavEndpoint.type"
           :error-messages="errors.type"
+          :loading="loading"
+          color="orange"
         >
         </v-select>
       </v-col>
@@ -39,19 +43,22 @@
           hide-details="auto"
           v-model="data.webdavEndpoint.customEndpoint"
           :error-messages="errors.customEndpoint"
+          :loading="loading"
+          color="orange"
         ></v-text-field>
       </v-col>
     </v-row>
     <v-row>
       <v-col class="d-flex align-content-end">
         <v-switch
-          color="warning"
           label="Allow Self Signed Certificate"
           v-model="data.allowSelfSignedCerts"
           hide-details="auto"
           density="compact"
           inset
           :error-messages="errors.allowSelfSignedCerts"
+          :loading="loading"
+          color="orange"
         ></v-switch>
       </v-col>
     </v-row>
@@ -83,6 +90,8 @@
           hide-details="auto"
           v-model="data.username"
           :error-messages="errors.username"
+          :loading="loading"
+          color="orange"
         >
         </v-text-field>
       </v-col>
@@ -97,6 +106,8 @@
           hide-details="auto"
           v-model="data.password"
           :error-messages="errors.password"
+          :loading="loading"
+          color="orange"
         ></v-text-field>
       </v-col>
     </v-row>
@@ -114,6 +125,8 @@
           hide-details="auto"
           v-model="data.backupDir"
           :error-messages="errors.backupDir"
+          :loading="loading"
+          color="orange"
         ></v-text-field>
       </v-col>
     </v-row>
@@ -130,6 +143,8 @@ import {
 } from "../../services/ConfigService";
 import { ref } from "vue";
 import { HTTPError } from "ky";
+
+const loading = ref(true);
 
 const items = [
   {
@@ -167,13 +182,16 @@ const emit = defineEmits<{
   (e: "success"): void;
   (e: "fail"): void;
   (e: "loaded"): void;
+  (e: "loading"): void;
 }>();
 
 function save() {
+  loading.value = true;
   clearErrors();
   saveWebdavConfig(data.value)
     .then(() => {
       emit("success");
+      loading.value = false;
     })
     .catch(async (reason) => {
       if (reason instanceof HTTPError) {
@@ -186,6 +204,7 @@ function save() {
         }
       }
       emit("fail");
+      loading.value = false;
     });
 }
 
@@ -196,10 +215,11 @@ function clearErrors() {
 }
 
 function loadData() {
-  console.log("ok");
+  emit("loading");
   getWebdavConfig().then((value) => {
     data.value = value;
     emit("loaded");
+    loading.value = false;
   });
 }
 
