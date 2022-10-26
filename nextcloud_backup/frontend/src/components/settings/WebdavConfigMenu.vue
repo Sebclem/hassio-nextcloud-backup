@@ -15,6 +15,7 @@
           @fail="saving = false"
           @success="dialogStatusStore.webdav = false"
           @loaded="loading = false"
+          @loading="loading = true"
         ></webdav-settings-form>
       </v-card-text>
       <v-divider></v-divider>
