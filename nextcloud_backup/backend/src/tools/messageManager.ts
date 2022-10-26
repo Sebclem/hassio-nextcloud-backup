@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { DateTime } from "luxon";
 import { Message, MessageType } from "../types/message.js";
 
@@ -8,6 +9,7 @@ class MessageManager {
 
   public addMessage(type: MessageType, message: string, detail?: string, isImportant = false) {
     this.messages.push({
+      id: randomUUID(),
       message: message,
       type: type,
       time: DateTime.now(),

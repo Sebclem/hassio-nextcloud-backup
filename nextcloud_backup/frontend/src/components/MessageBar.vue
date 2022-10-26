@@ -9,7 +9,7 @@
       <v-divider></v-divider>
       <v-responsive max-height="350px" class="overflow-y-auto">
         <v-list class="py-0">
-          <template v-for="(item, index) in messages" :key="item.message">
+          <template v-for="(item, index) in messages" :key="item.id">
             <v-divider v-if="index != 0"></v-divider>
             <v-list-item :class="{ 'bg-brown-darken-4': !item.viewed }">
               <v-list-item-title>
@@ -69,13 +69,17 @@
 import { getMessages } from "@/services/messageService";
 import { MessageType, type Message } from "@/types/messages";
 import { DateTime } from "luxon";
-import { ref } from "vue";
+import { onBeforeUnmount, ref } from "vue";
 
 const messages = ref<Message[]>([]);
 
-getMessages().then((values) => {
-  messages.value = values;
-});
+const interval = setInterval(refreshMessages, 1000);
+
+function refreshMessages() {
+  getMessages().then((values) => {
+    messages.value = values;
+  });
+}
 
 function getMessageColor(messageType: MessageType) {
   switch (messageType) {
@@ -132,6 +136,10 @@ function getTimeDelta(time: string) {
     } as any);
   }
 }
-
 const show = ref<boolean[]>([]);
+refreshMessages();
+
+onBeforeUnmount(() => {
+  clearInterval(interval);
+});
 </script>

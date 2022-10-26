@@ -9,6 +9,7 @@ export enum MessageType {
 
 
 export interface Message {
+  id: string;
   time: DateTime;
   type: MessageType;
   message: string;
