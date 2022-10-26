@@ -36,7 +36,7 @@
                 <v-btn
                   color="success"
                   variant="text"
-                  @click.stop
+                  @click="markReaded(item.id)"
                   icon
                   v-if="!item.viewed"
                   size="small"
@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { getMessages } from "@/services/messageService";
+import * as messageService from "@/services/messageService";
 import { useMessageStore } from "@/stores/message";
 import { MessageType } from "@/types/messages";
 import { DateTime } from "luxon";
@@ -76,10 +76,10 @@ import { onBeforeUnmount, ref } from "vue";
 const messagesStore = useMessageStore();
 const { messages } = storeToRefs(messagesStore);
 
-const interval = setInterval(refreshMessages, 1000);
+const interval = setInterval(refreshMessages, 2000);
 
 function refreshMessages() {
-  getMessages().then((values) => {
+  messageService.getMessages().then((values) => {
     messages.value = values;
   });
 }
@@ -141,6 +141,12 @@ function getTimeDelta(time: string) {
 }
 const show = ref<boolean[]>([]);
 refreshMessages();
+
+function markReaded(id: string) {
+  messageService.markRead(id).then((values) => {
+    messages.value = values;
+  });
+}
 
 onBeforeUnmount(() => {
   clearInterval(interval);

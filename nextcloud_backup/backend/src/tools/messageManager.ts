@@ -40,6 +40,19 @@ class MessageManager {
   public get(){
     return this.messages;
   }
+
+  public getById(id: string){
+    return this.messages.find(value=>value.id == id);
+  } 
+
+  public markReaded(id: string){
+    const index = this.messages.findIndex(value=>value.id == id);
+    if(index == -1){
+      return false;
+    }
+    this.messages[index].viewed = true;
+    return true;
+  }
 }
 
 
