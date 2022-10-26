@@ -9,10 +9,15 @@
       </div>
     </v-app-bar-title>
     <v-spacer></v-spacer>
-    <v-btn icon id="message-btn" >
-      <v-badge color="error" :content="countUnreadMessages">
-        <v-icon :class="{ shake: haveUnreadMessages }">mdi-bell</v-icon>
+    <v-btn icon id="message-btn">
+      <v-badge
+        color="error"
+        :content="countUnreadMessages"
+        v-if="haveUnreadMessages"
+      >
+        <v-icon class="shake">mdi-bell</v-icon>
       </v-badge>
+      <v-icon v-else>mdi-bell</v-icon>
     </v-btn>
     <v-menu width="210px">
       <template v-slot:activator="{ props }">
