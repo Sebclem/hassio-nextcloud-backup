@@ -31,18 +31,23 @@
                   @click="show[index] = show[index] ? false : true"
                   size="small"
                 >
-                  <v-icon>mdi-information</v-icon>
+                  <v-icon>
+                    {{ show[index] ? "mdi-chevron-up" : "mdi-information" }}
+                  </v-icon>
                 </v-btn>
-                <v-btn
-                  color="success"
-                  variant="text"
-                  @click="markReaded(item.id)"
-                  icon
-                  v-if="!item.viewed"
-                  size="small"
-                >
-                  <v-icon>mdi-check</v-icon>
-                </v-btn>
+                <v-scroll-x-transition>
+                  <v-btn
+                    color="success"
+                    variant="text"
+                    @click="markReaded(item.id)"
+                    icon
+                    v-show="!item.viewed"
+                    size="small"
+                  >
+                    <v-icon>mdi-check</v-icon>
+                  </v-btn>
+                </v-scroll-x-transition>
+
                 <div class="text-caption text-disabled ml-1">
                   {{ getTimeDelta(item.time) }}
                 </div>

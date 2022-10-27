@@ -17,6 +17,7 @@
     "ky": "^0.31.4",
     "luxon": "^3.0.4",
     "pinia": "^2.0.23",
+    "pretty-bytes": "^6.0.0",
     "roboto-fontface": "*",
     "vue": "^3.2.40",
     "vuetify": "3.0.0-beta.15",

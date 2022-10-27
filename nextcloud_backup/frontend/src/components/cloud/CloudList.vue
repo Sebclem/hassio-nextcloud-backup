@@ -16,23 +16,13 @@
                     class="text-center text-subtitle-2 text-disabled"
                     >Folder is empty</v-list-item
                   >
-                  <template v-for="(item, index) in autoBackups" :key="item.id">
-                    <v-divider
-                      v-if="index != 0"
-                      color="grey-darken-3"
-                    ></v-divider>
-                    <v-list-item>
-                      <v-list-item-title>{{ item.name }}</v-list-item-title>
-                      <template v-slot:append>
-                        <v-btn variant="text" icon color="secondary">
-                          <v-icon>mdi-information</v-icon>
-                        </v-btn>
-                        <v-btn variant="text" icon color="red">
-                          <v-icon>mdi-trash-can</v-icon>
-                        </v-btn>
-                      </template>
-                    </v-list-item>
-                  </template>
+                  <cloud-list-item
+                    v-for="(item, index) in autoBackups"
+                    :key="item.id"
+                    :item="item"
+                    :index="index"
+                  >
+                  </cloud-list-item>
                 </v-list>
               </v-card-text>
             </v-card>
@@ -50,26 +40,13 @@
                     class="text-center text-subtitle-2 text-disabled"
                     >Folder is empty</v-list-item
                   >
-                  <template
+                  <cloud-list-item
                     v-for="(item, index) in manualBackups"
                     :key="item.id"
+                    :item="item"
+                    :index="index"
                   >
-                    <v-divider
-                      v-if="index != 0"
-                      color="grey-darken-3"
-                    ></v-divider>
-                    <v-list-item>
-                      <v-list-item-title>{{ item.name }}</v-list-item-title>
-                      <template v-slot:append>
-                        <v-btn variant="text" icon color="secondary">
-                          <v-icon>mdi-information</v-icon>
-                        </v-btn>
-                        <v-btn variant="text" icon color="red">
-                          <v-icon>mdi-trash-can</v-icon>
-                        </v-btn>
-                      </template>
-                    </v-list-item>
-                  </template>
+                  </cloud-list-item>
                 </v-list>
               </v-card-text>
             </v-card>
@@ -88,6 +65,9 @@ import {
   getManualBackupList,
 } from "@/services/webdavService";
 
+import CloudListItem from "./CloudListItem.vue";
+
+const popup = ref(false);
 const autoBackups = ref<WebdavBackup[]>([]);
 const manualBackups = ref<WebdavBackup[]>([]);
 function refreshBackup() {
@@ -98,6 +78,5 @@ function refreshBackup() {
     manualBackups.value = value;
   });
 }
-
 refreshBackup();
 </script>
