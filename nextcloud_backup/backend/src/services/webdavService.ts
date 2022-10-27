@@ -139,7 +139,7 @@ function parseXmlBackupData(body: string) {
         backups.push({
           id: id,
           lastEdit: lastEdit,
-          size: propstat["d:prop"]["d:getcontentlenght"],
+          size: propstat["d:prop"]["d:getcontentlength"],
           name: name,
         });
       }

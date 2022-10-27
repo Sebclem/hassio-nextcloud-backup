@@ -18,6 +18,7 @@ specifiers:
   npm-run-all: ^4.1.5
   pinia: ^2.0.23
   prettier: ^2.7.1
+  pretty-bytes: ^6.0.0
   roboto-fontface: '*'
   typescript: ~4.7.4
   vite: ^3.1.7
@@ -34,6 +35,7 @@ dependencies:
   ky: 0.31.4
   luxon: 3.0.4
   pinia: 2.0.23_rg374xhldfcyvjtaj3qktyfz5y
+  pretty-bytes: 6.0.0
   roboto-fontface: 0.10.0
   vue: 3.2.40
   vuetify: 3.0.0-beta.15_vdkwhj2kz5kpysy3rwb432nm3y
@@ -1840,6 +1842,11 @@ packages:
     engines: {node: '>=10.13.0'}
     hasBin: true
     dev: true
+
+  /pretty-bytes/6.0.0:
+    resolution: {integrity: sha512-6UqkYefdogmzqAZWzJ7laYeJnaXDy2/J+ZqiiMtS7t7OfpXWTlaeGMwX8U6EFvPV/YWWEKRkS8hKS4k60WHTOg==}
+    engines: {node: ^14.13.1 || >=16.0.0}
+    dev: false
 
   /punycode/2.1.1:
     resolution: {integrity: sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==}

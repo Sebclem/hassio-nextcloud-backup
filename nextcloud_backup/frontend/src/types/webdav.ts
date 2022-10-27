@@ -4,5 +4,5 @@ export interface WebdavBackup {
   id: string;
   name: string;
   size: number;
-  lastEdit: DateTime;
+  lastEdit: string;
 }
