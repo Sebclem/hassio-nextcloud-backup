@@ -5,4 +5,10 @@ export interface WebdavBackup {
   name: string;
   size: number;
   lastEdit: DateTime;
+  path: string;
+}
+
+
+export interface WebdavDelete {
+  path: string;
 }

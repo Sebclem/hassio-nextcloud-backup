@@ -8,3 +8,13 @@ export function getAutoBackupList() {
 export function getManualBackupList() {
   return kyClient.get("webdav/backup/manual").json<WebdavBackup[]>();
 }
+
+export function deleteWebdabBackup(path: string) {
+  return kyClient
+    .delete("webdav", {
+      json: {
+        path: path,
+      },
+    })
+    .text();
+}

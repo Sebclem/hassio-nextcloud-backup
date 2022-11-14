@@ -107,7 +107,7 @@ export function getBackups(folder: string, config: WebdavConfig) {
     body: PROPFIND_BODY,
   }).then(
     (value) => {
-      return parseXmlBackupData(value.body);
+      return parseXmlBackupData(value.body, config);
     },
     (reason) => {
       messageManager.error(
@@ -120,7 +120,28 @@ export function getBackups(folder: string, config: WebdavConfig) {
   );
 }
 
-function parseXmlBackupData(body: string) {
+export function deleteBackup(path: string, config: WebdavConfig){
+  const endpoint = getEndpoint(config);
+  return got.delete(config.url + endpoint + path, {
+    headers: {
+      authorization:
+        "Basic " +
+        Buffer.from(config.username + ":" + config.password).toString("base64")
+    }
+  }).then(
+    (response) => {
+      return response;
+    },
+    (reason) => {
+      messageManager.error("Fail to delete backup in webdav", reason?.message);
+      logger.error(`Fail to delete backup in Cloud`);
+      logger.error(reason);
+      return Promise.reject(reason);
+    }
+  );
+}
+
+function parseXmlBackupData(body: string, config: WebdavConfig) {
   const parser = new XMLParser();
   const data = parser.parse(body);
   const multistatus = data["d:multistatus"];
@@ -141,6 +162,7 @@ function parseXmlBackupData(body: string) {
           lastEdit: lastEdit,
           size: propstat["d:prop"]["d:getcontentlength"],
           name: name,
+          path: href.replace(getEndpoint(config), "")
         });
       }
     }

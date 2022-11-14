@@ -2,20 +2,19 @@ import fs from "fs";
 import Joi from "joi";
 import logger from "../config/winston.js";
 import { default_root } from "../tools/pathTools.js";
-import WebdavConfigValidation from "../types/services/webdavConfigValidation.js";
 import {
   WebdavConfig,
-  WebdavEndpointType,
+  WebdavEndpointType
 } from "../types/services/webdavConfig.js";
+import WebdavConfigValidation from "../types/services/webdavConfigValidation.js";
 
 const webdavConfigPath = "/data/webdavConfigV2.json";
-
 const NEXTCLOUD_ENDPOINT = "/remote.php/dav/files/$username";
 
 export function validateWebdavConfig(config: WebdavConfig) {
   const validator = Joi.object(WebdavConfigValidation);
   return validator.validateAsync(config, {
-    abortEarly: false
+    abortEarly: false,
   });
 }
 
@@ -35,16 +34,22 @@ export function getWebdavConfig(): WebdavConfig {
 }
 
 export function getEndpoint(config: WebdavConfig) {
+  let endpoint: string;
+
   if (config.webdavEndpoint.type == WebdavEndpointType.NEXTCLOUD) {
-    return NEXTCLOUD_ENDPOINT.replace("$username", config.username);
+    endpoint = NEXTCLOUD_ENDPOINT.replace("$username", config.username);
   } else if (config.webdavEndpoint.customEndpoint) {
-    return config.webdavEndpoint.customEndpoint.replace(
+    endpoint = config.webdavEndpoint.customEndpoint.replace(
       "$username",
       config.username
     );
   } else {
     return "";
   }
+  if (endpoint.endsWith("/")) {
+    return endpoint.slice(0, -1);
+  }
+  return endpoint;
 }
 
 export function getWebdavDefaultConfig(): WebdavConfig {

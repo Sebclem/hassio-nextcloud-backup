@@ -5,4 +5,9 @@ export interface WebdavBackup {
   name: string;
   size: number;
   lastEdit: string;
+  path: string;
+}
+
+export interface WebdavDeletePayload {
+  path: string;
 }

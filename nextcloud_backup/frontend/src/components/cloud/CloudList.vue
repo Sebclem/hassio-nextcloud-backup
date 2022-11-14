@@ -21,6 +21,7 @@
                     :key="item.id"
                     :item="item"
                     :index="index"
+                    @delete="deleteBackup"
                   >
                   </cloud-list-item>
                 </v-list>
@@ -45,6 +46,7 @@
                     :key="item.id"
                     :item="item"
                     :index="index"
+                    @delete="deleteBackup"
                   >
                   </cloud-list-item>
                 </v-list>
@@ -54,20 +56,22 @@
         </v-row>
       </v-card-text>
     </v-card>
+    <cloud-delete-dialog ref="deleteDialog"></cloud-delete-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onBeforeUnmount, ref } from "vue";
 import type { WebdavBackup } from "@/types/webdav";
 import {
   getAutoBackupList,
   getManualBackupList,
 } from "@/services/webdavService";
-
+import CloudDeleteDialog from "./CloudDeleteDialog.vue";
 import CloudListItem from "./CloudListItem.vue";
 
-const popup = ref(false);
+const deleteDialog = ref<InstanceType<typeof CloudDeleteDialog> | null>(null);
+const deleteItem = ref<WebdavBackup | null>(null);
 const autoBackups = ref<WebdavBackup[]>([]);
 const manualBackups = ref<WebdavBackup[]>([]);
 function refreshBackup() {
@@ -78,5 +82,16 @@ function refreshBackup() {
     manualBackups.value = value;
   });
 }
+
+function deleteBackup(item: WebdavBackup) {
+  deleteItem.value = item;
+  deleteDialog.value?.open(item);
+}
 refreshBackup();
+
+const interval = setInterval(refreshBackup, 2000);
+
+onBeforeUnmount(() => {
+  clearInterval(interval);
+});
 </script>
