@@ -380,12 +380,13 @@ class WebdavTools {
         return new Promise((resolve, reject) => {
             this.getFolderContent(this.getConf().back_dir + pathTools.auto)
                 .then(async (contents) => {
+                    
                     if (contents.length < limit) {
                         resolve();
                         return;
                     }
                     contents.sort((a, b) => {
-                        return a.date < b.date ? 1 : -1
+                        return Date.parse(b.lastmod) - Date.parse(a.lastmod)
                     });
 
                     let toDel = contents.slice(limit);

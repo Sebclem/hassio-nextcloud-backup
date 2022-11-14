@@ -295,7 +295,7 @@ function clean() {
                     return;
                 }
                 snaps.sort((a, b) => {
-                    return a.date < b.date ? 1 : -1
+                    return Date.parse(b.date) - Date.parse(a.date);
                 });
                 let toDel = snaps.slice(limit);
                 for (let i of toDel) {

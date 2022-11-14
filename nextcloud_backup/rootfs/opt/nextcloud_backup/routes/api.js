@@ -21,7 +21,7 @@ router.get("/formated-local-snap", function (req, res, next) {
     hassioApiTools.getSnapshots()
         .then((snaps) => {
             snaps.sort((a, b) => {
-                return a.date < b.date ? 1 : -1
+                return Date.parse(b.date) - Date.parse(a.date);
             });
 
             res.render("localSnaps", { snaps: snaps, DateTime: DateTime });
@@ -43,7 +43,7 @@ router.get("/formated-backup-manual", function (req, res, next) {
         .getFolderContent(webdav.getConf().back_dir + pathTools.manual)
         .then((contents) => {
             contents.sort((a, b) => {
-                return a.date < b.date ? 1 : -1
+                return Date.parse(b.lastmod) - Date.parse(a.lastmod)
             });
             //TODO Remove this when bug is fixed, etag contain '&quot;' at start and end ?
             for (let backup of contents) {
@@ -67,7 +67,7 @@ router.get("/formated-backup-auto", function (req, res, next) {
         .getFolderContent(url)
         .then((contents) => {
             contents.sort((a, b) => {
-                return a.date < b.date ? 1 : -1
+                return Date.parse(b.lastmod) - Date.parse(a.lastmod)
             });
             //TODO Remove this when bug is fixed, etag contain '&quot;' at start and end ?
             for (let backup of contents) {
