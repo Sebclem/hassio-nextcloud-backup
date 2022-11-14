@@ -20,7 +20,7 @@
     "pretty-bytes": "^6.0.0",
     "roboto-fontface": "*",
     "vue": "^3.2.40",
-    "vuetify": "3.0.0",
+    "vuetify": "3.0.1",
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
