@@ -1,5 +1,6 @@
 import express from "express";
 import Joi from "joi";
+import { getBackupConfig } from "../services/backupConfigService.js";
 import {
   getWebdavConfig,
   validateWebdavConfig,
@@ -13,10 +14,11 @@ const webdavRouter = express.Router();
 
 webdavRouter.get("/backup/auto", (req, res, next) => {
   const config = getWebdavConfig();
+  const backupConf = getBackupConfig();
   validateWebdavConfig(config)
     .then(async () => {
       const value = await webdavService
-        .getBackups(pathTools.auto, config);
+        .getBackups(pathTools.auto, config, backupConf.nameTemplate);
       res.json(value);
     })
     .catch((reason) => {
@@ -27,10 +29,11 @@ webdavRouter.get("/backup/auto", (req, res, next) => {
 
 webdavRouter.get("/backup/manual", (req, res, next) => {
   const config = getWebdavConfig();
+  const backupConf = getBackupConfig();
   validateWebdavConfig(config)
     .then(async () => {
       const value = await webdavService
-        .getBackups(pathTools.manual, config);
+        .getBackups(pathTools.manual, config, backupConf.nameTemplate);
       res.json(value);
     })
     .catch((reason) => {

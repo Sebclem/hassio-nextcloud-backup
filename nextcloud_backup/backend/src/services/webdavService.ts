@@ -8,6 +8,7 @@ import * as pathTools from "../tools/pathTools.js";
 import * as statusTools from "../tools/status.js";
 import type { WebdavBackup } from "../types/services/webdav.js";
 import type { WebdavConfig } from "../types/services/webdavConfig.js";
+import { templateToRegexp } from "./backupConfigService.js";
 import { getEndpoint } from "./webdavConfigService.js";
 
 const PROPFIND_BODY =
@@ -94,7 +95,11 @@ function createDirectory(path: string, config: WebdavConfig) {
   });
 }
 
-export function getBackups(folder: string, config: WebdavConfig) {
+export function getBackups(
+  folder: string,
+  config: WebdavConfig,
+  nameTemplate: string
+) {
   const endpoint = getEndpoint(config);
   return got(config.url + endpoint + config.backupDir + folder, {
     method: "PROPFIND" as Method,
@@ -107,7 +112,10 @@ export function getBackups(folder: string, config: WebdavConfig) {
     body: PROPFIND_BODY,
   }).then(
     (value) => {
-      return parseXmlBackupData(value.body, config);
+      const data = parseXmlBackupData(value.body, config).sort(
+        (a, b) => b.lastEdit.toMillis() - a.lastEdit.toMillis()
+      );
+      return extractBackupInfo(data, nameTemplate);
     },
     (reason) => {
       messageManager.error(
@@ -120,25 +128,56 @@ export function getBackups(folder: string, config: WebdavConfig) {
   );
 }
 
-export function deleteBackup(path: string, config: WebdavConfig){
+function extractBackupInfo(backups: WebdavBackup[], template: string) {
+  const regex = new RegExp(templateToRegexp(template));
+  for (const elem of backups) {
+    const match = elem.name.match(regex);
+    if (match?.groups?.date) {
+      let format = "yyyy-LL-dd";
+      let date = match.groups.date;
+      if (match.groups.hour) {
+        format += "+HHmm";
+        date += `+${match.groups.hour}`;
+      } else if (match.groups.hour_12) {
+        format += "+hhmma";
+        date += `+${match.groups.hour_12}`;
+      }
+
+      elem.creationDate = DateTime.fromFormat(date, format);
+    }
+    if(match?.groups?.version){
+      elem.haVersion = match.groups.version
+    }
+  }
+  return backups;
+}
+
+export function deleteBackup(path: string, config: WebdavConfig) {
   const endpoint = getEndpoint(config);
-  return got.delete(config.url + endpoint + path, {
-    headers: {
-      authorization:
-        "Basic " +
-        Buffer.from(config.username + ":" + config.password).toString("base64")
-    }
-  }).then(
-    (response) => {
-      return response;
-    },
-    (reason) => {
-      messageManager.error("Fail to delete backup in webdav", reason?.message);
-      logger.error(`Fail to delete backup in Cloud`);
-      logger.error(reason);
-      return Promise.reject(reason);
-    }
-  );
+  return got
+    .delete(config.url + endpoint + path, {
+      headers: {
+        authorization:
+          "Basic " +
+          Buffer.from(config.username + ":" + config.password).toString(
+            "base64"
+          ),
+      },
+    })
+    .then(
+      (response) => {
+        return response;
+      },
+      (reason) => {
+        messageManager.error(
+          "Fail to delete backup in webdav",
+          reason?.message
+        );
+        logger.error(`Fail to delete backup in Cloud`);
+        logger.error(reason);
+        return Promise.reject(reason);
+      }
+    );
 }
 
 function parseXmlBackupData(body: string, config: WebdavConfig) {
@@ -162,7 +201,7 @@ function parseXmlBackupData(body: string, config: WebdavConfig) {
           lastEdit: lastEdit,
           size: propstat["d:prop"]["d:getcontentlength"],
           name: name,
-          path: href.replace(getEndpoint(config), "")
+          path: href.replace(getEndpoint(config), ""),
         });
       }
     }

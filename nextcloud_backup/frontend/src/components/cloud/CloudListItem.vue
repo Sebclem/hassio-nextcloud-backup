@@ -26,19 +26,69 @@
   </v-list-item>
   <v-expand-transition>
     <v-card v-show="detail" variant="tonal" color="secondary" rounded="0">
-      <v-card-text class="d-flex justify-center">
-        <v-chip color="primary" variant="flat" class="mr-2" label>
-          <v-icon start icon="mdi-pencil"></v-icon>
-          {{
-            DateTime.fromISO(item.lastEdit).toLocaleString(
-              DateTime.DATETIME_MED
-            )
-          }}
-        </v-chip>
-        <v-chip color="success" variant="flat" label>
-          <v-icon start icon="mdi-database"></v-icon>
-          {{ prettyBytes(item.size) }}
-        </v-chip>
+      <v-card-text>
+        <v-row>
+          <v-col class="d-flex justify-center">
+            <v-tooltip text="Creation" location="top">
+              <template v-slot:activator="{ props }">
+                <v-chip
+                  color="primary"
+                  variant="flat"
+                  class="mr-2"
+                  label
+                  v-bind="props"
+                >
+                  <v-icon start icon="mdi-folder-plus"></v-icon>
+                  {{
+                    item.creationDate
+                      ? DateTime.fromISO(item.creationDate).toLocaleString(
+                          DateTime.DATETIME_MED
+                        )
+                      : "UNKNOWN"
+                  }}
+                </v-chip>
+              </template>
+            </v-tooltip>
+            <v-tooltip text="Home Assistant Version" location="top">
+              <template v-slot:activator="{ props }">
+                <v-chip color="success" variant="flat" label v-bind="props">
+                  <v-icon start icon="mdi-home-assistant"></v-icon>
+                  {{ item.haVersion ? item.haVersion : "UNKNOWN" }}
+                </v-chip>
+              </template>
+            </v-tooltip>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col class="d-flex justify-center">
+            <v-tooltip text="Last edit" location="top">
+              <template v-slot:activator="{ props }">
+                <v-chip
+                  color="primary"
+                  variant="flat"
+                  class="mr-2"
+                  label
+                  v-bind="props"
+                >
+                  <v-icon start icon="mdi-pencil"></v-icon>
+                  {{
+                    DateTime.fromISO(item.lastEdit).toLocaleString(
+                      DateTime.DATETIME_MED
+                    )
+                  }}
+                </v-chip>
+              </template>
+            </v-tooltip>
+            <v-tooltip text="Size" location="top">
+              <template v-slot:activator="{ props }">
+                <v-chip color="success" variant="flat" label v-bind="props">
+                  <v-icon start icon="mdi-database"></v-icon>
+                  {{ prettyBytes(item.size) }}
+                </v-chip>
+              </template>
+            </v-tooltip>
+          </v-col>
+        </v-row>
       </v-card-text>
       <v-divider class="mx-4"></v-divider>
       <v-card-actions class="justify-center">
