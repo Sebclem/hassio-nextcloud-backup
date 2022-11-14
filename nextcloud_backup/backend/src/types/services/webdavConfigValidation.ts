@@ -1,4 +1,4 @@
-import Joi, { not } from "joi";
+import Joi from "joi";
 import { WebdavEndpointType } from "./webdavConfig.js";
 
 

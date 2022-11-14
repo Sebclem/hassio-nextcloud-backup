@@ -1,27 +1,25 @@
 <template>
   <v-divider v-if="index != 0" color="grey-darken-3"></v-divider>
   <v-list-item>
-    <v-list-item-title class="text-deep-orange-darken-3">{{
-      item.name
-    }}</v-list-item-title>
+    <v-list-item-title>{{ item.name }}</v-list-item-title>
     <template v-slot:append>
       <v-scroll-x-transition>
         <v-chip
           color="primary"
           variant="flat"
           size="small"
-          class="mr-2"
+          class="mr-1"
           v-show="!detail"
         >
           {{
             DateTime.fromISO(item.lastEdit).toLocaleString(
-              DateTime.DATETIME_SHORT
+              DateTime.DATETIME_MED
             )
           }}
         </v-chip>
       </v-scroll-x-transition>
 
-      <v-btn variant="text" icon color="secondary" @click="detail = !detail">
+      <v-btn variant="text" icon color="success" @click="detail = !detail">
         <v-icon>{{ detail ? "mdi-chevron-up" : "mdi-information" }}</v-icon>
       </v-btn>
     </template>
@@ -33,7 +31,7 @@
           <v-icon start icon="mdi-pencil"></v-icon>
           {{
             DateTime.fromISO(item.lastEdit).toLocaleString(
-              DateTime.DATETIME_SHORT
+              DateTime.DATETIME_MED
             )
           }}
         </v-chip>
@@ -51,7 +49,7 @@
             </v-btn>
           </template>
         </v-tooltip>
-        <v-btn variant="outlined" color="red">
+        <v-btn variant="outlined" color="red" @click="emits('delete', item)">
           <v-icon>mdi-trash-can</v-icon>
         </v-btn>
       </v-card-actions>
@@ -61,13 +59,17 @@
 
 <script setup lang="ts">
 import type { WebdavBackup } from "@/types/webdav";
-import prettyBytes from "pretty-bytes";
 import { DateTime } from "luxon";
+import prettyBytes from "pretty-bytes";
 import { ref } from "vue";
 
 const detail = ref(false);
 defineProps<{
   item: WebdavBackup;
   index: number;
+}>();
+
+const emits = defineEmits<{
+  (e: "delete", item: WebdavBackup): void;
 }>();
 </script>
