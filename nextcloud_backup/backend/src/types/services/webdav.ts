@@ -6,6 +6,8 @@ export interface WebdavBackup {
   size: number;
   lastEdit: DateTime;
   path: string;
+  haVersion?: string;
+  creationDate?: DateTime;
 }
 
 
