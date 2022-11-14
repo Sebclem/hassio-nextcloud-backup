@@ -27,7 +27,7 @@ app.set("port", process.env.PORT || 3000);
 // );
 
 app.use(
-  morgan("dev", { stream: { write: (message) => logger.info(message) } })
+  morgan("dev", { stream: { write: (message) => logger.debug(message) } })
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
