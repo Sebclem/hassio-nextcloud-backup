@@ -25,7 +25,7 @@
             <template v-slot:default="{ expanded }">
               {{ CronModeFriendly[cron.mode] }}
               <v-spacer></v-spacer>
-              <v-fade-transition leave-absolute>
+              <v-fade-transition>
                 <v-chip
                   v-if="!expanded && cron.monthDay != undefined"
                   append-icon="mdi-calendar"
@@ -34,7 +34,7 @@
                   {{ cron.monthDay }}
                 </v-chip>
               </v-fade-transition>
-              <v-fade-transition leave-absolute>
+              <v-fade-transition>
                 <v-chip
                   v-if="!expanded && cron.weekday != undefined"
                   append-icon="mdi-calendar"
@@ -44,7 +44,7 @@
                   {{ weekdayFriendly[cron.weekday] }}
                 </v-chip>
               </v-fade-transition>
-              <v-fade-transition leave-absolute>
+              <v-fade-transition>
                 <v-chip
                   v-if="!expanded && cron.hour"
                   append-icon="mdi-clock"
@@ -54,7 +54,7 @@
                   {{ cron.hour }}
                 </v-chip>
               </v-fade-transition>
-              <v-fade-transition leave-absolute>
+              <v-fade-transition>
                 <v-chip
                   v-if="!expanded && cron.custom"
                   append-icon="mdi-clock-edit"
@@ -163,6 +163,12 @@
             </v-row>
           </v-expansion-panel-text>
         </v-expansion-panel>
+        <div
+          v-if="data.cron?.length == 0"
+          class="my-3 text-subtitle-2 text-medium-emphasis"
+        >
+          No auto backup configured
+        </div>
       </v-expansion-panels>
     </v-card-text>
   </v-card>

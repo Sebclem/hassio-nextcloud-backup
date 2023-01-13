@@ -45,9 +45,14 @@
         </v-sheet>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row dense>
       <v-col>
         <BackupConfigAutoBackup :loading="loading"></BackupConfigAutoBackup>
+      </v-col>
+    </v-row>
+    <v-row dense>
+      <v-col>
+        <BackupConfigAutoClean :loading="loading"></BackupConfigAutoClean>
       </v-col>
     </v-row>
   </v-form>
@@ -62,6 +67,7 @@ import { storeToRefs } from "pinia";
 import BackupConfigAddon from "./BackupConfig/BackupConfigAddon.vue";
 import BackupConfigAutoBackup from "./BackupConfig/BackupConfigAutoBackup.vue";
 import BackupConfigFolder from "./BackupConfig/BackupConfigFolder.vue";
+import BackupConfigAutoClean from "./BackupConfig/BackupConfigAutoClean.vue";
 
 const backupConfigStore = useBackupConfigStore();
 const { data } = storeToRefs(backupConfigStore);
