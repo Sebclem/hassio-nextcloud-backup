@@ -86,30 +86,6 @@ function getAddonToBackup(addons: AddonModel[]) {
   return slugs;
 }
 
-function getFolderList() {
-  return [
-    {
-      name: "Home Assistant configuration",
-      slug: "homeassistant",
-    },
-    {
-      name: "SSL",
-      slug: "ssl",
-    },
-    {
-      name: "Share",
-      slug: "share",
-    },
-    {
-      name: "Media",
-      slug: "media",
-    },
-    {
-      name: "Local add-ons",
-      slug: "addons/local",
-    },
-  ];
-}
 
 function getFolderToBackup() {
   const excluded_folder = settingsTools.getSettings().exclude_folder;
@@ -434,6 +410,32 @@ function startAddons(addonSlugs: string[]) {
   });
 }
 
+export function getFolderList() {
+  return [
+    {
+      name: "Home Assistant configuration",
+      slug: "homeassistant",
+    },
+    {
+      name: "SSL",
+      slug: "ssl",
+    },
+    {
+      name: "Share",
+      slug: "share",
+    },
+    {
+      name: "Media",
+      slug: "media",
+    },
+    {
+      name: "Local add-ons",
+      slug: "addons/local",
+    },
+  ];
+}
+
+
 function publish_state(state: Status) {
   // let data_error_sensor = {
   //     state: state.status == "error" ? "on" : "off",
@@ -501,7 +503,6 @@ function publish_state(state: Status) {
 export {
   getVersion,
   getAddonList,
-  getFolderList,
   getBackups,
   downloadSnapshot,
   createNewBackup,

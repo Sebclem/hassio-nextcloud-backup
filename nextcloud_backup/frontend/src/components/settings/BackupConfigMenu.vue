@@ -1,28 +1,28 @@
 <template>
   <v-dialog
-    v-model="dialogStatusStore.webdav"
+    v-model="dialogStatusStore.backup"
     persistent
     :width="width"
     :fullscreen="isFullScreen"
     scrollable
   >
     <v-card>
-      <v-card-title class="text-center">Cloud Settings</v-card-title>
+      <v-card-title class="text-center">Backup Settings</v-card-title>
       <v-divider></v-divider>
       <v-card-text>
-        <webdav-settings-form
+        <backup-config-form
           ref="form"
           @fail="saving = false"
           @success="saved"
           @loaded="loading = false"
           @loading="loading = true"
-        ></webdav-settings-form>
+        ></backup-config-form>
       </v-card-text>
       <v-divider></v-divider>
       <v-card-actions class="justify-end">
         <v-btn
           color="red"
-          @click="dialogStatusStore.webdav = false"
+          @click="dialogStatusStore.backup = false"
           :disabled="saving"
           >Cancel</v-btn
         >
@@ -35,13 +35,13 @@
 </template>
 
 <script setup lang="ts">
-import { useMenuSize } from "@/composable/menuSize";
 import { useDialogStatusStore } from "@/stores/dialogStatus";
 import { computed, ref } from "vue";
-import WebdavSettingsForm from "./WebdavConfigForm.vue";
+import { useMenuSize } from "@/composable/menuSize";
+import BackupConfigForm from "./BackupConfigForm.vue";
 
 const dialogStatusStore = useDialogStatusStore();
-const form = ref<InstanceType<typeof WebdavSettingsForm> | null>(null);
+const form = ref<InstanceType<typeof BackupConfigForm> | null>(null);
 const { width, isFullScreen } = useMenuSize();
 const loading = ref(true);
 const saving = ref(false);

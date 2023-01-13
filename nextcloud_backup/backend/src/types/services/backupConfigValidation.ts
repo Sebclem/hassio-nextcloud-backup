@@ -47,8 +47,8 @@ const backupConfigValidation = {
     webdav: Joi.object(AutoCleanConfig).required(),
   }).required(),
   exclude: Joi.object({
-    addon: Joi.array().items(Joi.string().not().empty()),
-    folder: Joi.array().items(Joi.string().not().empty()),
+    addon: Joi.array().items(Joi.string().not().empty()).required(),
+    folder: Joi.array().items(Joi.string().not().empty()).required(),
   }).required(),
   autoStopAddon: Joi.array().items(Joi.string().not().empty()),
   password: Joi.object({
