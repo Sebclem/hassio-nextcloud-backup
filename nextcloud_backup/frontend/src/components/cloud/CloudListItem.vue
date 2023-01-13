@@ -59,7 +59,7 @@
             </v-tooltip>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row dense>
           <v-col class="d-flex justify-center">
             <v-tooltip text="Last edit" location="top">
               <template v-slot:activator="{ props }">
