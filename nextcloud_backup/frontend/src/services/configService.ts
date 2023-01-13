@@ -33,5 +33,9 @@ function cleanupConfig(config: BackupConfig) {
   if (!config.autoClean.webdav.enabled) {
     config.autoClean.webdav.nbrToKeep = undefined;
   }
+
+  if (!config.password.enabled){
+    config.password.value = undefined;
+  }
   return config;
 }

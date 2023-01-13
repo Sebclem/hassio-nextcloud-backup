@@ -9,7 +9,7 @@
           <v-row dense>
             <v-col>
               <v-switch
-                label="Auto clean Home Assistant Backups"
+                label="Auto clean Home Assistant backups"
                 v-model="data.autoClean.homeAssistant.enabled"
                 hide-details="auto"
                 density="compact"
@@ -42,7 +42,7 @@
           <v-row dense>
             <v-col>
               <v-switch
-                label="Auto clean Cloud Backups"
+                label="Auto clean Cloud backups"
                 v-model="data.autoClean.webdav.enabled"
                 hide-details="auto"
                 density="compact"
