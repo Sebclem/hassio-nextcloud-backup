@@ -6,11 +6,15 @@
       <v-card-text>
         <v-row>
           <v-col>
-            <v-card variant="outlined" elevation="5" color="grey-darken-2">
-              <v-card-title class="text-center text-white">Auto</v-card-title>
+            <v-card variant="elevated" elevation="7" height="100%">
+              <v-card-title
+                class="text-center text-white bg-light-blue-darken-4"
+              >
+                Auto
+              </v-card-title>
               <v-divider color="grey-darken-3"></v-divider>
               <v-card-text class="pa-0">
-                <v-list variant="tonal" class="pa-0">
+                <v-list class="pa-0">
                   <v-list-item
                     v-if="autoBackups.length == 0"
                     class="text-center text-subtitle-2 text-disabled"
@@ -31,11 +35,14 @@
         </v-row>
         <v-row>
           <v-col>
-            <v-card variant="outlined" elevation="5" color="grey-darken-2">
-              <v-card-title class="text-center text-white">Manual</v-card-title>
+            <v-card variant="elevated" elevation="7" height="100%">
+              <v-card-title
+                class="text-center text-white bg-light-blue-darken-4"
+                >Manual</v-card-title
+              >
               <v-divider color="grey-darken-3"></v-divider>
               <v-card-text class="pa-0">
-                <v-list variant="tonal" class="pa-0">
+                <v-list class="pa-0">
                   <v-list-item
                     v-if="manualBackups.length == 0"
                     class="text-center text-subtitle-2 text-disabled"

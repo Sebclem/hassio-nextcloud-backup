@@ -10,6 +10,7 @@ export interface WebdavConfig {
   password: string;
   backupDir: string;
   allowSelfSignedCerts: boolean
+  chunckedUpload: boolean
   webdavEndpoint: {
     type: WebdavEndpointType;
     customEndpoint?: string; 

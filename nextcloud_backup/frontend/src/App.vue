@@ -3,7 +3,8 @@
     <navbar-component></navbar-component>
     <message-bar></message-bar>
     <webdav-settings-menu></webdav-settings-menu>
-    <v-main class="mx-12"> 
+    <BackupConfigMenu></BackupConfigMenu>
+    <v-main class="mx-12">
       <v-row>
         <v-col cols="6" offset="6">
           <cloud-list></cloud-list>
@@ -18,6 +19,7 @@ import NavbarComponent from "./components/NavbarComponent.vue";
 import MessageBar from "./components/MessageBar.vue";
 import WebdavSettingsMenu from "./components/settings/WebdavConfigMenu.vue";
 import CloudList from "./components/cloud/CloudList.vue";
+import BackupConfigMenu from "./components/settings/BackupConfigMenu.vue";
 </script>
 
 <style scoped></style>

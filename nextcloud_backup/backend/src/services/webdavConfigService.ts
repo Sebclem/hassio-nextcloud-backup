@@ -59,6 +59,7 @@ export function getWebdavDefaultConfig(): WebdavConfig {
     password: "",
     backupDir: default_root,
     allowSelfSignedCerts: false,
+    chunckedUpload: false,
     webdavEndpoint: {
       type: WebdavEndpointType.NEXTCLOUD,
     },

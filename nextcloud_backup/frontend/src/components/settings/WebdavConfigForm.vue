@@ -48,7 +48,7 @@
         ></v-text-field>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row class="mt-0">
       <v-col class="d-flex align-content-end">
         <v-switch
           label="Allow Self Signed Certificate"
@@ -62,7 +62,21 @@
         ></v-switch>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row class="mt-0">
+      <v-col class="d-flex align-content-end">
+        <v-switch
+          label="Chunked Upload (Beta)"
+          v-model="data.chunckedUpload"
+          hide-details="auto"
+          density="compact"
+          inset
+          :error-messages="errors.chunckedUpload"
+          :loading="loading"
+          color="orange"
+        ></v-switch>
+      </v-col>
+    </v-row>
+    <v-row class="mt-0">
       <v-col><v-divider></v-divider></v-col>
     </v-row>
     <v-row>
@@ -133,18 +147,10 @@
   </v-form>
 </template>
 <script setup lang="ts">
-import {
-  WebdavEndpointType,
-  type WebdavConfig,
-} from "../../types/webdavConfig";
-import {
-  getWebdavConfig,
-  saveWebdavConfig,
-} from "../../services/ConfigService";
+import { WebdavEndpointType, type WebdavConfig } from "@/types/webdavConfig";
+import { getWebdavConfig, saveWebdavConfig } from "@/services/configService";
 import { ref } from "vue";
-import { HTTPError } from "ky";
-
-const loading = ref(true);
+import { useConfigForm } from "@/composable/ConfigForm";
 
 const items = [
   {
@@ -165,6 +171,7 @@ const errors = ref({
   allowSelfSignedCerts: [],
   type: [],
   customEndpoint: [],
+  chunckedUpload: [],
 });
 
 const data = ref<WebdavConfig>({
@@ -173,6 +180,7 @@ const data = ref<WebdavConfig>({
   backupDir: "",
   username: "",
   password: "",
+  chunckedUpload: false,
   webdavEndpoint: {
     type: WebdavEndpointType.NEXTCLOUD,
   },
@@ -185,44 +193,19 @@ const emit = defineEmits<{
   (e: "loading"): void;
 }>();
 
-function save() {
-  loading.value = true;
-  clearErrors();
-  saveWebdavConfig(data.value)
-    .then(() => {
-      emit("success");
-      loading.value = false;
-    })
-    .catch(async (reason) => {
-      if (reason instanceof HTTPError) {
-        const response = await reason.response.json();
-        if (Array.isArray(response)) {
-          for (let elem of response) {
-            errors.value[elem.context.key as keyof typeof errors.value] =
-              elem.message;
-          }
-        }
-      }
-      emit("fail");
-      loading.value = false;
-    });
-}
-
-function clearErrors() {
-  for (let elem in errors.value) {
-    errors.value[elem as keyof typeof errors.value] = [];
-  }
-}
-
 function loadData() {
-  emit("loading");
-  getWebdavConfig().then((value) => {
+  return getWebdavConfig().then((value) => {
     data.value = value;
-    emit("loaded");
-    loading.value = false;
+    return data;
   });
 }
 
-loadData();
+const { save, loading } = useConfigForm(
+  saveWebdavConfig,
+  loadData,
+  data,
+  errors,
+  emit
+);
 defineExpose({ save });
 </script>

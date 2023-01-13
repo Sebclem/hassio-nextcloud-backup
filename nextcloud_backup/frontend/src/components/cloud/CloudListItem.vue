@@ -1,6 +1,6 @@
 <template>
   <v-divider v-if="index != 0" color="grey-darken-3"></v-divider>
-  <v-list-item>
+  <v-list-item class="bg-grey-darken-3">
     <v-list-item-title>{{ item.name }}</v-list-item-title>
     <template v-slot:append>
       <v-scroll-x-transition>
