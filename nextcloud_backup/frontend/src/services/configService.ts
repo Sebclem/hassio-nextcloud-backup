@@ -21,7 +21,17 @@ export function getBackupConfig() {
 export function saveBackupConfig(config: BackupConfig) {
   return kyClient
     .put("config/backup", {
-      json: config,
+      json: cleanupConfig(config),
     })
     .json();
+}
+
+function cleanupConfig(config: BackupConfig) {
+  if (!config.autoClean.homeAssistant.enabled) {
+    config.autoClean.homeAssistant.nbrToKeep = undefined;
+  }
+  if (!config.autoClean.webdav.enabled) {
+    config.autoClean.webdav.nbrToKeep = undefined;
+  }
+  return config;
 }
