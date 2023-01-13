@@ -55,6 +55,17 @@
         <BackupConfigAutoClean :loading="loading"></BackupConfigAutoClean>
       </v-col>
     </v-row>
+    <v-row dense>
+      <v-col>
+        <BackupConfigAutoStop :loading="loading"></BackupConfigAutoStop>
+      </v-col>
+    </v-row>
+    <v-divider class="my-4"></v-divider>
+    <v-row class="mb-10">
+      <v-col>
+        <BackupConfigSecurity :loading="loading"></BackupConfigSecurity>
+      </v-col>
+    </v-row>
   </v-form>
 </template>
 <script setup lang="ts">
@@ -68,6 +79,8 @@ import BackupConfigAddon from "./BackupConfig/BackupConfigAddon.vue";
 import BackupConfigAutoBackup from "./BackupConfig/BackupConfigAutoBackup.vue";
 import BackupConfigFolder from "./BackupConfig/BackupConfigFolder.vue";
 import BackupConfigAutoClean from "./BackupConfig/BackupConfigAutoClean.vue";
+import BackupConfigSecurity from "./BackupConfig/BackupConfigSecurity.vue";
+import BackupConfigAutoStop from "./BackupConfig/BackupConfigAutoStop.vue";
 
 const backupConfigStore = useBackupConfigStore();
 const { data } = storeToRefs(backupConfigStore);
