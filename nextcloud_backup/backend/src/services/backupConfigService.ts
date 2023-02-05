@@ -1,7 +1,7 @@
 import fs from "fs";
 import Joi from "joi";
 import logger from "../config/winston.js";
-import type { BackupConfig } from "../types/services/backupConfig.js";
+import { BackupConfig, BackupType } from "../types/services/backupConfig.js";
 import backupConfigValidation from "../types/services/backupConfigValidation.js";
 
 const backupConfigPath = "/data/backupConfigV2.json";
@@ -40,10 +40,7 @@ export function getBackupDefaultConfig(): BackupConfig {
         enabled: false,
       },
     },
-    exclude: {
-      addon: [],
-      folder: [],
-    },
+    backupType: BackupType.FULL,
     autoStopAddon: [],
     password: {
       enabled: false,

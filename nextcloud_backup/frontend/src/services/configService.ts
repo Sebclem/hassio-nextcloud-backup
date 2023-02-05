@@ -1,4 +1,4 @@
-import type { BackupConfig } from "@/types/backupConfig";
+import { BackupType, type BackupConfig } from "@/types/backupConfig";
 import type { WebdavConfig } from "@/types/webdavConfig";
 import kyClient from "./kyClient";
 
@@ -27,6 +27,12 @@ export function saveBackupConfig(config: BackupConfig) {
 }
 
 function cleanupConfig(config: BackupConfig) {
+  if (config.backupType == BackupType.Full) {
+    config.exclude = undefined;
+  } else if (!config.exclude) {
+    config.exclude = { addon: [], folder: [] };
+  }
+
   if (!config.autoClean.homeAssistant.enabled) {
     config.autoClean.homeAssistant.nbrToKeep = undefined;
   }
@@ -34,7 +40,7 @@ function cleanupConfig(config: BackupConfig) {
     config.autoClean.webdav.nbrToKeep = undefined;
   }
 
-  if (!config.password.enabled){
+  if (!config.password.enabled) {
     config.password.value = undefined;
   }
   return config;
