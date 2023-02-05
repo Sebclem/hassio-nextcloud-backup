@@ -12,7 +12,7 @@
       <v-card-text>
         <webdav-settings-form
           ref="form"
-          @fail="saving = false"
+          @fail="fail"
           @success="saved"
           @loaded="loading = false"
           @loading="loading = true"
@@ -36,9 +36,12 @@
 
 <script setup lang="ts">
 import { useMenuSize } from "@/composable/menuSize";
+import { useAlertStore } from "@/stores/alert";
 import { useDialogStatusStore } from "@/stores/dialogStatus";
 import { computed, ref } from "vue";
 import WebdavSettingsForm from "./WebdavConfigForm.vue";
+
+const alertStore = useAlertStore();
 
 const dialogStatusStore = useDialogStatusStore();
 const form = ref<InstanceType<typeof WebdavSettingsForm> | null>(null);
@@ -55,8 +58,14 @@ function save() {
   form.value?.save();
 }
 
+function fail() {
+  saving.value = false;
+  alertStore.add("error", "Fail to save cloud settings !");
+}
+
 function saved() {
   dialogStatusStore.webdav = false;
   saving.value = false;
+  alertStore.add("success", "Cloud settings saved !");
 }
 </script>
