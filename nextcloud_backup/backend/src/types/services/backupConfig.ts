@@ -15,6 +15,11 @@ export enum Weekday {
   SATURDAY
 }
 
+export enum BackupType {
+  FULL= "FULL",
+  PARTIAL = "PARTIAL"
+}
+
 
 export interface BackupConfig {
   nameTemplate: string;
@@ -22,8 +27,9 @@ export interface BackupConfig {
   autoClean: {
     homeAssistant: AutoCleanConfig;
     webdav: AutoCleanConfig;
-  }
-  exclude: {
+  },
+  backupType: BackupType;
+  exclude?: {
     addon: string[];
     folder: string[];
   }

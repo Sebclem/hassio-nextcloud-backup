@@ -30,13 +30,33 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="12" md="6">
-        <BackupConfigFolder :loading="loading"></BackupConfigFolder>
-      </v-col>
-      <v-col cols="12" md="6">
-        <BackupConfigAddon :loading="loading"></BackupConfigAddon>
+      <v-col>
+        <div class="text-subtitle-1 text-medium-emphasis">Backup Type</div>
+        <v-select
+          :items="
+            Object.entries(BackupType).map((value) => {
+              return { title: value[0], value: value[1] };
+            })
+          "
+          v-model="data.backupType"
+          hide-details="auto"
+          density="compact"
+          variant="outlined"
+          color="orange"
+        >
+        </v-select>
       </v-col>
     </v-row>
+    <v-fade-transition>
+      <v-row v-if="data.backupType == BackupType.Partial">
+        <v-col cols="12" md="6">
+          <BackupConfigFolder :loading="loading"></BackupConfigFolder>
+        </v-col>
+        <v-col cols="12" md="6">
+          <BackupConfigAddon :loading="loading"></BackupConfigAddon>
+        </v-col>
+      </v-row>
+    </v-fade-transition>
     <v-divider class="my-4"></v-divider>
     <v-row>
       <v-col class="text-center">
@@ -81,6 +101,7 @@ import BackupConfigFolder from "./BackupConfig/BackupConfigFolder.vue";
 import BackupConfigAutoClean from "./BackupConfig/BackupConfigAutoClean.vue";
 import BackupConfigSecurity from "./BackupConfig/BackupConfigSecurity.vue";
 import BackupConfigAutoStop from "./BackupConfig/BackupConfigAutoStop.vue";
+import { BackupType } from "@/types/backupConfig";
 
 const backupConfigStore = useBackupConfigStore();
 const { data } = storeToRefs(backupConfigStore);

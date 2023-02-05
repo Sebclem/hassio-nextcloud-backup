@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { CronMode } from "./backupConfig.js";
+import { BackupType, CronMode } from "./backupConfig.js";
 
 const CronConfigValidation = {
   id: Joi.string().required().not().empty(),
@@ -46,10 +46,17 @@ const backupConfigValidation = {
     homeAssistant: Joi.object(AutoCleanConfig).required(),
     webdav: Joi.object(AutoCleanConfig).required(),
   }).required(),
-  exclude: Joi.object({
-    addon: Joi.array().items(Joi.string().not().empty()).required(),
-    folder: Joi.array().items(Joi.string().not().empty()).required(),
-  }).required(),
+  backupType: Joi.string()
+    .required()
+    .valid(BackupType.FULL, BackupType.PARTIAL),
+  exclude: Joi.alternatives().conditional("backupType", {
+    is: BackupType.PARTIAL,
+    then: Joi.object({
+      addon: Joi.array().items(Joi.string().not().empty()).required(),
+      folder: Joi.array().items(Joi.string().not().empty()).required(),
+    }).required(),
+    otherwise: Joi.forbidden(),
+  }),
   autoStopAddon: Joi.array().items(Joi.string().not().empty()),
   password: Joi.object({
     enabled: Joi.boolean().required(),
