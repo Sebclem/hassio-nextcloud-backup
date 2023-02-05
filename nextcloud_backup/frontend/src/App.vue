@@ -3,7 +3,8 @@
     <navbar-component></navbar-component>
     <message-bar></message-bar>
     <webdav-settings-menu></webdav-settings-menu>
-    <BackupConfigMenu></BackupConfigMenu>
+    <backup-config-menu></backup-config-menu>
+    <alert-manager></alert-manager>
     <v-main class="mx-12">
       <v-row>
         <v-col cols="6" offset="6">
@@ -15,11 +16,12 @@
 </template>
 
 <script setup lang="ts">
-import NavbarComponent from "./components/NavbarComponent.vue";
-import MessageBar from "./components/MessageBar.vue";
-import WebdavSettingsMenu from "./components/settings/WebdavConfigMenu.vue";
+import AlertManager from "./components/AlertManager.vue";
 import CloudList from "./components/cloud/CloudList.vue";
+import MessageBar from "./components/MessageBar.vue";
+import NavbarComponent from "./components/NavbarComponent.vue";
 import BackupConfigMenu from "./components/settings/BackupConfigMenu.vue";
+import WebdavSettingsMenu from "./components/settings/WebdavConfigMenu.vue";
 </script>
 
 <style scoped></style>

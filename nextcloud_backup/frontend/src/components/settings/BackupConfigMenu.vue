@@ -12,7 +12,7 @@
       <v-card-text>
         <backup-config-form
           ref="form"
-          @fail="saving = false"
+          @fail="fail"
           @success="saved"
           @loaded="loading = false"
           @loading="loading = true"
@@ -39,6 +39,9 @@ import { useDialogStatusStore } from "@/stores/dialogStatus";
 import { computed, ref } from "vue";
 import { useMenuSize } from "@/composable/menuSize";
 import BackupConfigForm from "./BackupConfigForm.vue";
+import { useAlertStore } from "@/stores/alert";
+
+const alertStore = useAlertStore();
 
 const dialogStatusStore = useDialogStatusStore();
 const form = ref<InstanceType<typeof BackupConfigForm> | null>(null);
@@ -55,8 +58,14 @@ function save() {
   form.value?.save();
 }
 
-function saved() {
-  dialogStatusStore.webdav = false;
+function fail() {
   saving.value = false;
+  alertStore.add("error", "Fail to save backup settings !");
+}
+
+function saved() {
+  dialogStatusStore.backup = false;
+  saving.value = false;
+  alertStore.add("success", "Backup settings saved !");
 }
 </script>
