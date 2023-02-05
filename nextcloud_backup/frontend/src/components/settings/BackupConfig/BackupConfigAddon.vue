@@ -32,17 +32,21 @@ import { watch } from "vue";
 defineProps<{ loading: boolean }>();
 const backupConfigStore = useBackupConfigStore();
 const { data, addons, invertedAddons } = storeToRefs(backupConfigStore);
-watch(invertedAddons, () => {
+watch(invertedAddons, manageInverted);
+
+manageInverted();
+
+function manageInverted() {
   if (!data.value.exclude) {
-    data.value.exclude = { addon: [], folder: [] };
+    backupConfigStore.initExcludes();
   }
-  data.value.exclude.addon = [];
+  data.value.exclude!.addon = [];
   for (const addon of addons.value) {
     if (!invertedAddons.value.includes(addon.slug)) {
-      data.value.exclude.addon.push(addon.slug);
+      data.value.exclude!.addon.push(addon.slug);
     }
   }
-});
+}
 </script>
 
 <style scoped></style>

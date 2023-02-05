@@ -33,14 +33,21 @@ defineProps<{ loading: boolean }>();
 const backupConfigStore = useBackupConfigStore();
 
 const { data, folders, invertedFolders } = storeToRefs(backupConfigStore);
-watch(invertedFolders, () => {
-  data.value.exclude.folder = [];
+watch(invertedFolders, manageInverted);
+
+manageInverted();
+
+function manageInverted() {
+  if (!data.value.exclude) {
+    backupConfigStore.initExcludes();
+  }
+  data.value.exclude!.folder = [];
   for (const folder of folders.value) {
     if (!invertedFolders.value.includes(folder.slug)) {
-      data.value.exclude.folder.push(folder.slug);
+      data.value.exclude!.folder.push(folder.slug);
     }
   }
-});
+}
 </script>
 
 <style scoped></style>
