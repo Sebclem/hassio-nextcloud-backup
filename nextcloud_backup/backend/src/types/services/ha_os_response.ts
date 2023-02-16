@@ -51,7 +51,7 @@ export interface BackupModel {
   slug: string;
   date: string;
   name: string;
-  type: string;
+  type: "full" | "partial";
   protected: boolean;
   content: BackupContent;
   compressed: boolean;
@@ -65,7 +65,7 @@ export interface BackupContent {
 
 export interface BackupDetailModel {
   slug: string;
-  type: string;
+  type: "full" | "partial";
   name: string;
   date: string;
   size: string;
@@ -76,7 +76,7 @@ export interface BackupDetailModel {
     name: string;
     version: string;
     size: number;
-  };
+  }[];
   repositories: string[];
   folders: string[];
 }

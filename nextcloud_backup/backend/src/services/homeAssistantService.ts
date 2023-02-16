@@ -185,7 +185,7 @@ function delSnap(id: string) {
   );
 }
 
-function checkSnap(id: string) {
+function getBackupInfo(id: string) {
   const option: OptionsOfJSONResponseBody = {
     headers: { authorization: `Bearer ${token}` },
     responseType: "json",
@@ -269,7 +269,7 @@ function clean(backups: BackupModel[]) {
     return;
   }
   backups.sort((a, b) => {
-    return a.date < b.date ? 1 : -1;
+    return Date.parse(b.date) - Date.parse(a.date);
   });
   const toDel = backups.slice(limit);
   for (const i of toDel) {
@@ -511,4 +511,5 @@ export {
   startAddons,
   clean,
   publish_state,
+  getBackupInfo
 };

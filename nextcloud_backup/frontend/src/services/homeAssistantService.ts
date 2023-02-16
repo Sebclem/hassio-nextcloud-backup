@@ -1,4 +1,9 @@
-import type { AddonData, Folder } from "@/types/homeAssistant";
+import type {
+  BackupDetailModel,
+  AddonData,
+  BackupModel,
+  Folder,
+} from "@/types/homeAssistant";
 import kyClient from "./kyClient";
 
 export function getFolders() {
@@ -7,4 +12,12 @@ export function getFolders() {
 
 export function getAddons() {
   return kyClient.get("homeAssistant/addons").json<AddonData>();
+}
+
+export function getBackups() {
+  return kyClient.get("homeAssistant/backups").json<BackupModel[]>();
+}
+
+export function getBackupDetail(slug: string) {
+  return kyClient.get(`homeAssistant/backup/${slug}`).json<BackupDetailModel>();
 }

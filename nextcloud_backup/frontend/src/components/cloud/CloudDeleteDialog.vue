@@ -3,7 +3,7 @@
     <v-dialog
       v-model="dialog"
       :width="width"
-      :fullscreen="xs"
+      :fullscreen="isFullScreen"
       :persistent="loading"
     >
       <v-card>
@@ -30,25 +30,17 @@
 </template>
 
 <script setup lang="ts">
+import { useMenuSize } from "@/composable/menuSize";
 import { deleteWebdabBackup } from "@/services/webdavService";
 import type { WebdavBackup } from "@/types/webdav";
 import { computed, ref } from "vue";
 import { useDisplay } from "vuetify/dist/vuetify";
 
-const { xs, mdAndDown } = useDisplay();
 const dialog = ref(false);
 const loading = ref(false);
 const item = ref<WebdavBackup | null>(null);
 
-const width = computed(() => {
-  if (xs.value) {
-    return undefined;
-  } else if (mdAndDown.value) {
-    return "80%";
-  } else {
-    return "50%";
-  }
-});
+const { width, isFullScreen } = useMenuSize();
 
 function confirm() {
   loading.value = true;
