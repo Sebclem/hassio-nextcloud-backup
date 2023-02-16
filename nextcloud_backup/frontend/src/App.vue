@@ -7,7 +7,10 @@
     <alert-manager></alert-manager>
     <v-main class="mx-12">
       <v-row>
-        <v-col cols="6" offset="6">
+        <v-col cols="6">
+          <ha-list></ha-list>
+        </v-col>
+        <v-col cols="6">
           <cloud-list></cloud-list>
         </v-col>
       </v-row>
@@ -18,6 +21,7 @@
 <script setup lang="ts">
 import AlertManager from "./components/AlertManager.vue";
 import CloudList from "./components/cloud/CloudList.vue";
+import HaList from "./components/homeAssistant/HaList.vue";
 import MessageBar from "./components/MessageBar.vue";
 import NavbarComponent from "./components/NavbarComponent.vue";
 import BackupConfigMenu from "./components/settings/BackupConfigMenu.vue";

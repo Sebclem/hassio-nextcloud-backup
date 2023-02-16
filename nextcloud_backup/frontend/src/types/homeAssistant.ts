@@ -22,3 +22,37 @@ export interface AddonModel {
   logo: boolean;
   state: string;
 }
+
+export interface BackupModel {
+  slug: string;
+  date: string;
+  name: string;
+  type: "full" | "partial";
+  protected: boolean;
+  content: BackupContent;
+  compressed: boolean;
+}
+
+export interface BackupContent {
+  homeassistant: boolean;
+  addons: string[];
+  folders: string[];
+}
+
+export interface BackupDetailModel {
+  slug: string;
+  type: "full" | "partial";
+  name: string;
+  date: string;
+  size: string;
+  protected: boolean;
+  homeassistant: string;
+  addons: {
+    slug: string;
+    name: string;
+    version: string;
+    size: number;
+  }[];
+  repositories: string[];
+  folders: string[];
+}
