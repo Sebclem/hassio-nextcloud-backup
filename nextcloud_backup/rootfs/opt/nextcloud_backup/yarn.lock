@@ -600,14 +600,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-xml-parser@npm:^3.19.0":
-  version: 3.21.1
-  resolution: "fast-xml-parser@npm:3.21.1"
+"fast-xml-parser@npm:^4.2.4":
+  version: 4.2.7
+  resolution: "fast-xml-parser@npm:4.2.7"
   dependencies:
-    strnum: ^1.0.4
+    strnum: ^1.0.5
   bin:
-    xml2js: cli.js
-  checksum: 73b9c907a424cc2f9b11a8a2f1b7448d936f1db6fa574b85cbe4be9739c2f77d99a827bb27d738a0db0047b20c71a5d663f64937fbdb9c38977fc6cd145221d2
+    fxparser: src/cli/cli.js
+  checksum: d8b0c9e04756f6c43fa0399428f30149acadae21350e42e26e8fe98e24e6afa6b9b00aa554453795036b00e9fee974a1b556fe2ba18be391d51a9bf1ab790e7c
   languageName: node
   linkType: hard
 
@@ -778,10 +778,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hot-patcher@npm:^0.5.0":
-  version: 0.5.0
-  resolution: "hot-patcher@npm:0.5.0"
-  checksum: 07d1dfa658e36aa9105a42569f7d6a7461bc65570358f80612545e1a6d44cb06c8f07a7c6128fd4b7d214c363137fd524523b9dfe130daf4bc7cddb5d60e8839
+"hot-patcher@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "hot-patcher@npm:1.0.0"
+  checksum: 7f410e5fe1a24498ff68821654df30d501b48f957bf577de86b36bd254947e355823557bd11f0707c043fc7765fc7f513250fd0a8d5150666e37af83157c68a8
   languageName: node
   linkType: hard
 
@@ -1041,6 +1041,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"minimatch@npm:^5.1.0":
+  version: 5.1.6
+  resolution: "minimatch@npm:5.1.6"
+  dependencies:
+    brace-expansion: ^2.0.1
+  checksum: 7564208ef81d7065a370f788d337cd80a689e981042cb9a1d0e6580b6c6a8c9279eba80010516e258835a988363f99f54a6f711a315089b8b42694f5da9d0d77
+  languageName: node
+  linkType: hard
+
 "morgan@npm:1.10.0":
   version: 1.10.0
   resolution: "morgan@npm:1.10.0"
@@ -1107,7 +1116,7 @@ __metadata:
     jquery: 3.6.0
     luxon: 3.0.1
     morgan: 1.10.0
-    webdav: 4.10.0
+    webdav: 4.11.3
     winston: 3.8.1
   languageName: unknown
   linkType: soft
@@ -1404,7 +1413,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"strnum@npm:^1.0.4":
+"strnum@npm:^1.0.5":
   version: 1.0.5
   resolution: "strnum@npm:1.0.5"
   checksum: 651b2031db5da1bf4a77fdd2f116a8ac8055157c5420f5569f64879133825915ad461513e7202a16d7fec63c54fd822410d0962f8ca12385c4334891b9ae6dd2
@@ -1496,24 +1505,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webdav@npm:4.10.0":
-  version: 4.10.0
-  resolution: "webdav@npm:4.10.0"
+"webdav@npm:4.11.3":
+  version: 4.11.3
+  resolution: "webdav@npm:4.11.3"
   dependencies:
     axios: ^0.27.2
     base-64: ^1.0.0
     byte-length: ^1.0.2
-    fast-xml-parser: ^3.19.0
+    fast-xml-parser: ^4.2.4
     he: ^1.2.0
-    hot-patcher: ^0.5.0
+    hot-patcher: ^1.0.0
     layerr: ^0.1.2
     md5: ^2.3.0
-    minimatch: ^5.0.1
+    minimatch: ^5.1.0
     nested-property: ^4.0.0
     path-posix: ^1.0.0
     url-join: ^4.0.1
     url-parse: ^1.5.10
-  checksum: 0cfea9c233cfb8c490b6f6be01cb789f20fd01dbfe0ebc8f89057000390117a7cdbd55501c5fc248f54f2393d529cc60a058bf982d96e7e2507a7c99528444ab
+  checksum: e5bfc66149088cd857c23a3a549650d7483dd5615cf1c4b6251a5b290a4ad8fef4975bfd99fca2d5842a0eaadc056bc0044e37893e0ad5447e6ce2e2dbd81da5
   languageName: node
   linkType: hard
 
