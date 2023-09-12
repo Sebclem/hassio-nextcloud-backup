@@ -40,7 +40,7 @@ jobs:
         uses: docker/setup-qemu-action@v2
 
       - name: Set up Docker Buildx ${{matrix.arch}}
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       - name: Set Version Prod ${{matrix.arch}}
         if: github.event_name != 'workflow_dispatch' && github.event_name != 'push'
