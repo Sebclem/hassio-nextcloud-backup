@@ -23,10 +23,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fortawesome/fontawesome-free@npm:6.1.2":
-  version: 6.1.2
-  resolution: "@fortawesome/fontawesome-free@npm:6.1.2"
-  checksum: 0d3c9d60ffbb9c1fa4041051eff6542adc1fc29653501399d0235c077a2195a35f286d979da42fe021f73649032f9eeae2c9a0511eaacda2896559155d40a0fc
+"@fortawesome/fontawesome-free@npm:6.5.1":
+  version: 6.5.1
+  resolution: "@fortawesome/fontawesome-free@npm:6.5.1"
+  checksum: 8905de0ad0cab9b6c4a3503267d96c9b34df703d3e1331e18f37f775722eaef9e93a55ead53cca6f5a68559c7cbc77dfd871e75a7932b2a54dfa99352b5dc7d3
   languageName: node
   linkType: hard
 
@@ -1093,7 +1093,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "nexcloud-backup@workspace:."
   dependencies:
-    "@fortawesome/fontawesome-free": 6.1.2
+    "@fortawesome/fontawesome-free": 6.5.1
     app-root-path: 3.0.0
     bootstrap: 5.1.3
     cookie-parser: 1.4.6
