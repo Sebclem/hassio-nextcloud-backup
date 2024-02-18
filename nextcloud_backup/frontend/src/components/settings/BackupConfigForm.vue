@@ -18,8 +18,6 @@
             <v-btn
               color="success"
               variant="outlined"
-              class="mt-n2"
-              height="auto"
               href="https://github.com/Sebclem/hassio-nextcloud-backup/blob/master/nextcloud_backup/naming_template.md"
               target="_blank"
             >
@@ -93,7 +91,7 @@ import { ref } from "vue";
 
 import { useConfigForm } from "@/composable/ConfigForm";
 import { saveBackupConfig } from "@/services/configService";
-import { useBackupConfigStore } from "@/stores/backupConfig";
+import { useBackupConfigStore } from "@/store/backupConfig";
 import { storeToRefs } from "pinia";
 import BackupConfigAddon from "./BackupConfig/BackupConfigAddon.vue";
 import BackupConfigAutoBackup from "./BackupConfig/BackupConfigAutoBackup.vue";
@@ -131,3 +129,4 @@ const { save, loading } = useConfigForm(
 );
 defineExpose({ save });
 </script>
+@/store/backupConfig

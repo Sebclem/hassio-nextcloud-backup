@@ -72,7 +72,7 @@
 
 <script setup lang="ts">
 import * as messageService from "@/services/messageService";
-import { useMessageStore } from "@/stores/message";
+import { useMessageStore } from "@/store/message";
 import { MessageType } from "@/types/messages";
 import { DateTime } from "luxon";
 import { storeToRefs } from "pinia";
@@ -157,3 +157,4 @@ onBeforeUnmount(() => {
   clearInterval(interval);
 });
 </script>
+@/store/message

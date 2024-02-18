@@ -3,7 +3,7 @@ import Joi from "joi";
 import logger from "../config/winston.js";
 import { default_root } from "../tools/pathTools.js";
 import {
-  WebdavConfig,
+  type WebdavConfig,
   WebdavEndpointType
 } from "../types/services/webdavConfig.js";
 import WebdavConfigValidation from "../types/services/webdavConfigValidation.js";

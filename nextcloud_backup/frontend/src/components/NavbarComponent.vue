@@ -42,8 +42,8 @@
 </template>
 
 <script setup lang="ts">
-import { useDialogStatusStore } from "@/stores/dialogStatus";
-import { useMessageStore } from "@/stores/message";
+import { useDialogStatusStore } from "@/store/dialogStatus";
+import { useMessageStore } from "@/store/message";
 import { storeToRefs } from "pinia";
 import logoUrl from "../assets/logo.svg";
 
@@ -86,3 +86,4 @@ const { haveUnreadMessages, countUnreadMessages } = storeToRefs(messagesStore);
   }
 }
 </style>
+@/store/dialogStatus@/store/message

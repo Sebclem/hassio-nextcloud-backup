@@ -3,11 +3,11 @@
   "compilerOptions": {
     "allowJs": true,
     "outDir": "./dist",
-    "module": "ES2022",
+    "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "target": "es6",
     "sourceMap": true,
-    "importsNotUsedAsValues": "error",
+    "verbatimModuleSyntax": true,
     "strict": true,
   },
   "include": ["src/**/*"]

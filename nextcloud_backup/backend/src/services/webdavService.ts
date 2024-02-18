@@ -1,6 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 import { createReadStream, statSync, unlinkSync } from "fs";
-import got, { HTTPError, Method } from "got";
+import got, { HTTPError, type Method } from "got";
 import { DateTime } from "luxon";
 import logger from "../config/winston.js";
 import messageManager from "../tools/messageManager.js";

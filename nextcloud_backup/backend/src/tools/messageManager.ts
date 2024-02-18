@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { DateTime } from "luxon";
-import { Message, MessageType } from "../types/message.js";
+import { type Message, MessageType } from "../types/message.js";
 
 const maxMessageLength = 255;
 

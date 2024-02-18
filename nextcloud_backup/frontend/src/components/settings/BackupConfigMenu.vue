@@ -35,11 +35,11 @@
 </template>
 
 <script setup lang="ts">
-import { useDialogStatusStore } from "@/stores/dialogStatus";
+import { useDialogStatusStore } from "@/store/dialogStatus";
 import { computed, ref } from "vue";
 import { useMenuSize } from "@/composable/menuSize";
 import BackupConfigForm from "./BackupConfigForm.vue";
-import { useAlertStore } from "@/stores/alert";
+import { useAlertStore } from "@/store/alert";
 
 const alertStore = useAlertStore();
 
@@ -69,3 +69,4 @@ function saved() {
   alertStore.add("success", "Backup settings saved !");
 }
 </script>
+@/store/dialogStatus@/store/alert

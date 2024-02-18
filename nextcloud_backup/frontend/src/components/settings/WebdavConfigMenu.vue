@@ -36,8 +36,8 @@
 
 <script setup lang="ts">
 import { useMenuSize } from "@/composable/menuSize";
-import { useAlertStore } from "@/stores/alert";
-import { useDialogStatusStore } from "@/stores/dialogStatus";
+import { useAlertStore } from "@/store/alert";
+import { useDialogStatusStore } from "@/store/dialogStatus";
 import { computed, ref } from "vue";
 import WebdavSettingsForm from "./WebdavConfigForm.vue";
 
@@ -69,3 +69,4 @@ function saved() {
   alertStore.add("success", "Cloud settings saved !");
 }
 </script>
+@/store/alert@/store/dialogStatus
