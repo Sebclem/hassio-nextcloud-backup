@@ -1,7 +1,7 @@
 import fs from "fs";
 
 import FormData from "form-data";
-import got, { OptionsOfJSONResponseBody, Response } from "got";
+import got, { type OptionsOfJSONResponseBody, type Response } from "got";
 import stream from "stream";
 import { promisify } from "util";
 import logger from "../config/winston.js";

@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { useBackupConfigStore } from "@/stores/backupConfig";
+import { useBackupConfigStore } from "@/store/backupConfig";
 import { storeToRefs } from "pinia";
 import { watch } from "vue";
 
@@ -51,3 +51,4 @@ function manageInverted() {
 </script>
 
 <style scoped></style>
+@/store/backupConfig

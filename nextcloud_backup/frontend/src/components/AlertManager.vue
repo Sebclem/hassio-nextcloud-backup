@@ -36,7 +36,7 @@
   </v-fade-transition>
 </template>
 <script lang="ts" setup>
-import { useAlertStore } from "@/stores/alert";
+import { useAlertStore } from "@/store/alert";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 
@@ -54,3 +54,4 @@ const alertVisible = computed(() => alertList.value.length > 0);
   z-index: 99999;
 }
 </style>
+@/store/alert

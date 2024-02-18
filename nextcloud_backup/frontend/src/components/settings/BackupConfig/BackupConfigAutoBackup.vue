@@ -175,7 +175,7 @@
 </template>
 
 <script setup lang="ts">
-import { useBackupConfigStore } from "@/stores/backupConfig";
+import { useBackupConfigStore } from "@/store/backupConfig";
 import {
   CronMode,
   CronModeFriendly,
@@ -198,3 +198,4 @@ const { data } = storeToRefs(backupConfigStore);
 </script>
 
 <style scoped></style>
+@/store/backupConfig

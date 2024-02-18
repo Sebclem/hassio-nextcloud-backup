@@ -25,10 +25,11 @@
 </template>
 
 <script setup lang="ts">
-import { useBackupConfigStore } from "@/stores/backupConfig";
+import { useBackupConfigStore } from "@/store/backupConfig";
 import { storeToRefs } from "pinia";
 
 defineProps<{ loading: boolean }>();
 const backupConfigStore = useBackupConfigStore();
 const { data, addons } = storeToRefs(backupConfigStore);
 </script>
+@/store/backupConfig

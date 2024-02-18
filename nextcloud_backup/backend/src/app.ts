@@ -1,5 +1,5 @@
 import cookieParser from "cookie-parser";
-import express, { NextFunction, Request, Response } from "express";
+import express, { type NextFunction, type Request, type Response } from "express";
 import createError from "http-errors";
 import morgan from "morgan";
 import path from "path";
