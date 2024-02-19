@@ -7,14 +7,19 @@ const maxMessageLength = 255;
 class MessageManager {
   private messages: Message[] = [];
 
-  public addMessage(type: MessageType, message: string, detail?: string, isImportant = false) {
-    this.messages.push({
+  public addMessage(
+    type: MessageType,
+    message: string,
+    detail?: string,
+    isImportant = false
+  ) {
+    this.messages.unshift({
       id: randomUUID(),
       message: message,
       type: type,
       time: DateTime.now(),
       viewed: !isImportant,
-      detail: detail
+      detail: detail,
     });
     if (this.messages.length > maxMessageLength) {
       this.messages.shift();
@@ -37,24 +42,28 @@ class MessageManager {
     this.addMessage(MessageType.SUCCESS, message, detail);
   }
 
-  public get(){
+  public get() {
     return this.messages;
   }
 
-  public getById(id: string){
-    return this.messages.find(value=>value.id == id);
-  } 
+  public getById(id: string) {
+    return this.messages.find((value) => value.id == id);
+  }
 
-  public markReaded(id: string){
-    const index = this.messages.findIndex(value=>value.id == id);
-    if(index == -1){
+  public markReaded(id: string) {
+    const index = this.messages.findIndex((value) => value.id == id);
+    if (index == -1) {
       return false;
     }
     this.messages[index].viewed = true;
     return true;
   }
+  public markAllReaded() {
+    this.messages.forEach((value: Message) => {
+      value.viewed = true;
+    });
+  }
 }
-
 
 const messageManager = new MessageManager();
 export default messageManager;
