@@ -10,6 +10,7 @@ import type { WebdavBackup } from "../types/services/webdav.js";
 import type { WebdavConfig } from "../types/services/webdavConfig.js";
 import { templateToRegexp } from "./backupConfigService.js";
 import { getEndpoint } from "./webdavConfigService.js";
+import { WebdabStatus } from "../types/status.js";
 
 const PROPFIND_BODY =
   '<?xml version="1.0" encoding="utf-8" ?>\
@@ -38,6 +39,13 @@ export function checkWebdavLogin(config: WebdavConfig) {
     },
     (reason) => {
       messageManager.error("Fail to connect to Webdav", reason?.message);
+      const status = statusTools.getStatus();
+      status.webdav = {
+        state: WebdabStatus.LOGIN_FAIL,
+        blocked: true,
+        last_check: DateTime.now()
+      }
+      statusTools.setStatus(status);
       logger.error(`Fail to connect to Webdav`);
       logger.error(reason);
       return Promise.reject(reason);
@@ -61,6 +69,13 @@ export async function createBackupFolder(conf: WebdavConfig) {
           messageManager.error("Fail to create webdav root folder");
           logger.error("Fail to create webdav root folder");
           logger.error(error);
+          const status = statusTools.getStatus();
+          status.webdav = {
+            state: WebdabStatus.MK_FOLDER_FAIL,
+            blocked: true,
+            last_check: DateTime.now()
+          }
+          statusTools.setStatus(status);
           return Promise.reject(error);
         }
       }

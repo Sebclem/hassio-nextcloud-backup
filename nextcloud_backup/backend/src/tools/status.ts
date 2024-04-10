@@ -1,40 +1,46 @@
 import { publish_state } from "../services/homeAssistantService.js";
-import logger from "../config/winston.js"
-import type { Status } from "../types/status.js";
+import logger from "../config/winston.js";
+import { type Status, WebdabStatus } from "../types/status.js";
+import { DateTime } from "luxon";
 
 let status: Status = {
-    status: "idle",
-    last_backup: undefined,
-    next_backup: undefined,
-    progress: -1,
+  status: "idle",
+  last_backup: undefined,
+  next_backup: undefined,
+  progress: -1,
+  webdav: {
+    state: WebdabStatus.INIT,
+    last_check: DateTime.now(),
+    blocked: true,
+  },
 };
 
 export function init() {
-    if (status.status !== "idle") {
-        status.status = "idle";
-        status.message = undefined;
-        status.progress = -1;
-    }
+  if (status.status !== "idle") {
+    status.status = "idle";
+    status.message = undefined;
+    status.progress = -1;
+  }
 }
 
 export function getStatus() {
-    return status;
+  return status;
 }
 
 export function setStatus(new_state: Status) {
-    const old_state_str = JSON.stringify(status);
-    if(old_state_str !== JSON.stringify(new_state)){
-        status = new_state;
-        publish_state(status);
-    }
+  const old_state_str = JSON.stringify(status);
+  if (old_state_str !== JSON.stringify(new_state)) {
+    status = new_state;
+    publish_state(status);
+  }
 }
 
-export function setError(message: string, error_code: number){
-    // Check if we don't have another error stored
-    if (status.status != "error") {
-        status.status = "error"
-        status.message = message
-        status.error_code = error_code;
-    }
-    logger.error(message);
+export function setError(message: string, error_code: number) {
+  // Check if we don't have another error stored
+  if (status.status != "error") {
+    status.status = "error";
+    status.message = message;
+    status.error_code = error_code;
+  }
+  logger.error(message);
 }

@@ -9,3 +9,5 @@
 - `7` => Fail to download snap
 - `8` => Fail to stop addon
 - `9` => Fail to start addon
+
+
