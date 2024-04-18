@@ -12,6 +12,10 @@ let status: Status = {
     folder_created: false,
     last_check: DateTime.now(),
   },
+  hass: {
+    ok: false,
+    last_check: DateTime.now(),
+  },
 };
 
 export function init() {

@@ -25,4 +25,8 @@ export interface Status {
     folder_created: boolean;
     last_check: DateTime;
   };
+  hass: {
+    ok: boolean;
+    last_check: DateTime;
+  };
 }

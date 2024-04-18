@@ -24,6 +24,7 @@ import type {
   SupervisorResponse,
 } from "../types/services/ha_os_response.js";
 import { States, type Status } from "../types/status.js";
+import { DateTime } from "luxon";
 
 const pipeline = promisify(stream.pipeline);
 
@@ -113,9 +114,17 @@ function getBackups(): Promise<Response<SupervisorResponse<BackupData>>> {
     option
   ).then(
     (result) => {
+      const status = statusTools.getStatus();
+      status.hass.ok = true;
+      status.hass.last_check = DateTime.now();
+      statusTools.setStatus(status);
       return result;
     },
     (error) => {
+      const status = statusTools.getStatus();
+      status.hass.ok = false;
+      status.hass.last_check = DateTime.now();
+      statusTools.setStatus(status);
       messageManager.error("Fail to fetch Hassio backups", error?.message);
       return Promise.reject(error);
     }
