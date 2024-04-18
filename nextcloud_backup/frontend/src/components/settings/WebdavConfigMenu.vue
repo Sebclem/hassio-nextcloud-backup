@@ -53,6 +53,10 @@ let saveLoading = computed(() => {
   return saving.value || loading.value;
 });
 
+const emit = defineEmits<{
+  (e: "saved"): void;
+}>();
+
 function save() {
   saving.value = true;
   form.value?.save();
@@ -60,13 +64,16 @@ function save() {
 
 function fail() {
   saving.value = false;
-  alertStore.add("error", "Fail to save cloud settings !");
+  alertStore.add(
+    "error",
+    "Fail to connect to Cloud<br>Please check credentials !"
+  );
 }
 
 function saved() {
   dialogStatusStore.webdav = false;
   saving.value = false;
   alertStore.add("success", "Cloud settings saved !");
+  emit("saved");
 }
 </script>
-@/store/alert@/store/dialogStatus
