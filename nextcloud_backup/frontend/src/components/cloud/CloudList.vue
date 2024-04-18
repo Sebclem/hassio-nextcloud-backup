@@ -1,7 +1,20 @@
 <template>
   <div>
-    <v-card elevation="10" class="mt-10" border>
-      <v-card-title class="text-center"> Cloud </v-card-title>
+    <v-card elevation="10" border>
+      <v-row align="center" justify="center">
+        <v-col offset="2">
+          <v-card-title class="text-center"> Cloud </v-card-title>
+        </v-col>
+        <v-col cols="2">
+          <v-btn
+            class="float-right mr-2"
+            icon="mdi-refresh"
+            variant="text"
+            @click="refreshBackup"
+            :loading="loading"
+          ></v-btn>
+        </v-col>
+      </v-row>
       <v-divider></v-divider>
       <v-card-text>
         <v-row>
@@ -81,13 +94,23 @@ const deleteDialog = ref<InstanceType<typeof CloudDeleteDialog> | null>(null);
 const deleteItem = ref<WebdavBackup | null>(null);
 const autoBackups = ref<WebdavBackup[]>([]);
 const manualBackups = ref<WebdavBackup[]>([]);
+
+const loading = ref<boolean>(true);
+
 function refreshBackup() {
-  getAutoBackupList().then((value) => {
-    autoBackups.value = value;
-  });
-  getManualBackupList().then((value) => {
-    manualBackups.value = value;
-  });
+  loading.value = true;
+  getAutoBackupList()
+    .then((value) => {
+      autoBackups.value = value;
+      return getManualBackupList();
+    })
+    .then((value) => {
+      manualBackups.value = value;
+      loading.value = false;
+    })
+    .catch(() => {
+      loading.value = false;
+    });
 }
 
 function deleteBackup(item: WebdavBackup) {
@@ -95,10 +118,5 @@ function deleteBackup(item: WebdavBackup) {
   deleteDialog.value?.open(item);
 }
 refreshBackup();
-
-const interval = setInterval(refreshBackup, 2000);
-
-onBeforeUnmount(() => {
-  clearInterval(interval);
-});
+defineExpose({ refreshBackup });
 </script>

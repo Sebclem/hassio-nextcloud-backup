@@ -1,7 +1,20 @@
 <template>
   <div>
-    <v-card elevation="10" class="mt-10" border>
-      <v-card-title class="text-center"> Home Assistant </v-card-title>
+    <v-card elevation="10" border>
+      <v-row align="center" justify="center">
+        <v-col offset="2">
+          <v-card-title class="text-center"> Home Assistant </v-card-title>
+        </v-col>
+        <v-col cols="2">
+          <v-btn
+            class="float-right mr-2"
+            icon="mdi-refresh"
+            variant="text"
+            @click="refreshBackup"
+            :loading="loading"
+          ></v-btn>
+        </v-col>
+      </v-row>
       <v-divider></v-divider>
       <v-card-text>
         <v-row>
@@ -43,19 +56,17 @@ import { getBackups } from "@/services/homeAssistantService";
 import HaListItem from "./HaListItem.vue";
 
 const backups = ref<BackupModel[]>([]);
+const loading = ref<boolean>(true);
 
 function refreshBackup() {
+  loading.value = true;
   getBackups().then((value) => {
     backups.value = value;
+    loading.value = false;
   });
 }
 
 refreshBackup();
-const interval = setInterval(refreshBackup, 2000);
-
-onBeforeUnmount(() => {
-  clearInterval(interval);
-});
 
 // TODO Manage delete
 </script>
