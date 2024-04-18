@@ -26,6 +26,7 @@ declare module 'vue' {
     NavbarComponent: typeof import('./src/components/NavbarComponent.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    StatusComponent: typeof import('./src/components/StatusComponent.vue')['default']
     WebdavConfigForm: typeof import('./src/components/settings/WebdavConfigForm.vue')['default']
     WebdavConfigMenu: typeof import('./src/components/settings/WebdavConfigMenu.vue')['default']
   }

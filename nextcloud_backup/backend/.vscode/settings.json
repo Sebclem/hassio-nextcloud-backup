@@ -8,4 +8,5 @@
   "javascript.inlayHints.propertyDeclarationTypes.enabled": true,
   "javascript.inlayHints.parameterNames.suppressWhenArgumentMatchesName": true,
   "javascript.inlayHints.parameterNames.enabled": "literals",
+  "editor.formatOnSave": true
 }

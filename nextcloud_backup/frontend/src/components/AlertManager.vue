@@ -11,9 +11,7 @@
           class="mb-2"
         >
           <v-row dense>
-            <v-col>
-              {{ alert.message }}
-            </v-col>
+            <v-col v-html="alert.message"></v-col>
             <v-col cols="2">
               <v-btn
                 class="d-inline"

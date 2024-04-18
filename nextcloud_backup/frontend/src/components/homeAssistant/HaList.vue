@@ -63,7 +63,9 @@ function refreshBackup() {
   getBackups().then((value) => {
     backups.value = value;
     loading.value = false;
-  });
+  }).catch(()=> {
+    loading.value = false;
+  })
 }
 
 refreshBackup();

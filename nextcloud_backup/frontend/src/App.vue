@@ -7,6 +7,11 @@
     <alert-manager></alert-manager>
     <v-main class="mx-12">
       <v-row>
+        <v-col cols="4" offset="1">
+          <status-component></status-component>
+        </v-col>
+      </v-row>
+      <v-row>
         <v-col cols="6">
           <ha-list></ha-list>
         </v-col>
