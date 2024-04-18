@@ -1,24 +1,28 @@
 import type { DateTime } from "luxon";
 
-export enum WebdabStatus {
-  OK = "OK",
-  LOGIN_FAIL = "LOGIN_FAIL",
-  UPLOAD_FAIL = "UPLOAD_FAIL",
-  CON_ERROR = "CON_ERROR",
-  INIT = "INIT",
-  MK_FOLDER_FAIL = "MK_FOLDER_FAIL"
+export enum States {
+  IDLE = "IDLE",
+  BKUP_CREATION = "BKUP_CREATION",
+  BKUP_DOWNLOAD_HA = "BKUP_DOWNLOAD_HA",
+  BKUP_DOWNLOAD_CLOUD = "BKUP_DOWNLOAD_CLOUD",
+  BKUP_UPLOAD_HA = "BKUP_UPLOAD_HA",
+  BKUP_UPLOAD_CLOUD = "BKUP_UPLOAD_CLOUD",
+  STOP_ADDON = "STOP_ADDON",
+  START_ADDON = "START_ADDON",
 }
 
 export interface Status {
-  status: string;
-  progress: number;
-  last_backup?: string;
+  status: States;
+  progress?: number;
+  last_backup: {
+    success?: boolean;
+    last_success?: DateTime;
+    message?: string;
+  };
   next_backup?: string;
-  message?: string;
-  error_code?: number;
   webdav: {
-    state: WebdabStatus;
+    logged_in: boolean;
+    folder_created: boolean;
     last_check: DateTime;
-    blocked: boolean;
-  }; 
+  };
 }

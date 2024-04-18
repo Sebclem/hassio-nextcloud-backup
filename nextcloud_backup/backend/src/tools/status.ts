@@ -1,25 +1,23 @@
 import { publish_state } from "../services/homeAssistantService.js";
-import logger from "../config/winston.js";
-import { type Status, WebdabStatus } from "../types/status.js";
+import { States, type Status } from "../types/status.js";
 import { DateTime } from "luxon";
 
 let status: Status = {
-  status: "idle",
-  last_backup: undefined,
+  status: States.IDLE,
+  last_backup: {},
   next_backup: undefined,
-  progress: -1,
+  progress: undefined,
   webdav: {
-    state: WebdabStatus.INIT,
+    logged_in: false,
+    folder_created: false,
     last_check: DateTime.now(),
-    blocked: true,
   },
 };
 
 export function init() {
-  if (status.status !== "idle") {
-    status.status = "idle";
-    status.message = undefined;
-    status.progress = -1;
+  if (status.status !== States.IDLE) {
+    status.status = States.IDLE;
+    status.progress = undefined;
   }
 }
 
@@ -33,14 +31,4 @@ export function setStatus(new_state: Status) {
     status = new_state;
     publish_state(status);
   }
-}
-
-export function setError(message: string, error_code: number) {
-  // Check if we don't have another error stored
-  if (status.status != "error") {
-    status.status = "error";
-    status.message = message;
-    status.error_code = error_code;
-  }
-  logger.error(message);
 }

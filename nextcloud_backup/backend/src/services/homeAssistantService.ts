@@ -1,7 +1,12 @@
 import fs from "fs";
 
 import FormData from "form-data";
-import got, { type OptionsOfJSONResponseBody, type Response } from "got";
+import got, {
+  RequestError,
+  type OptionsOfJSONResponseBody,
+  type PlainResponse,
+  type Response,
+} from "got";
 import stream from "stream";
 import { promisify } from "util";
 import logger from "../config/winston.js";
@@ -18,7 +23,7 @@ import type {
   CoreInfoBody,
   SupervisorResponse,
 } from "../types/services/ha_os_response.js";
-import type { Status } from "../types/status.js";
+import { States, type Status } from "../types/status.js";
 
 const pipeline = promisify(stream.pipeline);
 
@@ -86,7 +91,6 @@ function getAddonToBackup(addons: AddonModel[]) {
   return slugs;
 }
 
-
 function getFolderToBackup() {
   const excluded_folder = settingsTools.getSettings().exclude_folder;
   const all_folder = getFolderList();
@@ -126,7 +130,7 @@ function downloadSnapshot(id: string): Promise<string> {
   const tmp_file = `./temp/${id}.tar`;
   const stream = fs.createWriteStream(tmp_file);
   const status = statusTools.getStatus();
-  status.status = "download";
+  status.status = States.BKUP_DOWNLOAD_HA;
   status.progress = 0;
   statusTools.setStatus(status);
   const option = {
@@ -147,7 +151,9 @@ function downloadSnapshot(id: string): Promise<string> {
   ).then(
     () => {
       logger.info("Download success !");
-      status.progress = 1;
+      const status = statusTools.getStatus();
+      status.status = States.IDLE;
+      status.progress = undefined;
       statusTools.setStatus(status);
       logger.debug(
         "Snapshot dl size : " + fs.statSync(tmp_file).size / 1024 / 1024
@@ -160,6 +166,10 @@ function downloadSnapshot(id: string): Promise<string> {
         "Fail to download Home Assistant backup",
         reason.message
       );
+      const status = statusTools.getStatus();
+      status.status = States.IDLE;
+      status.progress = undefined;
+      statusTools.setStatus(status);
       return Promise.reject(reason);
     }
   );
@@ -217,7 +227,7 @@ function createNewBackup(
   folders: string[]
 ) {
   const status = statusTools.getStatus();
-  status.status = "creating";
+  status.status = States.BKUP_CREATION;
   status.progress = -1;
   statusTools.setStatus(status);
   logger.info("Creating new snapshot...");
@@ -248,12 +258,20 @@ function createNewBackup(
     .then(
       (result) => {
         logger.info(`Snapshot created with id ${result.body.data.slug}`);
+        const status = statusTools.getStatus();
+        status.status = States.IDLE;
+        status.progress = undefined;
+        statusTools.setStatus(status);
         return result;
       },
       (reason) => {
         messageManager.error("Fail to create new backup.", reason.message);
         logger.error("Fail to create new backup");
         logger.error(reason);
+        const status = statusTools.getStatus();
+        status.status = States.IDLE;
+        status.progress = undefined;
+        statusTools.setStatus(status);
         return Promise.reject(reason);
       }
     );
@@ -297,6 +315,7 @@ function clean(backups: BackupModel[]) {
 function uploadSnapshot(path: string) {
   return new Promise((resolve, reject) => {
     const status = statusTools.getStatus();
+    status.status = States.BKUP_UPLOAD_HA;
     status.progress = 0;
     statusTools.setStatus(status);
     logger.info("Uploading backup...");
@@ -320,22 +339,36 @@ function uploadSnapshot(path: string) {
           logger.info("Upload done...");
         }
       })
-      .on("response", (res) => {
+      .on("response", (res: PlainResponse) => {
         if (res.statusCode !== 200) {
-          logger.error(status.message);
+          messageManager.error(
+            "Fail to upload backup to Home Assistant",
+            `Code: ${res.statusCode} Body: ${res.body}`
+          );
+          logger.error("Fail to upload backup to Home Assistant");
+          logger.error(`Code: ${res.statusCode}`);
+          logger.error(`Body: ${res.body}`);
           fs.unlinkSync(path);
-          reject(status.message);
+          reject(res.statusCode);
         } else {
           logger.info(`...Upload finish ! (status: ${res.statusCode})`);
+          const status = statusTools.getStatus();
+          status.status = States.IDLE;
+          status.progress = undefined;
+          statusTools.setStatus(status);
           fs.unlinkSync(path);
           resolve(res);
         }
       })
-      .on("error", (err) => {
+      .on("error", (err: RequestError) => {
+        const status = statusTools.getStatus();
+        status.status = States.IDLE;
+        status.progress = undefined;
+        statusTools.setStatus(status);
         fs.unlinkSync(path);
         messageManager.error(
           "Fail to upload backup to Home Assistant",
-          err?.message
+          err.message
         );
         logger.error("Fail to upload backup to Home Assistant");
         logger.error(err);
@@ -346,6 +379,10 @@ function uploadSnapshot(path: string) {
 
 function stopAddons(addonSlugs: string[]) {
   logger.info("Stopping addons...");
+  const status = statusTools.getStatus();
+  status.status = States.STOP_ADDON;
+  status.progress = -1;
+  statusTools.setStatus(status);
   const promises = [];
   const option: OptionsOfJSONResponseBody = {
     headers: { authorization: `Bearer ${token}` },
@@ -359,11 +396,16 @@ function stopAddons(addonSlugs: string[]) {
   }
   return Promise.allSettled(promises).then((values) => {
     let errors = false;
+    const status = statusTools.getStatus();
+    status.status = States.IDLE;
+    status.progress = undefined;
+    statusTools.setStatus(status);
     for (const val of values) {
       if (val.status == "rejected") {
         messageManager.error("Fail to stop addon", val.reason);
         logger.error("Fail to stop addon");
         logger.error(val.reason);
+        logger.error;
         errors = true;
       }
     }
@@ -378,7 +420,7 @@ function stopAddons(addonSlugs: string[]) {
 function startAddons(addonSlugs: string[]) {
   logger.info("Starting addons...");
   const status = statusTools.getStatus();
-  status.status = "starting";
+  status.status = States.START_ADDON;
   status.progress = -1;
   statusTools.setStatus(status);
   const promises = [];
@@ -393,6 +435,10 @@ function startAddons(addonSlugs: string[]) {
     }
   }
   return Promise.allSettled(promises).then((values) => {
+    const status = statusTools.getStatus();
+    status.status = States.IDLE;
+    status.progress = undefined;
+    statusTools.setStatus(status);
     let errors = false;
     for (const val of values) {
       if (val.status == "rejected") {
@@ -434,7 +480,6 @@ export function getFolderList() {
     },
   ];
 }
-
 
 function publish_state(state: Status) {
   // let data_error_sensor = {
@@ -511,5 +556,5 @@ export {
   startAddons,
   clean,
   publish_state,
-  getBackupInfo
+  getBackupInfo,
 };
