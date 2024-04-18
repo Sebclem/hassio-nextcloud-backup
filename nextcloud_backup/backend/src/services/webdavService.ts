@@ -1,6 +1,11 @@
 import { XMLParser } from "fast-xml-parser";
-import { createReadStream, statSync, unlinkSync } from "fs";
-import got, { HTTPError, type Method } from "got";
+import { createReadStream, stat, statSync, unlinkSync } from "fs";
+import got, {
+  HTTPError,
+  RequestError,
+  type Method,
+  type PlainResponse,
+} from "got";
 import { DateTime } from "luxon";
 import logger from "../config/winston.js";
 import messageManager from "../tools/messageManager.js";
@@ -10,7 +15,7 @@ import type { WebdavBackup } from "../types/services/webdav.js";
 import type { WebdavConfig } from "../types/services/webdavConfig.js";
 import { templateToRegexp } from "./backupConfigService.js";
 import { getEndpoint } from "./webdavConfigService.js";
-import { WebdabStatus } from "../types/status.js";
+import { States } from "../types/status.js";
 
 const PROPFIND_BODY =
   '<?xml version="1.0" encoding="utf-8" ?>\
@@ -24,7 +29,10 @@ const PROPFIND_BODY =
   </d:prop>\
 </d:propfind>';
 
-export function checkWebdavLogin(config: WebdavConfig) {
+export function checkWebdavLogin(
+  config: WebdavConfig,
+  silent: boolean = false
+) {
   const endpoint = getEndpoint(config);
   return got(config.url + endpoint, {
     method: "OPTIONS",
@@ -35,16 +43,21 @@ export function checkWebdavLogin(config: WebdavConfig) {
     },
   }).then(
     (response) => {
+      const status = statusTools.getStatus();
+      status.webdav.logged_in = true;
+      status.webdav.last_check = DateTime.now();
       return response;
     },
     (reason) => {
-      messageManager.error("Fail to connect to Webdav", reason?.message);
+      if (!silent) {
+        messageManager.error("Fail to connect to Webdav", reason?.message);
+      }
       const status = statusTools.getStatus();
       status.webdav = {
-        state: WebdabStatus.LOGIN_FAIL,
-        blocked: true,
-        last_check: DateTime.now()
-      }
+        logged_in: false,
+        folder_created: status.webdav.folder_created,
+        last_check: DateTime.now(),
+      };
       statusTools.setStatus(status);
       logger.error(`Fail to connect to Webdav`);
       logger.error(reason);
@@ -70,11 +83,8 @@ export async function createBackupFolder(conf: WebdavConfig) {
           logger.error("Fail to create webdav root folder");
           logger.error(error);
           const status = statusTools.getStatus();
-          status.webdav = {
-            state: WebdabStatus.MK_FOLDER_FAIL,
-            blocked: true,
-            last_check: DateTime.now()
-          }
+          status.webdav.folder_created = false;
+          status.webdav.last_check = DateTime.now();
           statusTools.setStatus(status);
           return Promise.reject(error);
         }
@@ -92,10 +102,18 @@ export async function createBackupFolder(conf: WebdavConfig) {
         messageManager.error("Fail to create webdav root folder");
         logger.error("Fail to create webdav root folder");
         logger.error(error);
+        const status = statusTools.getStatus();
+        status.webdav.folder_created = false;
+        status.webdav.last_check = DateTime.now();
+        statusTools.setStatus(status);
         return Promise.reject(error);
       }
     }
   }
+  const status = statusTools.getStatus();
+  status.webdav.folder_created = true;
+  status.webdav.last_check = DateTime.now();
+  statusTools.setStatus(status);
 }
 
 function createDirectory(path: string, config: WebdavConfig) {
@@ -115,6 +133,10 @@ export function getBackups(
   config: WebdavConfig,
   nameTemplate: string
 ) {
+  const status = statusTools.getStatus();
+  if (!status.webdav.logged_in && !status.webdav.folder_created) {
+    return Promise.reject("Not logged in");
+  }
   const endpoint = getEndpoint(config);
   return got(config.url + endpoint + config.backupDir + folder, {
     method: "PROPFIND" as Method,
@@ -160,8 +182,8 @@ function extractBackupInfo(backups: WebdavBackup[], template: string) {
 
       elem.creationDate = DateTime.fromFormat(date, format);
     }
-    if(match?.groups?.version){
-      elem.haVersion = match.groups.version
+    if (match?.groups?.version) {
+      elem.haVersion = match.groups.version;
     }
   }
   return backups;
@@ -224,13 +246,14 @@ function parseXmlBackupData(body: string, config: WebdavConfig) {
   return backups;
 }
 
-export function webdabUploadFile(
+export function webdavUploadFile(
   localPath: string,
   webdavPath: string,
   config: WebdavConfig
 ) {
   return new Promise((resolve, reject) => {
     logger.info(`Uploading ${localPath} to webdav...`);
+
     const stats = statSync(localPath);
     const stream = createReadStream(localPath);
     const options = {
@@ -251,6 +274,9 @@ export function webdabUploadFile(
     logger.debug(`...URI: ${encodeURI(url)}`);
     logger.debug(`...rejectUnauthorized: ${options.https?.rejectUnauthorized}`);
     const status = statusTools.getStatus();
+    status.status = States.BKUP_UPLOAD_CLOUD;
+    status.progress = 0;
+    statusTools.setStatus(status);
     got.stream
       .put(encodeURI(url), options)
       .on("uploadProgress", (e) => {
@@ -263,16 +289,19 @@ export function webdabUploadFile(
           logger.info("Upload done...");
         }
       })
-      .on("response", (res) => {
+      .on("response", (res: PlainResponse) => {
+        const status = statusTools.getStatus();
+        status.status = States.IDLE;
+        status.progress = undefined;
+        statusTools.setStatus(status);
         if (res.statusCode != 201 && res.statusCode != 204) {
           messageManager.error(
-            "Fail to upload file to webdav.",
-            `Status code: ${res.statusCode}`
+            "Fail to upload file to Cloud.",
+            `Code: ${res.statusCode} Body: ${res.body}`
           );
-          logger.error(
-            `Fail to upload file to webdav, Status code: ${res.statusCode}`
-          );
-          logger.error(status.message);
+          logger.error(`Fail to upload file to Cloud`);
+          logger.error(`Code: ${res.statusCode}`);
+          logger.error(`Body: ${res.body}`);
           unlinkSync(localPath);
           reject(res);
         } else {
@@ -281,10 +310,16 @@ export function webdabUploadFile(
           resolve(undefined);
         }
       })
-      .on("error", (err) => {
-        logger.error(status.message);
-        logger.error(err.stack);
-        reject(status.message);
+      .on("error", (err: RequestError) => {
+        const status = statusTools.getStatus();
+        status.status = States.IDLE;
+        status.progress = undefined;
+        statusTools.setStatus(status);
+        messageManager.error("Fail to upload backup to Cloud", err.message);
+        logger.error("Fail to upload backup to Cloud");
+        logger.error(err);
+        unlinkSync(localPath);
+        reject(err);
       });
   });
 }

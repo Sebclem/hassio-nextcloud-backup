@@ -68,11 +68,6 @@ function postInit() {
 
   settingsTools.check(settingsTools.getSettings(), true);
   // cronTools.init();
-
-  messageManager.error("this is error");
-  messageManager.info("This is info");
-  messageManager.warn("re gerg rg ergrge r ");
-  messageManager.success("zefzegz gze gerg erg zegfze gerg erg aeferg erg erg er");
   
 }
 
