@@ -5,6 +5,7 @@ import {
   validateBackupConfig,
 } from "../services/backupConfigService.js";
 import { getWebdavConfig, saveWebdavConfig, validateWebdavConfig } from "../services/webdavConfigService.js";
+import { checkWebdavLogin } from "../services/webdavService.js";
 
 const configRouter = express.Router();
 
@@ -32,13 +33,16 @@ configRouter.get("/webdav", (req, res, next) => {
 configRouter.put("/webdav", (req, res, next) => {
   validateWebdavConfig(req.body)
     .then(() => {
+      return checkWebdavLogin(req.body, true)
+    })
+    .then(() => {
       saveWebdavConfig(req.body);
       res.status(204);
       res.send();
     })
     .catch((error) => {
       res.status(400);
-      res.json(error.details);
+      res.json(error.details ? error.details : error);
     });
 });
 

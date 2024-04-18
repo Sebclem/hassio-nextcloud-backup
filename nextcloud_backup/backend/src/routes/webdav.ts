@@ -16,6 +16,9 @@ webdavRouter.get("/backup/auto", (req, res, next) => {
   const config = getWebdavConfig();
   const backupConf = getBackupConfig();
   validateWebdavConfig(config)
+    .then(() => {
+      return webdavService.checkWebdavLogin(config);
+    })
     .then(async () => {
       const value = await webdavService
         .getBackups(pathTools.auto, config, backupConf.nameTemplate);
@@ -31,6 +34,9 @@ webdavRouter.get("/backup/manual", (req, res, next) => {
   const config = getWebdavConfig();
   const backupConf = getBackupConfig();
   validateWebdavConfig(config)
+    .then(() => {
+      return webdavService.checkWebdavLogin(config);
+    })
     .then(async () => {
       const value = await webdavService
         .getBackups(pathTools.manual, config, backupConf.nameTemplate);
@@ -49,6 +55,9 @@ webdavRouter.delete("/", (req, res, next) => {
   validateWebdavConfig(config).then(() => {
    validator
       .validateAsync(body)
+      .then(() => {
+        return webdavService.checkWebdavLogin(config);
+      })
       .then(() => {
         webdavService.deleteBackup(body.path, config)
           .then(()=>{
