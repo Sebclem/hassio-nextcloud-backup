@@ -18,13 +18,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Enable corepack
         run: corepack enable
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: "pnpm"
@@ -39,10 +39,10 @@ jobs:
         working-directory: nextcloud_backup/frontend
 
       - name: Upload production-ready build files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: production-files
-          path: ./nextcloud/frontend/dist
+          name: front_dist
+          path: nextcloud_backup/frontend/dist/
 
   # build-dockers:
   #   runs-on: ubuntu-latest
