@@ -11,8 +11,12 @@
       <v-divider></v-divider>
       <v-responsive max-height="350px" class="overflow-y-auto">
         <v-list class="py-0">
-          <v-data-iterator :items="messages" item-value="id" items-per-page="-1">
-            <template v-slot:default="{ items,  isExpanded, toggleExpand}">
+          <v-data-iterator
+            :items="messages"
+            item-value="id"
+            items-per-page="-1"
+          >
+            <template v-slot:default="{ items, isExpanded, toggleExpand }">
               <template v-for="(item, index) in items" :key="item.raw.id">
                 <v-divider v-if="index != 0"></v-divider>
                 <v-list-item :class="{ 'bg-brown-darken-4': !item.raw.viewed }">
@@ -32,11 +36,15 @@
                       variant="text"
                       icon
                       color="secondary"
-                      @click="toggleExpand(item)"
+                      @click="toggleExpand(item as any)"
                       size="small"
                     >
                       <v-icon>
-                        {{ isExpanded(item) ? "mdi-chevron-up" : "mdi-information" }}
+                        {{
+                          isExpanded(item as any)
+                            ? "mdi-chevron-up"
+                            : "mdi-information"
+                        }}
                       </v-icon>
                     </v-btn>
                     <v-scroll-x-transition>
@@ -58,9 +66,13 @@
                   </template>
                 </v-list-item>
                 <v-expand-transition v-if="item.raw.detail">
-                  <div v-if="isExpanded(item)">
+                  <div v-if="isExpanded(item as any)">
                     <v-divider class="mx-3"></v-divider>
-                    <v-card class="mx-3 my-2" variant="outlined" color="secondary">
+                    <v-card
+                      class="mx-3 my-2"
+                      variant="outlined"
+                      color="secondary"
+                    >
                       <v-card-text>
                         {{ item.raw.detail }}
                       </v-card-text>
@@ -70,7 +82,6 @@
               </template>
             </template>
           </v-data-iterator>
-          
         </v-list>
       </v-responsive>
     </v-sheet>
@@ -160,10 +171,10 @@ function markReaded(id: string) {
   });
 }
 
-function markAllReaded(){
+function markAllReaded() {
   messageService.markAllRead().then((value) => {
     messages.value = value;
-  })
+  });
 }
 
 onBeforeUnmount(() => {

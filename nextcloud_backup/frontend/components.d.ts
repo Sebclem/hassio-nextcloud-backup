@@ -30,7 +30,6 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     StatusBar: typeof import('./src/components/statusBar/StatusBar.vue')['default']
-    StatusComponent: typeof import('./src/components/statusBar/StatusComponent.vue')['default']
     WebdavConfigForm: typeof import('./src/components/settings/WebdavConfigForm.vue')['default']
     WebdavConfigMenu: typeof import('./src/components/settings/WebdavConfigMenu.vue')['default']
   }

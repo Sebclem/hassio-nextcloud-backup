@@ -14,7 +14,7 @@ export const useAlertStore = defineStore("alert", () => {
     const alert: Alert = {
       id: uuidv4(),
       timeOut: ref(timeOutValue.value),
-      interval: setInterval(() => {
+      interval: window.setInterval(() => {
         timeout(alert);
       }, 50),
       type: type,
