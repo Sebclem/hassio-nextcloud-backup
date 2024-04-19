@@ -1,8 +1,13 @@
 import fs from "fs";
 import Joi from "joi";
 import logger from "../config/winston.js";
-import { type BackupConfig, BackupType } from "../types/services/backupConfig.js";
+import {
+  type BackupConfig,
+  BackupType,
+} from "../types/services/backupConfig.js";
 import backupConfigValidation from "../types/services/backupConfigValidation.js";
+import { DateTime } from "luxon";
+import { WorkflowType } from "../types/services/orchecstrator.js";
 
 const backupConfigPath = "/data/backupConfigV2.json";
 
@@ -52,10 +57,32 @@ export function templateToRegexp(template: string) {
   let regexp = template.replace("{date}", "(?<date>\\d{4}-\\d{2}-\\d{2})");
   regexp = regexp.replace("{hour}", "(?<hour>\\d{4})");
   regexp = regexp.replace("{hour_12}", "(?<hour12>\\d{4}(AM|PM))");
-  regexp = regexp.replace("{type}", "(?<type>Auto|Manual|)")
-  regexp = regexp.replace("{type_low}", "(?<type>auto|manual|)")
+  regexp = regexp.replace("{type}", "(?<type>Auto|Manual|)");
+  regexp = regexp.replace("{type_low}", "(?<type>auto|manual|)");
   return regexp.replace(
     "{ha_version}",
     "(?<version>\\d+\\.\\d+\\.\\d+(b\\d+)?)"
   );
+}
+
+export function getFormatedName(
+  workflowType: WorkflowType,
+  ha_version: string
+) {
+  const setting = getBackupConfig();
+  let template = setting.nameTemplate;
+  template = template.replace(
+    "{type_low}",
+    workflowType == WorkflowType.MANUAL ? "manual" : "auto"
+  );
+  template = template.replace(
+    "{type}",
+    workflowType == WorkflowType.MANUAL ? "Manual" : "Auto"
+  );
+  template = template.replace("{ha_version}", ha_version);
+  const now = DateTime.now().setLocale("en");
+  template = template.replace("{hour_12}", now.toFormat("hhmma"));
+  template = template.replace("{hour}", now.toFormat("HHmm"));
+  template = template.replace("{date}", now.toFormat("yyyy-MM-dd"));
+  return template;
 }

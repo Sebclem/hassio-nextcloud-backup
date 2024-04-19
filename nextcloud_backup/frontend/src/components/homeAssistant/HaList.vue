@@ -15,7 +15,7 @@
           ></v-btn>
         </v-col>
       </v-row>
-      <v-divider></v-divider>
+      <v-divider class="border-opacity-25"></v-divider>
       <v-card-text>
         <v-row>
           <v-col>
@@ -60,15 +60,19 @@ const loading = ref<boolean>(true);
 
 function refreshBackup() {
   loading.value = true;
-  getBackups().then((value) => {
-    backups.value = value;
-    loading.value = false;
-  }).catch(()=> {
-    loading.value = false;
-  })
+  getBackups()
+    .then((value) => {
+      backups.value = value;
+      loading.value = false;
+    })
+    .catch(() => {
+      loading.value = false;
+    });
 }
 
 refreshBackup();
+
+defineExpose({ refreshBackup });
 
 // TODO Manage delete
 </script>

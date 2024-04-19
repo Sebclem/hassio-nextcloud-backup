@@ -90,7 +90,7 @@
           </v-col>
         </v-row>
       </v-card-text>
-      <v-divider class="mx-4"></v-divider>
+      <v-divider class="mx-4 border-opacity-25"></v-divider>
       <v-card-actions class="justify-center">
         <v-tooltip text="Upload to Home Assitant" location="bottom">
           <template v-slot:activator="{ props }">

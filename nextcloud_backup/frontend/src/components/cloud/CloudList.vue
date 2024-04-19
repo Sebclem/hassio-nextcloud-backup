@@ -15,7 +15,7 @@
           ></v-btn>
         </v-col>
       </v-row>
-      <v-divider></v-divider>
+      <v-divider class="border-opacity-25"></v-divider>
       <v-card-text>
         <v-row>
           <v-col>

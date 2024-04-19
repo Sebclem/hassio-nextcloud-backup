@@ -120,7 +120,7 @@
               <h3>Content</h3>
             </v-col>
           </v-row>
-          <v-divider class="mt-2"></v-divider>
+          <v-divider class="mt-2 border-opacity-25"></v-divider>
           <v-row>
             <v-col cols="12" lg="6">
               <div class="text-center text-white mt-2">
@@ -152,7 +152,7 @@
           </v-row>
         </template>
       </v-card-text>
-      <v-divider class="mx-4"></v-divider>
+      <v-divider class="mx-4 border-opacity-25"></v-divider>
       <v-card-actions class="justify-center">
         <v-tooltip text="Upload to Cloud" location="bottom">
           <template v-slot:activator="{ props }">

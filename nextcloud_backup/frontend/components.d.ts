@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    ActionComponent: typeof import('./src/components/statusBar/ActionComponent.vue')['default']
     AlertManager: typeof import('./src/components/AlertManager.vue')['default']
     BackupConfigAddon: typeof import('./src/components/settings/BackupConfig/BackupConfigAddon.vue')['default']
     BackupConfigAutoBackup: typeof import('./src/components/settings/BackupConfig/BackupConfigAutoBackup.vue')['default']
@@ -16,9 +17,11 @@ declare module 'vue' {
     BackupConfigForm: typeof import('./src/components/settings/BackupConfigForm.vue')['default']
     BackupConfigMenu: typeof import('./src/components/settings/BackupConfigMenu.vue')['default']
     BackupConfigSecurity: typeof import('./src/components/settings/BackupConfig/BackupConfigSecurity.vue')['default']
+    BackupStatus: typeof import('./src/components/statusBar/BackupStatus.vue')['default']
     CloudDeleteDialog: typeof import('./src/components/cloud/CloudDeleteDialog.vue')['default']
     CloudList: typeof import('./src/components/cloud/CloudList.vue')['default']
     CloudListItem: typeof import('./src/components/cloud/CloudListItem.vue')['default']
+    ConnectionStatus: typeof import('./src/components/statusBar/ConnectionStatus.vue')['default']
     HaList: typeof import('./src/components/homeAssistant/HaList.vue')['default']
     HaListItem: typeof import('./src/components/homeAssistant/HaListItem.vue')['default']
     HaListItemContent: typeof import('./src/components/homeAssistant/HaListItemContent.vue')['default']
@@ -26,7 +29,8 @@ declare module 'vue' {
     NavbarComponent: typeof import('./src/components/NavbarComponent.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    StatusComponent: typeof import('./src/components/StatusComponent.vue')['default']
+    StatusBar: typeof import('./src/components/statusBar/StatusBar.vue')['default']
+    StatusComponent: typeof import('./src/components/statusBar/StatusComponent.vue')['default']
     WebdavConfigForm: typeof import('./src/components/settings/WebdavConfigForm.vue')['default']
     WebdavConfigMenu: typeof import('./src/components/settings/WebdavConfigMenu.vue')['default']
   }

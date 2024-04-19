@@ -13,7 +13,7 @@ import logger from "../config/winston.js";
 import messageManager from "../tools/messageManager.js";
 import * as settingsTools from "../tools/settingsTools.js";
 import * as statusTools from "../tools/status.js";
-import type { NewPartialBackupPayload } from "../types/services/ha_os_payload.js";
+import type { NewBackupPayload } from "../types/services/ha_os_payload.js";
 import type {
   AddonData,
   AddonModel,
@@ -25,6 +25,7 @@ import type {
 } from "../types/services/ha_os_response.js";
 import { States, type Status } from "../types/status.js";
 import { DateTime } from "luxon";
+import { BackupType } from "../types/services/backupConfig.js";
 
 const pipeline = promisify(stream.pipeline);
 
@@ -79,29 +80,6 @@ function getAddonList(): Promise<Response<SupervisorResponse<AddonData>>> {
       return Promise.reject(error);
     }
   );
-}
-
-function getAddonToBackup(addons: AddonModel[]) {
-  const excluded_addon = settingsTools.getSettings().exclude_addon;
-  const slugs: string[] = [];
-  for (const addon of addons) {
-    if (!excluded_addon.includes(addon.slug)) slugs.push(addon.slug);
-  }
-  logger.debug("Addon to backup:");
-  logger.debug(slugs);
-  return slugs;
-}
-
-function getFolderToBackup() {
-  const excluded_folder = settingsTools.getSettings().exclude_folder;
-  const all_folder = getFolderList();
-  const slugs = [];
-  for (const folder of all_folder) {
-    if (!excluded_folder.includes(folder.slug)) slugs.push(folder.slug);
-  }
-  logger.debug("Folders to backup:");
-  logger.debug(slugs);
-  return slugs;
 }
 
 function getBackups(): Promise<Response<SupervisorResponse<BackupData>>> {
@@ -232,25 +210,24 @@ function getBackupInfo(id: string) {
 
 function createNewBackup(
   name: string,
-  addonSlugs: string[],
-  folders: string[]
+  type: BackupType,
+  passwordEnable: boolean,
+  password?: string,
+  addonSlugs?: string[],
+  folders?: string[]
 ) {
   const status = statusTools.getStatus();
   status.status = States.BKUP_CREATION;
   status.progress = -1;
   statusTools.setStatus(status);
   logger.info("Creating new snapshot...");
-  const body: NewPartialBackupPayload = {
+  const body: NewBackupPayload = {
     name: name,
-    addons: addonSlugs,
-    folders: folders,
+    password: passwordEnable ? password : undefined,
+    addons: type == BackupType.PARTIAL ? addonSlugs : undefined,
+    folders: type == BackupType.PARTIAL ? folders : undefined,
   };
 
-  const password_protected = settingsTools.getSettings().password_protected;
-  logger.debug(`Is password protected ? ${password_protected}`);
-  if (password_protected === "true") {
-    body.password = settingsTools.getSettings().password_protect_value;
-  }
   const option: OptionsOfJSONResponseBody = {
     headers: { authorization: `Bearer ${token}` },
     responseType: "json",
@@ -259,31 +236,31 @@ function createNewBackup(
     },
     json: body,
   };
-  return got
-    .post<SupervisorResponse<{ slug: string }>>(
-      `http://hassio/backups/new/partial`,
-      option
-    )
-    .then(
-      (result) => {
-        logger.info(`Snapshot created with id ${result.body.data.slug}`);
-        const status = statusTools.getStatus();
-        status.status = States.IDLE;
-        status.progress = undefined;
-        statusTools.setStatus(status);
-        return result;
-      },
-      (reason) => {
-        messageManager.error("Fail to create new backup.", reason.message);
-        logger.error("Fail to create new backup");
-        logger.error(reason);
-        const status = statusTools.getStatus();
-        status.status = States.IDLE;
-        status.progress = undefined;
-        statusTools.setStatus(status);
-        return Promise.reject(reason);
-      }
-    );
+
+  const url =
+    type == BackupType.PARTIAL
+      ? "http://hassio/backups/new/partial"
+      : "http://hassio/backups/new/full";
+  return got.post<SupervisorResponse<{ slug: string }>>(url, option).then(
+    (result) => {
+      logger.info(`Snapshot created with id ${result.body.data.slug}`);
+      const status = statusTools.getStatus();
+      status.status = States.IDLE;
+      status.progress = undefined;
+      statusTools.setStatus(status);
+      return result;
+    },
+    (reason) => {
+      messageManager.error("Fail to create new backup.", reason.message);
+      logger.error("Fail to create new backup");
+      logger.error(reason);
+      const status = statusTools.getStatus();
+      status.status = States.IDLE;
+      status.progress = undefined;
+      statusTools.setStatus(status);
+      return Promise.reject(reason);
+    }
+  );
 }
 
 function clean(backups: BackupModel[]) {

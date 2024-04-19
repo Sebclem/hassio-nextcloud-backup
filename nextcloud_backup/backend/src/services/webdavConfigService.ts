@@ -4,9 +4,13 @@ import logger from "../config/winston.js";
 import { default_root } from "../tools/pathTools.js";
 import {
   type WebdavConfig,
-  WebdavEndpointType
+  WebdavEndpointType,
 } from "../types/services/webdavConfig.js";
 import WebdavConfigValidation from "../types/services/webdavConfigValidation.js";
+import { BackupType } from "../types/services/backupConfig.js";
+import * as pathTools from "../tools/pathTools.js";
+import { WorkflowType } from "../types/services/orchecstrator.js";
+import e from "express";
 
 const webdavConfigPath = "/data/webdavConfigV2.json";
 const NEXTCLOUD_ENDPOINT = "/remote.php/dav/files/$username";
@@ -46,10 +50,22 @@ export function getEndpoint(config: WebdavConfig) {
   } else {
     return "";
   }
-  if (endpoint.endsWith("/")) {
-    return endpoint.slice(0, -1);
+  if (!endpoint.startsWith("/")) {
+    endpoint = "/" + endpoint;
   }
+
+  if (!endpoint.endsWith("/")) {
+    return endpoint + "/";
+  }
+
   return endpoint;
+}
+
+export function getBackupFolder(type: WorkflowType, config: WebdavConfig) {
+  const end = type == WorkflowType.AUTO ? pathTools.auto : pathTools.manual;
+  return config.backupDir.endsWith("/")
+    ? config.backupDir + end
+    : config.backupDir + "/" + end;
 }
 
 export function getWebdavDefaultConfig(): WebdavConfig {

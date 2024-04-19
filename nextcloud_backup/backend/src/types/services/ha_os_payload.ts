@@ -1,5 +1,5 @@
-export interface NewPartialBackupPayload {
-  name?:	string;
+export interface NewBackupPayload {
+  name?: string;
   password?: string;
   homeassistant?: boolean;
   addons?: string[];

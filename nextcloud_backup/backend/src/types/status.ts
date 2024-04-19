@@ -17,7 +17,7 @@ export interface Status {
   last_backup: {
     success?: boolean;
     last_success?: DateTime;
-    message?: string;
+    last_try?: DateTime;
   };
   next_backup?: string;
   webdav: {

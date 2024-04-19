@@ -55,7 +55,7 @@
         </v-col>
       </v-row>
     </v-fade-transition>
-    <v-divider class="my-4"></v-divider>
+    <v-divider class="my-4 border-opacity-25"></v-divider>
     <v-row>
       <v-col class="text-center">
         <v-sheet border elevation="5" rounded class="py-1">
@@ -78,7 +78,7 @@
         <BackupConfigAutoStop :loading="loading"></BackupConfigAutoStop>
       </v-col>
     </v-row>
-    <v-divider class="my-4"></v-divider>
+    <v-divider class="my-4 border-opacity-25"></v-divider>
     <v-row class="mb-10">
       <v-col>
         <BackupConfigSecurity :loading="loading"></BackupConfigSecurity>

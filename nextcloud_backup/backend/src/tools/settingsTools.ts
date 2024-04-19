@@ -39,7 +39,7 @@ function check_cron(conf: Settings) {
       if (conf.cron_custom != null) {
         try {
           // TODO Need to be destroy
-          new CronJob(conf.cron_custom, () => {                                                    
+          new CronJob(conf.cron_custom, () => {
             //Do nothing
           });
           return true;

@@ -8,7 +8,7 @@
   >
     <v-card>
       <v-card-title class="text-center">Backup Settings</v-card-title>
-      <v-divider></v-divider>
+      <v-divider class="border-opacity-25"></v-divider>
       <v-card-text>
         <backup-config-form
           ref="form"
@@ -18,7 +18,7 @@
           @loading="loading = true"
         ></backup-config-form>
       </v-card-text>
-      <v-divider></v-divider>
+      <v-divider class="border-opacity-25"></v-divider>
       <v-card-actions class="justify-end">
         <v-btn
           color="red"

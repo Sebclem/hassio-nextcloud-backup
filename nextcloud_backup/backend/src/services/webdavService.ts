@@ -268,8 +268,7 @@ export function webdavUploadFile(
       },
       https: { rejectUnauthorized: !config.allowSelfSignedCerts },
     };
-    const url =
-      config.url + getEndpoint(config) + config.backupDir + webdavPath;
+    const url = config.url + getEndpoint(config) + webdavPath;
 
     logger.debug(`...URI: ${encodeURI(url)}`);
     logger.debug(`...rejectUnauthorized: ${options.https?.rejectUnauthorized}`);
