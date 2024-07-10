@@ -1,9 +1,10 @@
 import { XMLParser } from "fast-xml-parser";
-import { createReadStream, stat, statSync, unlinkSync } from "fs";
+import fs from "fs";
 import got, {
   HTTPError,
   RequestError,
   type Method,
+  type OptionsInit,
   type PlainResponse,
 } from "got";
 import { DateTime } from "luxon";
@@ -14,9 +15,14 @@ import * as statusTools from "../tools/status.js";
 import type { WebdavBackup } from "../types/services/webdav.js";
 import type { WebdavConfig } from "../types/services/webdavConfig.js";
 import { templateToRegexp } from "./backupConfigService.js";
-import { getEndpoint } from "./webdavConfigService.js";
+import { getChunkEndpoint, getEndpoint } from "./webdavConfigService.js";
 import { States } from "../types/status.js";
+import { randomUUID } from "crypto";
+import e, { response } from "express";
+import { NONAME } from "dns";
 
+const CHUNK_SIZE = 5 * 1024 * 1024; // 5MiB Same as desktop client
+const CHUNK_NUMBER_SIZE = 5; // To add landing "0"
 const PROPFIND_BODY =
   '<?xml version="1.0" encoding="utf-8" ?>\
 <d:propfind xmlns:d="DAV:">\
@@ -41,6 +47,7 @@ export function checkWebdavLogin(
         "Basic " +
         Buffer.from(config.username + ":" + config.password).toString("base64"),
     },
+    https: { rejectUnauthorized: !config.allowSelfSignedCerts },
   }).then(
     (response) => {
       const status = statusTools.getStatus();
@@ -146,6 +153,7 @@ export function getBackups(
         Buffer.from(config.username + ":" + config.password).toString("base64"),
       Depth: "1",
     },
+    https: { rejectUnauthorized: !config.allowSelfSignedCerts },
     body: PROPFIND_BODY,
   }).then(
     (value) => {
@@ -200,6 +208,7 @@ export function deleteBackup(path: string, config: WebdavConfig) {
             "base64"
           ),
       },
+      https: { rejectUnauthorized: !config.allowSelfSignedCerts },
     })
     .then(
       (response) => {
@@ -254,8 +263,8 @@ export function webdavUploadFile(
   return new Promise((resolve, reject) => {
     logger.info(`Uploading ${localPath} to webdav...`);
 
-    const stats = statSync(localPath);
-    const stream = createReadStream(localPath);
+    const stats = fs.statSync(localPath);
+    const stream = fs.createReadStream(localPath);
     const options = {
       body: stream,
       headers: {
@@ -301,11 +310,11 @@ export function webdavUploadFile(
           logger.error(`Fail to upload file to Cloud`);
           logger.error(`Code: ${res.statusCode}`);
           logger.error(`Body: ${res.body}`);
-          unlinkSync(localPath);
+          fs.unlinkSync(localPath);
           reject(res);
         } else {
           logger.info(`...Upload finish ! (status: ${res.statusCode})`);
-          unlinkSync(localPath);
+          fs.unlinkSync(localPath);
           resolve(undefined);
         }
       })
@@ -317,12 +326,145 @@ export function webdavUploadFile(
         messageManager.error("Fail to upload backup to Cloud", err.message);
         logger.error("Fail to upload backup to Cloud");
         logger.error(err);
-        unlinkSync(localPath);
+        fs.unlinkSync(localPath);
         reject(err);
       });
   });
 }
 
+export function chunkedUpload(
+  localPath: string,
+  webdavPath: string,
+  config: WebdavConfig
+) {
+  return new Promise<void>(async (resolve, reject) => {
+    const uuid = randomUUID();
+    const fileSize = fs.statSync(localPath).size;
+
+    const chunkEndpoint = getChunkEndpoint(config);
+    const chunkedUrl = config.url + chunkEndpoint + uuid;
+    const finalDestination = config.url + getEndpoint(config) + webdavPath;
+    await initChunkedUpload(chunkedUrl, finalDestination, config);
+
+    let start = 0;
+    let end = fileSize > CHUNK_SIZE ? CHUNK_SIZE : fileSize;
+    let current_size = end;
+    let uploadedBytes = 0;
+
+    let i = 0;
+    while (start < fileSize) {
+      const chunk = fs.createReadStream(localPath, { start, end });
+      try {
+        const chunckNumber = i.toString().padStart(CHUNK_NUMBER_SIZE, "0");
+        await uploadChunk(
+          chunkedUrl + `/${chunckNumber}`,
+          finalDestination,
+          chunk,
+          current_size,
+          fileSize,
+          config
+        );
+        start = end;
+        end = Math.min(start + CHUNK_SIZE, fileSize - 1);
+        current_size = end - start;
+        i++;
+      } catch (error) {
+        reject();
+        return;
+      }
+    }
+    logger.debug("Chunked upload funished, assembling chunks.");
+    assembleChunkedUpload(chunkedUrl, finalDestination, fileSize, config);
+    resolve();
+  });
+}
+
+export function uploadChunk(
+  url: string,
+  finalDestination: string,
+  body: fs.ReadStream,
+  contentLength: number,
+  totalLength: number,
+  config: WebdavConfig
+) {
+  return new Promise<PlainResponse>((resolve, reject) => {
+    logger.debug(`Uploading chunck.`);
+    logger.debug(`...URI: ${encodeURI(url)}`);
+    logger.debug(`...Final destination: ${encodeURI(finalDestination)}`);
+    logger.debug(`...Chunk size: ${contentLength}`);
+    got.stream
+      .put(url, {
+        headers: {
+          authorization:
+            "Basic " +
+            Buffer.from(config.username + ":" + config.password).toString(
+              "base64"
+            ),
+          Destination: encodeURI(finalDestination),
+          "OC-Total-Length": totalLength.toString(),
+          "content-length": contentLength.toString(),
+        },
+        https: { rejectUnauthorized: !config.allowSelfSignedCerts },
+        body: body,
+      })
+      .on("response", (res: PlainResponse) => {
+        if (res.ok) {
+          logger.debug("Chunk upload done.");
+          resolve(res);
+        } else {
+          logger.error(`Fail to upload chunk: ${res.statusCode}`);
+          reject(res);
+        }
+      })
+      .on("error", (err) => {
+        logger.error(`Fail to upload chunk: ${err.message}`);
+        reject(err);
+      });
+  });
+}
+
+export function initChunkedUpload(
+  url: string,
+  finalDestination: string,
+  config: WebdavConfig
+) {
+  logger.debug(`Init chuncked upload.`);
+  logger.debug(`...URI: ${encodeURI(url)}`);
+  logger.debug(`...Final destination: ${encodeURI(finalDestination)}`);
+  return got(encodeURI(url), {
+    method: "MKCOL" as Method,
+    headers: {
+      authorization:
+        "Basic " +
+        Buffer.from(config.username + ":" + config.password).toString("base64"),
+      Destination: encodeURI(finalDestination),
+    },
+    https: { rejectUnauthorized: !config.allowSelfSignedCerts },
+  });
+}
+
+export function assembleChunkedUpload(
+  url: string,
+  finalDestination: string,
+  totalLength: number,
+  config: WebdavConfig
+) {
+  let chunckFile = `${url}/.file`;
+  logger.debug(`Assemble chuncked upload.`);
+  logger.debug(`...URI: ${encodeURI(chunckFile)}`);
+  logger.debug(`...Final destination: ${encodeURI(finalDestination)}`);
+  return got(encodeURI(chunckFile), {
+    method: "MOVE" as Method,
+    headers: {
+      authorization:
+        "Basic " +
+        Buffer.from(config.username + ":" + config.password).toString("base64"),
+      Destination: encodeURI(finalDestination),
+      "OC-Total-Length": totalLength.toString(),
+    },
+    https: { rejectUnauthorized: !config.allowSelfSignedCerts },
+  });
+}
 // import fs from "fs";
 // import got from "got";
 // import https from "https";

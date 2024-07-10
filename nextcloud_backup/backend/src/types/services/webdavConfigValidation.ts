@@ -15,6 +15,11 @@ const WebdavConfigValidation = {
       is: WebdavEndpointType.CUSTOM,
       then: Joi.string().not().empty().required,
       otherwise: Joi.disallow()
+    }),
+    customChunkEndpoint: Joi.alternatives().conditional("type", {
+      is: WebdavEndpointType.CUSTOM,
+      then: Joi.string().not().empty().required,
+      otherwise: Joi.disallow()
     })
   }).required().label("Webdav endpoint"),
 }

@@ -71,11 +71,16 @@ export function doBackupWorkflow(type: WorkflowType) {
     })
     .then((tmpFile) => {
       tmpBackupFile = tmpFile;
-      return webDavService.webdavUploadFile(
+      return webDavService.chunkedUpload(
         tmpFile,
         getBackupFolder(type, webdavConfig) + name,
         webdavConfig
       );
+      // return webDavService.webdavUploadFile(
+      //   tmpFile,
+      //   getBackupFolder(type, webdavConfig) + name,
+      //   webdavConfig
+      // );
     })
     .then(() => {
       logger.info("Backup workflow finished successfully !");

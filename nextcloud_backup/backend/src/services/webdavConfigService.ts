@@ -14,6 +14,7 @@ import e from "express";
 
 const webdavConfigPath = "/data/webdavConfigV2.json";
 const NEXTCLOUD_ENDPOINT = "/remote.php/dav/files/$username";
+const NEXTCLOUD_CHUNK_ENDPOINT = "/remote.php/dav/uploads/$username";
 
 export function validateWebdavConfig(config: WebdavConfig) {
   const validator = Joi.object(WebdavConfigValidation);
@@ -44,6 +45,30 @@ export function getEndpoint(config: WebdavConfig) {
     endpoint = NEXTCLOUD_ENDPOINT.replace("$username", config.username);
   } else if (config.webdavEndpoint.customEndpoint) {
     endpoint = config.webdavEndpoint.customEndpoint.replace(
+      "$username",
+      config.username
+    );
+  } else {
+    return "";
+  }
+  if (!endpoint.startsWith("/")) {
+    endpoint = "/" + endpoint;
+  }
+
+  if (!endpoint.endsWith("/")) {
+    return endpoint + "/";
+  }
+
+  return endpoint;
+}
+
+export function getChunkEndpoint(config: WebdavConfig) {
+  let endpoint: string;
+
+  if (config.webdavEndpoint.type == WebdavEndpointType.NEXTCLOUD) {
+    endpoint = NEXTCLOUD_CHUNK_ENDPOINT.replace("$username", config.username);
+  } else if (config.webdavEndpoint.customChunkEndpoint) {
+    endpoint = config.webdavEndpoint.customChunkEndpoint.replace(
       "$username",
       config.username
     );
