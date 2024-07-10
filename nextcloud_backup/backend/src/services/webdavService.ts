@@ -4,7 +4,6 @@ import got, {
   HTTPError,
   RequestError,
   type Method,
-  type OptionsInit,
   type PlainResponse,
 } from "got";
 import { DateTime } from "luxon";
@@ -18,8 +17,6 @@ import { templateToRegexp } from "./backupConfigService.js";
 import { getChunkEndpoint, getEndpoint } from "./webdavConfigService.js";
 import { States } from "../types/status.js";
 import { randomUUID } from "crypto";
-import e, { response } from "express";
-import { NONAME } from "dns";
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MiB Same as desktop client
 const CHUNK_NUMBER_SIZE = 5; // To add landing "0"
@@ -332,51 +329,103 @@ export function webdavUploadFile(
   });
 }
 
-export function chunkedUpload(
+export async function chunkedUpload(
   localPath: string,
   webdavPath: string,
   config: WebdavConfig
 ) {
-  return new Promise<void>(async (resolve, reject) => {
-    const uuid = randomUUID();
-    const fileSize = fs.statSync(localPath).size;
+  const uuid = randomUUID();
+  const fileSize = fs.statSync(localPath).size;
 
-    const chunkEndpoint = getChunkEndpoint(config);
-    const chunkedUrl = config.url + chunkEndpoint + uuid;
-    const finalDestination = config.url + getEndpoint(config) + webdavPath;
+  const chunkEndpoint = getChunkEndpoint(config);
+  const chunkedUrl = config.url + chunkEndpoint + uuid;
+  const finalDestination = config.url + getEndpoint(config) + webdavPath;
+  try {
     await initChunkedUpload(chunkedUrl, finalDestination, config);
-
-    let start = 0;
-    let end = fileSize > CHUNK_SIZE ? CHUNK_SIZE : fileSize;
-    let current_size = end;
-    let uploadedBytes = 0;
-
-    let i = 0;
-    while (start < fileSize) {
-      const chunk = fs.createReadStream(localPath, { start, end });
-      try {
-        const chunckNumber = i.toString().padStart(CHUNK_NUMBER_SIZE, "0");
-        await uploadChunk(
-          chunkedUrl + `/${chunckNumber}`,
-          finalDestination,
-          chunk,
-          current_size,
-          fileSize,
-          config
-        );
-        start = end;
-        end = Math.min(start + CHUNK_SIZE, fileSize - 1);
-        current_size = end - start;
-        i++;
-      } catch (error) {
-        reject();
-        return;
-      }
+  } catch (err) {
+    if (err instanceof RequestError) {
+      messageManager.error(
+        "Fail to init chuncked upload.",
+        `Code: ${err.code} Body: ${err.response?.body}`
+      );
+      logger.error(`Fail to init chuncked upload`);
+      logger.error(`Code: ${err.code}`);
+      logger.error(`Body: ${err.response?.body}`);
+    } else {
+      messageManager.error(
+        "Fail to init chuncked upload.",
+        (err as Error).message
+      );
+      logger.error(`Fail to init chuncked upload`);
+      logger.error((err as Error).message);
     }
-    logger.debug("Chunked upload funished, assembling chunks.");
-    assembleChunkedUpload(chunkedUrl, finalDestination, fileSize, config);
-    resolve();
-  });
+    fs.unlinkSync(localPath);
+    throw err;
+  }
+
+  let start = 0;
+  let end = fileSize > CHUNK_SIZE ? CHUNK_SIZE : fileSize;
+  let current_size = end;
+  let uploadedBytes = 0;
+
+  let i = 0;
+  while (start < fileSize) {
+    const chunk = fs.createReadStream(localPath, { start, end });
+    try {
+      const chunckNumber = i.toString().padStart(CHUNK_NUMBER_SIZE, "0");
+      await uploadChunk(
+        chunkedUrl + `/${chunckNumber}`,
+        finalDestination,
+        chunk,
+        current_size,
+        fileSize,
+        config
+      );
+      start = end;
+      end = Math.min(start + CHUNK_SIZE, fileSize - 1);
+      current_size = end - start;
+      i++;
+    } catch (error) {
+      if (error instanceof Error) {
+        messageManager.error(
+          "Fail to upload file to Cloud.",
+          `Error: ${error.message}`
+        );
+        logger.error(`Fail to upload file to Cloud`);
+      } else {
+        messageManager.error(
+          "Fail to upload file to Cloud.",
+          `Code: ${(error as PlainResponse).statusCode} Body: ${
+            (error as PlainResponse).body
+          }`
+        );
+        logger.error(`Fail to upload file to Cloud`);
+        logger.error(`Code: ${(error as PlainResponse).statusCode}`);
+        logger.error(`Body: ${(error as PlainResponse).body}`);
+      }
+      throw error;
+    }
+  }
+  logger.debug("Chunked upload funished, assembling chunks.");
+  try {
+    await assembleChunkedUpload(chunkedUrl, finalDestination, fileSize, config);
+  } catch (err) {
+    if (err instanceof RequestError) {
+      messageManager.error(
+        "Fail to assembling chunks.",
+        `Code: ${err.code} Body: ${err.response?.body}`
+      );
+      logger.error("Fail to assemble chunks");
+      logger.error(`Code: ${err.code}`);
+      logger.error(`Body: ${err.response?.body}`);
+    } else {
+      messageManager.error("Fail to assemble chunks", (err as Error).message);
+      logger.error("Fail to assemble chunks");
+      logger.error((err as Error).message);
+    }
+    fs.unlinkSync(localPath);
+    throw err;
+  }
 }
 
 export function uploadChunk(
@@ -449,7 +498,7 @@ export function assembleChunkedUpload(
   totalLength: number,
   config: WebdavConfig
 ) {
-  let chunckFile = `${url}/.file`;
+  const chunckFile = `${url}/.file`;
   logger.debug(`Assemble chuncked upload.`);
   logger.debug(`...URI: ${encodeURI(chunckFile)}`);
   logger.debug(`...Final destination: ${encodeURI(finalDestination)}`);
