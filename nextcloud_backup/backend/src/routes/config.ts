@@ -11,7 +11,7 @@ import {
 } from "../services/webdavConfigService.js";
 import { checkWebdavLogin } from "../services/webdavService.js";
 import type { BackupConfig } from "../types/services/backupConfig.js";
-import { ValidationError } from "joi";
+import type { ValidationError } from "joi";
 import type { WebdavConfig } from "../types/services/webdavConfig.js";
 
 const configRouter = express.Router();
@@ -47,9 +47,9 @@ configRouter.put("/webdav", (req, res) => {
       res.status(204);
       res.send();
     })
-    .catch((error) => {
+    .catch((error: ValidationError) => {
       res.status(400);
-      if (error instanceof ValidationError) {
+      if (error.details) {
         res.json(error.details);
       } else {
         res.json(error);

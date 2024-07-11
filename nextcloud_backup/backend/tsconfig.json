@@ -3,12 +3,12 @@
   "compilerOptions": {
     "allowJs": true,
     "outDir": "./dist",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "target": "es6",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "ES2022",
     "sourceMap": true,
     "verbatimModuleSyntax": true,
-    "strict": true,
+    "strict": true
   },
   "include": ["src/**/*"]
 }
