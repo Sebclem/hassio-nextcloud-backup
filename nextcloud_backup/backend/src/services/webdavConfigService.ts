@@ -1,16 +1,14 @@
 import fs from "fs";
 import Joi from "joi";
 import logger from "../config/winston.js";
+import * as pathTools from "../tools/pathTools.js";
 import { default_root } from "../tools/pathTools.js";
+import { WorkflowType } from "../types/services/orchecstrator.js";
 import {
   type WebdavConfig,
   WebdavEndpointType,
 } from "../types/services/webdavConfig.js";
 import WebdavConfigValidation from "../types/services/webdavConfigValidation.js";
-import { BackupType } from "../types/services/backupConfig.js";
-import * as pathTools from "../tools/pathTools.js";
-import { WorkflowType } from "../types/services/orchecstrator.js";
-import e from "express";
 
 const webdavConfigPath = "/data/webdavConfigV2.json";
 const NEXTCLOUD_ENDPOINT = "/remote.php/dav/files/$username";
@@ -34,7 +32,9 @@ export function getWebdavConfig(): WebdavConfig {
     saveWebdavConfig(defaultConfig);
     return defaultConfig;
   } else {
-    return JSON.parse(fs.readFileSync(webdavConfigPath).toString());
+    return JSON.parse(
+      fs.readFileSync(webdavConfigPath).toString()
+    ) as WebdavConfig;
   }
 }
 

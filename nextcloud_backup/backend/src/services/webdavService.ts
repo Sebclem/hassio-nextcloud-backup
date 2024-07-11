@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { XMLParser } from "fast-xml-parser";
 import fs from "fs";
 import got, {
@@ -54,7 +58,10 @@ export function checkWebdavLogin(
     },
     (reason) => {
       if (!silent) {
-        messageManager.error("Fail to connect to Webdav", reason?.message);
+        messageManager.error(
+          "Fail to connect to Webdav",
+          (reason as Error).message
+        );
       }
       const status = statusTools.getStatus();
       status.webdav = {
@@ -65,7 +72,7 @@ export function checkWebdavLogin(
       statusTools.setStatus(status);
       logger.error(`Fail to connect to Webdav`);
       logger.error(reason);
-      return Promise.reject(reason);
+      return Promise.reject(reason as Error);
     }
   );
 }
@@ -90,7 +97,7 @@ export async function createBackupFolder(conf: WebdavConfig) {
           status.webdav.folder_created = false;
           status.webdav.last_check = DateTime.now();
           statusTools.setStatus(status);
-          return Promise.reject(error);
+          return Promise.reject(error as Error);
         }
       }
     }
@@ -110,7 +117,7 @@ export async function createBackupFolder(conf: WebdavConfig) {
         status.webdav.folder_created = false;
         status.webdav.last_check = DateTime.now();
         statusTools.setStatus(status);
-        return Promise.reject(error);
+        return Promise.reject(error as Error);
       }
     }
   }
@@ -139,7 +146,7 @@ export function getBackups(
 ) {
   const status = statusTools.getStatus();
   if (!status.webdav.logged_in && !status.webdav.folder_created) {
-    return Promise.reject("Not logged in");
+    return Promise.reject(new Error("Not logged in"));
   }
   const endpoint = getEndpoint(config);
   return got(config.url + endpoint + config.backupDir + folder, {
@@ -165,7 +172,7 @@ export function getBackups(
       );
       logger.error(`Fail to retrive webdav backups in ${folder} folder`);
       logger.error(reason);
-      return Promise.reject(reason);
+      return Promise.reject(reason as Error);
     }
   );
 }
@@ -214,11 +221,11 @@ export function deleteBackup(path: string, config: WebdavConfig) {
       (reason) => {
         messageManager.error(
           "Fail to delete backup in webdav",
-          reason?.message
+          (reason as Error)?.message
         );
         logger.error(`Fail to delete backup in Cloud`);
         logger.error(reason);
-        return Promise.reject(reason);
+        return Promise.reject(reason as Error);
       }
     );
 }
@@ -302,13 +309,13 @@ export function webdavUploadFile(
         if (res.statusCode != 201 && res.statusCode != 204) {
           messageManager.error(
             "Fail to upload file to Cloud.",
-            `Code: ${res.statusCode} Body: ${res.body}`
+            `Code: ${res.statusCode} Body: ${res.body as string}`
           );
           logger.error(`Fail to upload file to Cloud`);
           logger.error(`Code: ${res.statusCode}`);
-          logger.error(`Body: ${res.body}`);
+          logger.error(`Body: ${res.body as string}`);
           fs.unlinkSync(localPath);
-          reject(res);
+          reject(new Error(res.statusCode.toString()));
         } else {
           logger.info(`...Upload finish ! (status: ${res.statusCode})`);
           fs.unlinkSync(localPath);
@@ -340,6 +347,10 @@ export async function chunkedUpload(
   const chunkEndpoint = getChunkEndpoint(config);
   const chunkedUrl = config.url + chunkEndpoint + uuid;
   const finalDestination = config.url + getEndpoint(config) + webdavPath;
+  const status = statusTools.getStatus();
+  status.status = States.BKUP_UPLOAD_CLOUD;
+  status.progress = 0;
+  statusTools.setStatus(status);
   try {
     await initChunkedUpload(chunkedUrl, finalDestination, config);
   } catch (err) {
@@ -366,7 +377,7 @@ export async function chunkedUpload(
   let start = 0;
   let end = fileSize > CHUNK_SIZE ? CHUNK_SIZE : fileSize;
   let current_size = end;
-  let uploadedBytes = 0;
+  // const uploadedBytes = 0;
 
   let i = 0;
   while (start < fileSize) {
@@ -396,12 +407,12 @@ export async function chunkedUpload(
         messageManager.error(
           "Fail to upload file to Cloud.",
           `Code: ${(error as PlainResponse).statusCode} Body: ${
-            (error as PlainResponse).body
+            (error as PlainResponse).body as string
           }`
         );
         logger.error(`Fail to upload file to Cloud`);
         logger.error(`Code: ${(error as PlainResponse).statusCode}`);
-        logger.error(`Body: ${(error as PlainResponse).body}`);
+        logger.error(`Body: ${(error as PlainResponse).body as string}`);
       }
       throw error;
     }
@@ -462,7 +473,7 @@ export function uploadChunk(
           resolve(res);
         } else {
           logger.error(`Fail to upload chunk: ${res.statusCode}`);
-          reject(res);
+          reject(new Error(res.statusCode.toString()));
         }
       })
       .on("error", (err) => {

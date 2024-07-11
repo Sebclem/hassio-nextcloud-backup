@@ -3,11 +3,15 @@ import * as haOsService from "../services/homeAssistantService.js";
 
 const homeAssistantRouter = express.Router();
 
-homeAssistantRouter.get("/backups/", (req, res, next) => {
+homeAssistantRouter.get("/backups/", (req, res) => {
   haOsService
     .getBackups()
     .then((value) => {
-      res.json(value.body.data.backups.sort((a, b)=> Date.parse(b.date) - Date.parse(a.date)));
+      res.json(
+        value.body.data.backups.sort(
+          (a, b) => Date.parse(b.date) - Date.parse(a.date)
+        )
+      );
     })
     .catch((reason) => {
       res.status(500);
@@ -15,7 +19,7 @@ homeAssistantRouter.get("/backups/", (req, res, next) => {
     });
 });
 
-homeAssistantRouter.get("/backup/:slug", (req, res, next) => {
+homeAssistantRouter.get("/backup/:slug", (req, res) => {
   haOsService
     .getBackupInfo(req.params.slug)
     .then((value) => {
@@ -27,7 +31,7 @@ homeAssistantRouter.get("/backup/:slug", (req, res, next) => {
     });
 });
 
-homeAssistantRouter.get("/addons", (req, res, next) => {
+homeAssistantRouter.get("/addons", (req, res) => {
   haOsService
     .getAddonList()
     .then((value) => {
@@ -39,7 +43,7 @@ homeAssistantRouter.get("/addons", (req, res, next) => {
     });
 });
 
-homeAssistantRouter.get("/folders", (req, res, next) => {
+homeAssistantRouter.get("/folders", (req, res) => {
   res.json(haOsService.getFolderList());
 });
 

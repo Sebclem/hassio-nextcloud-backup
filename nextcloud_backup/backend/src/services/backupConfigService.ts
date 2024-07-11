@@ -29,7 +29,9 @@ export function getBackupConfig(): BackupConfig {
     saveBackupConfig(defaultConfig);
     return defaultConfig;
   } else {
-    return JSON.parse(fs.readFileSync(backupConfigPath).toString());
+    return JSON.parse(
+      fs.readFileSync(backupConfigPath).toString()
+    ) as BackupConfig;
   }
 }
 

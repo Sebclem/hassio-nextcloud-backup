@@ -1,15 +1,15 @@
+import { unlinkSync } from "fs";
+import { DateTime } from "luxon";
+import logger from "../config/winston.js";
+import messageManager from "../tools/messageManager.js";
+import * as statusTools from "../tools/status.js";
+import { BackupType } from "../types/services/backupConfig.js";
 import type { AddonModel } from "../types/services/ha_os_response.js";
 import { WorkflowType } from "../types/services/orchecstrator.js";
 import * as backupConfigService from "./backupConfigService.js";
 import * as homeAssistantService from "./homeAssistantService.js";
 import { getBackupFolder, getWebdavConfig } from "./webdavConfigService.js";
 import * as webDavService from "./webdavService.js";
-import * as statusTools from "../tools/status.js";
-import { stat, unlinkSync } from "fs";
-import logger from "../config/winston.js";
-import { BackupType } from "../types/services/backupConfig.js";
-import { DateTime } from "luxon";
-import messageManager from "../tools/messageManager.js";
 
 export function doBackupWorkflow(type: WorkflowType) {
   let name = "";
@@ -38,7 +38,7 @@ export function doBackupWorkflow(type: WorkflowType) {
     .then(() => {
       return homeAssistantService.stopAddons(addonsToStartStop);
     })
-    .then((response) => {
+    .then(() => {
       if (backupConfig.backupType == BackupType.FULL) {
         return homeAssistantService.createNewBackup(
           name,
@@ -66,21 +66,23 @@ export function doBackupWorkflow(type: WorkflowType) {
       }
     })
     .then((response) => {
-      response.body.data.slug;
       return homeAssistantService.downloadSnapshot(response.body.data.slug);
     })
     .then((tmpFile) => {
       tmpBackupFile = tmpFile;
-      return webDavService.chunkedUpload(
-        tmpFile,
-        getBackupFolder(type, webdavConfig) + name,
-        webdavConfig
-      );
-      // return webDavService.webdavUploadFile(
-      //   tmpFile,
-      //   getBackupFolder(type, webdavConfig) + name,
-      //   webdavConfig
-      // );
+      if (webdavConfig.chunckedUpload) {
+        return webDavService.chunkedUpload(
+          tmpFile,
+          getBackupFolder(type, webdavConfig) + name,
+          webdavConfig
+        );
+      } else {
+        return webDavService.webdavUploadFile(
+          tmpFile,
+          getBackupFolder(type, webdavConfig) + name,
+          webdavConfig
+        );
+      }
     })
     .then(() => {
       logger.info("Backup workflow finished successfully !");
@@ -96,7 +98,7 @@ export function doBackupWorkflow(type: WorkflowType) {
       if (tmpBackupFile != "") {
         unlinkSync(tmpBackupFile);
       }
-      return Promise.reject();
+      return Promise.reject(new Error());
     });
 }
 

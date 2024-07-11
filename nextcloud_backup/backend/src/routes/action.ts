@@ -10,7 +10,7 @@ actionRouter.post("/backup", (req, res) => {
     .then(() => {
       logger.info("All good !");
     })
-    .catch((reason) => {
+    .catch(() => {
       logger.error("Something wrong !");
     });
   res.statusCode = 200;

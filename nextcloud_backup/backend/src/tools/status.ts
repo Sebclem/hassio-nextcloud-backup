@@ -1,4 +1,3 @@
-import { publish_state } from "../services/homeAssistantService.js";
 import { States, type Status } from "../types/status.js";
 import { DateTime } from "luxon";
 
@@ -33,6 +32,6 @@ export function setStatus(new_state: Status) {
   const old_state_str = JSON.stringify(status);
   if (old_state_str !== JSON.stringify(new_state)) {
     status = new_state;
-    publish_state(status);
+    // publish_state(status);
   }
 }

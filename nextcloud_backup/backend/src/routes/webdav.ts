@@ -12,7 +12,7 @@ import { WebdavDeleteValidation } from "../types/services/webdavValidation.js";
 
 const webdavRouter = express.Router();
 
-webdavRouter.get("/backup/auto", (req, res, next) => {
+webdavRouter.get("/backup/auto", (req, res) => {
   const config = getWebdavConfig();
   const backupConf = getBackupConfig();
   validateWebdavConfig(config)
@@ -20,8 +20,11 @@ webdavRouter.get("/backup/auto", (req, res, next) => {
       return webdavService.checkWebdavLogin(config);
     })
     .then(async () => {
-      const value = await webdavService
-        .getBackups(pathTools.auto, config, backupConf.nameTemplate);
+      const value = await webdavService.getBackups(
+        pathTools.auto,
+        config,
+        backupConf.nameTemplate
+      );
       res.json(value);
     })
     .catch((reason) => {
@@ -30,7 +33,7 @@ webdavRouter.get("/backup/auto", (req, res, next) => {
     });
 });
 
-webdavRouter.get("/backup/manual", (req, res, next) => {
+webdavRouter.get("/backup/manual", (req, res) => {
   const config = getWebdavConfig();
   const backupConf = getBackupConfig();
   validateWebdavConfig(config)
@@ -38,8 +41,11 @@ webdavRouter.get("/backup/manual", (req, res, next) => {
       return webdavService.checkWebdavLogin(config);
     })
     .then(async () => {
-      const value = await webdavService
-        .getBackups(pathTools.manual, config, backupConf.nameTemplate);
+      const value = await webdavService.getBackups(
+        pathTools.manual,
+        config,
+        backupConf.nameTemplate
+      );
       res.json(value);
     })
     .catch((reason) => {
@@ -48,28 +54,30 @@ webdavRouter.get("/backup/manual", (req, res, next) => {
     });
 });
 
-webdavRouter.delete("/", (req, res, next) => {
-  const body: WebdavDelete = req.body;
+webdavRouter.delete("/", (req, res) => {
+  const body = req.body as WebdavDelete;
   const validator = Joi.object(WebdavDeleteValidation);
   const config = getWebdavConfig();
-  validateWebdavConfig(config).then(() => {
-   validator
-      .validateAsync(body)
-      .then(() => {
-        return webdavService.checkWebdavLogin(config);
-      })
-      .then(() => {
-        webdavService.deleteBackup(body.path, config)
-          .then(()=>{
-            res.status(201).send();
-          }).catch((reason)=>{
-            res.status(500).json(reason);
-          });
-      })
-      .catch((reason) => {
-        res.status(400).json(reason);
-      });
-  });
+  validateWebdavConfig(config)
+    .then(() => {
+      return validator.validateAsync(body);
+    })
+    .then(() => {
+      return webdavService.checkWebdavLogin(config);
+    })
+    .then(() => {
+      webdavService
+        .deleteBackup(body.path, config)
+        .then(() => {
+          res.status(201).send();
+        })
+        .catch((reason) => {
+          res.status(500).json(reason);
+        });
+    })
+    .catch((reason) => {
+      res.status(400).json(reason);
+    });
 });
 
 export default webdavRouter;

@@ -1,30 +1,25 @@
 import cookieParser from "cookie-parser";
-import express, { type NextFunction, type Request, type Response } from "express";
+import cors from "cors";
+import errorHandler from "errorhandler";
+import express from "express";
 import createError from "http-errors";
 import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
 import logger from "./config/winston.js";
 import apiV2Router from "./routes/apiV2.js";
-import cors from "cors"
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 
-app.use(cors({
-  origin: true
-}))
+app.use(
+  cors({
+    origin: true,
+  })
+);
 
 app.set("port", process.env.PORT || 3000);
-
-// app.use(
-//     logger("dev", {
-//         skip: function (req, res) {
-//             return (res.statusCode = 304);
-//         },
-//     })
-// );
 
 app.use(
   morgan("dev", { stream: { write: (message) => logger.debug(message) } })
@@ -46,15 +41,9 @@ app.use((req, res, next) => {
 });
 
 // error handler
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render("error");
-});
-
+if (process.env.NODE_ENV === "development") {
+  // only use in development
+  app.use(errorHandler());
+}
 
 export default app;

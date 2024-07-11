@@ -5,27 +5,26 @@ import got, {
   RequestError,
   type OptionsOfJSONResponseBody,
   type PlainResponse,
+  type Progress,
   type Response,
 } from "got";
+import { DateTime } from "luxon";
 import stream from "stream";
 import { promisify } from "util";
 import logger from "../config/winston.js";
 import messageManager from "../tools/messageManager.js";
-import * as settingsTools from "../tools/settingsTools.js";
 import * as statusTools from "../tools/status.js";
+import { BackupType } from "../types/services/backupConfig.js";
 import type { NewBackupPayload } from "../types/services/ha_os_payload.js";
 import type {
   AddonData,
-  AddonModel,
   BackupData,
   BackupDetailModel,
   BackupModel,
   CoreInfoBody,
   SupervisorResponse,
 } from "../types/services/ha_os_response.js";
-import { States, type Status } from "../types/status.js";
-import { DateTime } from "luxon";
-import { BackupType } from "../types/services/backupConfig.js";
+import { States } from "../types/status.js";
 
 const pipeline = promisify(stream.pipeline);
 
@@ -44,7 +43,7 @@ function getVersion(): Promise<Response<SupervisorResponse<CoreInfoBody>>> {
     (result) => {
       return result;
     },
-    (error) => {
+    (error: Error) => {
       messageManager.error(
         "Fail to fetch Home Assistant version",
         error?.message
@@ -73,7 +72,7 @@ function getAddonList(): Promise<Response<SupervisorResponse<AddonData>>> {
       });
       return result;
     },
-    (error) => {
+    (error: Error) => {
       messageManager.error("Fail to fetch addons list", error?.message);
       logger.error(`Fail to fetch addons list (${error?.message})`);
       logger.error(error);
@@ -98,7 +97,7 @@ function getBackups(): Promise<Response<SupervisorResponse<BackupData>>> {
       statusTools.setStatus(status);
       return result;
     },
-    (error) => {
+    (error: Error) => {
       const status = statusTools.getStatus();
       status.hass.ok = false;
       status.hass.last_check = DateTime.now();
@@ -127,7 +126,7 @@ function downloadSnapshot(id: string): Promise<string> {
   return pipeline(
     got.stream
       .get(`http://hassio/backups/${id}/download`, option)
-      .on("downloadProgress", (e) => {
+      .on("downloadProgress", (e: Progress) => {
         const percent = Math.round(e.percent * 100) / 100;
         if (status.progress !== percent) {
           status.progress = percent;
@@ -147,7 +146,7 @@ function downloadSnapshot(id: string): Promise<string> {
       );
       return tmp_file;
     },
-    (reason) => {
+    (reason: Error) => {
       fs.unlinkSync(tmp_file);
       messageManager.error(
         "Fail to download Home Assistant backup",
@@ -170,7 +169,7 @@ function delSnap(id: string) {
     (result) => {
       return result;
     },
-    (reason) => {
+    (reason: RequestError) => {
       messageManager.error(
         "Fail to delete Homme assistant backup detail.",
         reason.message
@@ -196,7 +195,7 @@ function getBackupInfo(id: string) {
       logger.debug(`Backup size: ${result.body.data.size}`);
       return result;
     },
-    (reason) => {
+    (reason: RequestError) => {
       messageManager.error(
         "Fail to retrive Homme assistant backup detail.",
         reason.message
@@ -250,7 +249,7 @@ function createNewBackup(
       statusTools.setStatus(status);
       return result;
     },
-    (reason) => {
+    (reason: RequestError) => {
       messageManager.error("Fail to create new backup.", reason.message);
       logger.error("Fail to create new backup");
       logger.error(reason);
@@ -263,19 +262,15 @@ function createNewBackup(
   );
 }
 
-function clean(backups: BackupModel[]) {
+function clean(backups: BackupModel[], numberToKeep: number) {
   const promises = [];
-  let limit = settingsTools.getSettings().auto_clean_local_keep;
-  if (limit == null) {
-    limit = 5;
-  }
-  if (backups.length < limit) {
+  if (backups.length < numberToKeep) {
     return;
   }
   backups.sort((a, b) => {
     return Date.parse(b.date) - Date.parse(a.date);
   });
-  const toDel = backups.slice(limit);
+  const toDel = backups.slice(numberToKeep);
   for (const i of toDel) {
     promises.push(delSnap(i.slug));
   }
@@ -284,6 +279,7 @@ function clean(backups: BackupModel[]) {
     let errors = false;
     for (const val of values) {
       if (val.status == "rejected") {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         messageManager.error("Fail to delete backup", val.reason);
         logger.error("Fail to delete backup");
         logger.error(val.reason);
@@ -293,7 +289,7 @@ function clean(backups: BackupModel[]) {
     if (errors) {
       messageManager.error("Fail to clean backups in Home Assistant");
       logger.error("Fail to clean backups in Home Assistant");
-      return Promise.reject();
+      return Promise.reject(new Error());
     }
   });
 }
@@ -315,7 +311,7 @@ function uploadSnapshot(path: string) {
     };
     got.stream
       .post(`http://hassio/backups/new/upload`, options)
-      .on("uploadProgress", (e) => {
+      .on("uploadProgress", (e: Progress) => {
         const percent = e.percent;
         if (status.progress !== percent) {
           status.progress = percent;
@@ -329,13 +325,13 @@ function uploadSnapshot(path: string) {
         if (res.statusCode !== 200) {
           messageManager.error(
             "Fail to upload backup to Home Assistant",
-            `Code: ${res.statusCode} Body: ${res.body}`
+            `Code: ${res.statusCode} Body: ${res.body as string}`
           );
           logger.error("Fail to upload backup to Home Assistant");
           logger.error(`Code: ${res.statusCode}`);
-          logger.error(`Body: ${res.body}`);
+          logger.error(`Body: ${res.body as string}`);
           fs.unlinkSync(path);
-          reject(res.statusCode);
+          reject(new Error(res.statusCode.toString()));
         } else {
           logger.info(`...Upload finish ! (status: ${res.statusCode})`);
           const status = statusTools.getStatus();
@@ -388,17 +384,17 @@ function stopAddons(addonSlugs: string[]) {
     statusTools.setStatus(status);
     for (const val of values) {
       if (val.status == "rejected") {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         messageManager.error("Fail to stop addon", val.reason);
         logger.error("Fail to stop addon");
         logger.error(val.reason);
-        logger.error;
         errors = true;
       }
     }
     if (errors) {
       messageManager.error("Fail to stop addon");
       logger.error("Fail to stop addon");
-      return Promise.reject();
+      return Promise.reject(new Error());
     }
   });
 }
@@ -428,6 +424,7 @@ function startAddons(addonSlugs: string[]) {
     let errors = false;
     for (const val of values) {
       if (val.status == "rejected") {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         messageManager.error("Fail to start addon", val.reason);
         logger.error("Fail to start addon");
         logger.error(val.reason);
@@ -437,7 +434,7 @@ function startAddons(addonSlugs: string[]) {
     if (errors) {
       messageManager.error("Fail to start addon");
       logger.error("Fail to start addon");
-      return Promise.reject();
+      return Promise.reject(new Error());
     }
   });
 }
@@ -467,7 +464,7 @@ export function getFolderList() {
   ];
 }
 
-function publish_state(state: Status) {
+function publish_state() {
   // let data_error_sensor = {
   //     state: state.status == "error" ? "on" : "off",
   //     attributes: {
@@ -532,15 +529,15 @@ function publish_state(state: Status) {
 }
 
 export {
-  getVersion,
-  getAddonList,
-  getBackups,
-  downloadSnapshot,
-  createNewBackup,
-  uploadSnapshot,
-  stopAddons,
-  startAddons,
   clean,
-  publish_state,
+  createNewBackup,
+  downloadSnapshot,
+  getAddonList,
   getBackupInfo,
+  getBackups,
+  getVersion,
+  publish_state,
+  startAddons,
+  stopAddons,
+  uploadSnapshot,
 };

@@ -1,10 +1,12 @@
 import { existsSync, mkdirSync } from "fs";
 import logger from "./config/winston.js";
 import * as homeAssistantService from "./services/homeAssistantService.js";
-import * as settingsTools from "./tools/settingsTools.js";
 import * as statusTools from "./tools/status.js";
 import kleur from "kleur";
-import { checkWebdavLogin, createBackupFolder } from "./services/webdavService.js";
+import {
+  checkWebdavLogin,
+  createBackupFolder,
+} from "./services/webdavService.js";
 import {
   getWebdavConfig,
   validateWebdavConfig,
@@ -59,16 +61,15 @@ function postInit() {
         }
       );
     },
-    (reason) => {
+    (reason: Error) => {
       logger.error("Webdav config: " + kleur.red().bold("FAIL !"));
       logger.error(reason);
       messageManager.error("Invalid webdav config", reason.message);
     }
   );
 
-  settingsTools.check(settingsTools.getSettings(), true);
+  // settingsTools.check(settingsTools.getSettings(), true);
   // cronTools.init();
-  
 }
 
 export default postInit;

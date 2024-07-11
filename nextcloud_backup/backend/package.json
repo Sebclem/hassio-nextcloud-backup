@@ -7,12 +7,11 @@
     "build:watch": "tsc -w",
     "build": "tsc --build --verbose",
     "dev": "pnpm build && concurrently -n tsc,node \"pnpm build:watch\" \"pnpm serve:watch\"",
-    "lint": "tsc --noEmit && eslint \"**/*.{js,ts}\" --quiet --fix",
+    "lint": "tsc --noEmit && eslint --quiet --fix",
     "serve:watch": "nodemon dist/server.js",
     "serve": "node dist/server.js"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^7.0.1",
     "app-root-path": "3.1.0",
     "cookie-parser": "1.4.6",
     "cors": "^2.8.5",
@@ -35,23 +34,24 @@
   },
   "packageManager": "pnpm@8.15.3",
   "devDependencies": {
+    "@eslint/js": "^9.6.0",
     "@tsconfig/recommended": "^1.0.3",
     "@types/cookie-parser": "^1.4.6",
     "@types/cors": "^2.8.17",
-    "@types/cron": "^2.4.0",
     "@types/errorhandler": "^1.5.3",
+    "@types/eslint__js": "^8.42.3",
     "@types/express": "^4.17.21",
     "@types/figlet": "^1.5.8",
     "@types/http-errors": "^2.0.4",
     "@types/luxon": "^3.4.2",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.11.19",
-    "@typescript-eslint/parser": "^7.0.1",
     "concurrently": "8.2.2",
     "dotenv": "^16.4.4",
-    "eslint": "8.56.0",
+    "eslint": "^9.6.0",
     "nodemon": "^3.0.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "typescript-eslint": "8.0.0-alpha.41"
   }
 }
