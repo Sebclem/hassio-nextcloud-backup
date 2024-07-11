@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { randomUUID } from "crypto";
 import { XMLParser } from "fast-xml-parser";
 import fs from "fs";
 import got, {
@@ -17,10 +18,9 @@ import * as pathTools from "../tools/pathTools.js";
 import * as statusTools from "../tools/status.js";
 import type { WebdavBackup } from "../types/services/webdav.js";
 import type { WebdavConfig } from "../types/services/webdavConfig.js";
+import { States } from "../types/status.js";
 import { templateToRegexp } from "./backupConfigService.js";
 import { getChunkEndpoint, getEndpoint } from "./webdavConfigService.js";
-import { States } from "../types/status.js";
-import { randomUUID } from "crypto";
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MiB Same as desktop client
 const CHUNK_NUMBER_SIZE = 5; // To add landing "0"
@@ -56,12 +56,9 @@ export function checkWebdavLogin(
       status.webdav.last_check = DateTime.now();
       return response;
     },
-    (reason) => {
+    (reason: RequestError) => {
       if (!silent) {
-        messageManager.error(
-          "Fail to connect to Webdav",
-          (reason as Error).message
-        );
+        messageManager.error("Fail to connect to Webdav", reason.message);
       }
       const status = statusTools.getStatus();
       status.webdav = {
@@ -72,7 +69,7 @@ export function checkWebdavLogin(
       statusTools.setStatus(status);
       logger.error(`Fail to connect to Webdav`);
       logger.error(reason);
-      return Promise.reject(reason as Error);
+      return Promise.reject(reason);
     }
   );
 }
@@ -166,13 +163,13 @@ export function getBackups(
       );
       return extractBackupInfo(data, nameTemplate);
     },
-    (reason) => {
+    (reason: RequestError) => {
       messageManager.error(
         `Fail to retrive webdav backups in ${folder} folder`
       );
       logger.error(`Fail to retrive webdav backups in ${folder} folder`);
       logger.error(reason);
-      return Promise.reject(reason as Error);
+      return Promise.reject(reason);
     }
   );
 }
@@ -218,14 +215,11 @@ export function deleteBackup(path: string, config: WebdavConfig) {
       (response) => {
         return response;
       },
-      (reason) => {
-        messageManager.error(
-          "Fail to delete backup in webdav",
-          (reason as Error)?.message
-        );
+      (reason: RequestError) => {
+        messageManager.error("Fail to delete backup in webdav", reason.message);
         logger.error(`Fail to delete backup in Cloud`);
         logger.error(reason);
-        return Promise.reject(reason as Error);
+        return Promise.reject(reason);
       }
     );
 }

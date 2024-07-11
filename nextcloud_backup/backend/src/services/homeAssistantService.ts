@@ -72,7 +72,7 @@ function getAddonList(): Promise<Response<SupervisorResponse<AddonData>>> {
       });
       return result;
     },
-    (error: Error) => {
+    (error: RequestError) => {
       messageManager.error("Fail to fetch addons list", error?.message);
       logger.error(`Fail to fetch addons list (${error?.message})`);
       logger.error(error);
@@ -97,7 +97,7 @@ function getBackups(): Promise<Response<SupervisorResponse<BackupData>>> {
       statusTools.setStatus(status);
       return result;
     },
-    (error: Error) => {
+    (error: RequestError) => {
       const status = statusTools.getStatus();
       status.hass.ok = false;
       status.hass.last_check = DateTime.now();
@@ -146,7 +146,7 @@ function downloadSnapshot(id: string): Promise<string> {
       );
       return tmp_file;
     },
-    (reason: Error) => {
+    (reason: RequestError) => {
       fs.unlinkSync(tmp_file);
       messageManager.error(
         "Fail to download Home Assistant backup",
