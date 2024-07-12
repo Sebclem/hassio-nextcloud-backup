@@ -73,13 +73,13 @@ export function doBackupWorkflow(type: WorkflowType) {
       if (webdavConfig.chunckedUpload) {
         return webDavService.chunkedUpload(
           tmpFile,
-          getBackupFolder(type, webdavConfig) + name,
+          getBackupFolder(type, webdavConfig) + name + ".tar",
           webdavConfig
         );
       } else {
         return webDavService.webdavUploadFile(
           tmpFile,
-          getBackupFolder(type, webdavConfig) + name,
+          getBackupFolder(type, webdavConfig) + name + ".tar",
           webdavConfig
         );
       }
