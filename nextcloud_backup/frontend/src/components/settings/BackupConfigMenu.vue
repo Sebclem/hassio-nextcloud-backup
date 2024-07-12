@@ -69,4 +69,3 @@ function saved() {
   alertStore.add("success", "Backup settings saved !");
 }
 </script>
-@/store/dialogStatus@/store/alert

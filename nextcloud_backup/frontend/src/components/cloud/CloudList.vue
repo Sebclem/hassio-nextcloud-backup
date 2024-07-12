@@ -76,7 +76,10 @@
         </v-row>
       </v-card-text>
     </v-card>
-    <cloud-delete-dialog ref="deleteDialog"></cloud-delete-dialog>
+    <cloud-delete-dialog
+      ref="deleteDialog"
+      @deleted="refreshBackup"
+    ></cloud-delete-dialog>
   </div>
 </template>
 

@@ -32,9 +32,9 @@
 <script setup lang="ts">
 import { useMenuSize } from "@/composable/menuSize";
 import { deleteWebdabBackup } from "@/services/webdavService";
+import { useAlertStore } from "@/store/alert";
 import type { WebdavBackup } from "@/types/webdav";
-import { computed, ref } from "vue";
-import { useDisplay } from "vuetify/dist/vuetify";
+import { ref } from "vue";
 
 const dialog = ref(false);
 const loading = ref(false);
@@ -42,6 +42,11 @@ const item = ref<WebdavBackup | null>(null);
 
 const { width, isFullScreen } = useMenuSize();
 
+const emit = defineEmits<{
+  (e: "deleted"): void;
+}>();
+
+const alertStore = useAlertStore();
 function confirm() {
   loading.value = true;
   if (item.value) {
@@ -49,9 +54,12 @@ function confirm() {
       .then(() => {
         loading.value = false;
         dialog.value = false;
+        alertStore.add("success", "Backup deleted from cloud");
+        emit("deleted");
       })
       .catch(() => {
         loading.value = false;
+        alertStore.add("error", "Fail to deleted backup from cloud");
       });
   }
 }
