@@ -414,6 +414,12 @@ export async function chunkedUpload(
   logger.debug("Chunked upload funished, assembling chunks.");
   try {
     await assembleChunkedUpload(chunkedUrl, finalDestination, fileSize, config);
+    const status = statusTools.getStatus();
+    status.status = States.IDLE;
+    status.progress = undefined;
+    statusTools.setStatus(status);
+    logger.info(`...Upload finish !`);
+    fs.unlinkSync(localPath);
   } catch (err) {
     if (err instanceof RequestError) {
       messageManager.error(
@@ -482,7 +488,7 @@ export function initChunkedUpload(
   finalDestination: string,
   config: WebdavConfig
 ) {
-  logger.debug(`Init chuncked upload.`);
+  logger.info(`Init chuncked upload.`);
   logger.debug(`...URI: ${encodeURI(url)}`);
   logger.debug(`...Final destination: ${encodeURI(finalDestination)}`);
   return got(encodeURI(url), {
@@ -504,7 +510,7 @@ export function assembleChunkedUpload(
   config: WebdavConfig
 ) {
   const chunckFile = `${url}/.file`;
-  logger.debug(`Assemble chuncked upload.`);
+  logger.info(`Assemble chuncked upload.`);
   logger.debug(`...URI: ${encodeURI(chunckFile)}`);
   logger.debug(`...Final destination: ${encodeURI(finalDestination)}`);
   return got(encodeURI(chunckFile), {
