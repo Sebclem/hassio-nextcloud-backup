@@ -85,6 +85,9 @@ export function doBackupWorkflow(type: WorkflowType) {
       }
     })
     .then(() => {
+      return homeAssistantService.startAddons(addonsToStartStop);
+    })
+    .then(() => {
       logger.info("Backup workflow finished successfully !");
       messageManager.info("Backup workflow finished successfully !");
       const status = statusTools.getStatus();
@@ -104,8 +107,7 @@ export function doBackupWorkflow(type: WorkflowType) {
 
 // This methods remove addon that are no installed in HA from the conf array
 function sanitizeAddonList(addonInConf: string[], addonInHA: AddonModel[]) {
-  addonInConf.filter((value) => addonInHA.some((v) => v.slug == value));
-  return addonInConf;
+  return addonInConf.filter((value) => addonInHA.some((v) => v.slug == value));
 }
 
 function getAddonToBackup(excludedAddon: string[], addonInHA: AddonModel[]) {
