@@ -1,35 +1,37 @@
 <template>
   <v-fade-transition>
-    <div id="alertContainer" v-if="alertVisible">
-      <v-slide-x-transition group tag="div">
-        <v-alert
-          v-for="alert of alertList"
-          v-bind:key="alert.id"
-          elevation="24"
-          :type="alert.type"
-          border="start"
-          class="mb-2"
-        >
-          <v-row dense>
-            <v-col v-html="alert.message"></v-col>
-            <v-col cols="2">
-              <v-btn
-                class="d-inline"
-                size="30"
-                variant="text"
-                rounded
-                icon="$close"
-                @click="alertStore.remove(alert.id)"
-              ></v-btn>
-            </v-col>
-          </v-row>
+    <div id="parent" v-if="alertVisible">
+      <div id="alertContainer">
+        <v-slide-x-transition group tag="div">
+          <v-alert
+            v-for="alert of alertList"
+            v-bind:key="alert.id"
+            elevation="24"
+            :type="alert.type"
+            border="start"
+            class="mb-2"
+          >
+            <v-row dense>
+              <v-col v-html="alert.message"></v-col>
+              <v-col cols="2">
+                <v-btn
+                  class="d-inline"
+                  size="30"
+                  variant="text"
+                  rounded
+                  icon="$close"
+                  @click="alertStore.remove(alert.id)"
+                ></v-btn>
+              </v-col>
+            </v-row>
 
-          <v-progress-linear
-            :max="alertStore.timeOutValue"
-            :model-value="alert.timeOut"
-          ></v-progress-linear>
-        </v-alert>
-      </v-slide-x-transition>
+            <v-progress-linear
+              :max="alertStore.timeOutValue"
+              :model-value="alert.timeOut"
+            ></v-progress-linear>
+          </v-alert>
+        </v-slide-x-transition>
+      </div>
     </div>
   </v-fade-transition>
 </template>
@@ -45,11 +47,17 @@ const { alertList } = storeToRefs(alertStore);
 const alertVisible = computed(() => alertList.value.length > 0);
 </script>
 <style>
-#alertContainer {
+#parent {
   position: absolute;
   top: 70px;
   right: 20px;
   z-index: 99999;
+  height: 100vh;
+  #alertContainer {
+    position: sticky;
+    top: 80px;
+    right: 20px;
+  }
 }
 </style>
 @/store/alert
