@@ -1,8 +1,7 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import errorHandler from "errorhandler";
 import express from "express";
-import createError from "http-errors";
+
 import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -20,10 +19,11 @@ app.use(
 );
 
 app.set("port", process.env.PORT || 3000);
-
-// app.use(
-//   morgan("dev", { stream: { write: (message) => logger.debug(message) } })
-// );
+if (process.env.ACCESS_LOG == "true") {
+  app.use(
+    morgan("dev", { stream: { write: (message) => logger.debug(message) } })
+  );
+}
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -35,16 +35,5 @@ app.use("/v2/api/", apiV2Router);
         Error handler
 ----------------------------------------------------------
 */
-
-// error handler
-if (app.get("env") == "development") {
-  // catch 404 and forward to error handler
-  app.use((req, res, next) => {
-    next(createError(404));
-  });
-
-  // only use in development
-  app.use(errorHandler());
-}
 
 export default app;
