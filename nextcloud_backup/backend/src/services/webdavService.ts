@@ -343,7 +343,7 @@ export async function chunkedUpload(
   const finalDestination = config.url + getEndpoint(config) + webdavPath;
   const status = statusTools.getStatus();
   status.status = States.BKUP_UPLOAD_CLOUD;
-  status.progress = 0;
+  status.progress = -1;
   statusTools.setStatus(status);
   try {
     await initChunkedUpload(chunkedUrl, finalDestination, config);
@@ -365,16 +365,21 @@ export async function chunkedUpload(
       logger.error((err as Error).message);
     }
     fs.unlinkSync(localPath);
+    const status = statusTools.getStatus();
+    status.status = States.IDLE;
+    status.progress = undefined;
+    statusTools.setStatus(status);
     throw err;
   }
 
   let start = 0;
-  let end = fileSize > CHUNK_SIZE ? CHUNK_SIZE : fileSize;
-  let current_size = end;
+  let end = Math.min(CHUNK_SIZE - 1, fileSize - 1);
+
+  let current_size = end + 1;
   // const uploadedBytes = 0;
 
-  let i = 0;
-  while (start < fileSize) {
+  let i = 1;
+  while (start < fileSize - 1) {
     const chunk = fs.createReadStream(localPath, { start, end });
     try {
       const chunckNumber = i.toString().padStart(CHUNK_NUMBER_SIZE, "0");
@@ -386,9 +391,9 @@ export async function chunkedUpload(
         fileSize,
         config
       );
-      start = end;
-      end = Math.min(start + CHUNK_SIZE, fileSize - 1);
-      current_size = end - start;
+      start = end + 1;
+      end = Math.min(start + CHUNK_SIZE - 1, fileSize - 1);
+      current_size = end - start + 1;
       i++;
     } catch (error) {
       if (error instanceof Error) {
@@ -408,6 +413,10 @@ export async function chunkedUpload(
         logger.error(`Code: ${(error as PlainResponse).statusCode}`);
         logger.error(`Body: ${(error as PlainResponse).body as string}`);
       }
+      const status = statusTools.getStatus();
+      status.status = States.IDLE;
+      status.progress = undefined;
+      statusTools.setStatus(status);
       throw error;
     }
   }
@@ -435,6 +444,10 @@ export async function chunkedUpload(
       logger.error((err as Error).message);
     }
     fs.unlinkSync(localPath);
+    const status = statusTools.getStatus();
+    status.status = States.IDLE;
+    status.progress = undefined;
+    statusTools.setStatus(status);
     throw err;
   }
 }
@@ -452,6 +465,7 @@ export function uploadChunk(
     logger.debug(`...URI: ${encodeURI(url)}`);
     logger.debug(`...Final destination: ${encodeURI(finalDestination)}`);
     logger.debug(`...Chunk size: ${contentLength}`);
+    logger.debug(`...Total size: ${totalLength}`);
     got.stream
       .put(url, {
         headers: {
