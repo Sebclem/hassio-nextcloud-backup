@@ -32,26 +32,49 @@
         </v-select>
       </v-col>
     </v-row>
-    <v-row v-if="data.webdavEndpoint.type == WebdavEndpointType.CUSTOM">
-      <v-col>
-        <div class="text-subtitle-1 text-medium-emphasis">Custom Endpoint</div>
-        <v-text-field
-          placeholder="/remote.php/dav/files/$username"
-          hint="You can use the $username variable"
-          variant="outlined"
-          density="compact"
-          hide-details="auto"
-          v-model="data.webdavEndpoint.customEndpoint"
-          :error-messages="errors.customEndpoint"
-          :loading="loading"
-          color="orange"
-        ></v-text-field>
-      </v-col>
-    </v-row>
+    <div v-if="data.webdavEndpoint.type == WebdavEndpointType.CUSTOM">
+      <v-row>
+        <v-col>
+          <div class="text-subtitle-1 text-medium-emphasis">
+            Custom endpoint
+          </div>
+          <v-text-field
+            placeholder="/remote.php/dav/files/$username"
+            hint="You can use the $username variable"
+            variant="outlined"
+            density="compact"
+            hide-details="auto"
+            v-model="data.webdavEndpoint.customEndpoint"
+            :error-messages="errors.customEndpoint"
+            :loading="loading"
+            color="orange"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <div class="text-subtitle-1 text-medium-emphasis">
+            Custom chunk endpoint
+          </div>
+          <v-text-field
+            placeholder="/remote.php/dav/uploads/$username"
+            hint="You can use the $username variable"
+            variant="outlined"
+            density="compact"
+            hide-details="auto"
+            v-model="data.webdavEndpoint.customChunkEndpoint"
+            :error-messages="errors.customChunkEndpoint"
+            :loading="loading"
+            color="orange"
+          ></v-text-field>
+        </v-col>
+      </v-row>
+    </div>
+
     <v-row class="mt-0">
       <v-col class="d-flex align-content-end">
         <v-switch
-          label="Allow Self Signed Certificate"
+          label="Allow self signed certificate"
           v-model="data.allowSelfSignedCerts"
           hide-details="auto"
           density="compact"
@@ -65,7 +88,7 @@
     <v-row class="mt-0">
       <v-col class="d-flex align-content-end">
         <v-switch
-          label="Chunked Upload (Beta)"
+          label="Chunked upload (Beta)"
           v-model="data.chunckedUpload"
           hide-details="auto"
           density="compact"
@@ -171,6 +194,7 @@ const errors = ref({
   allowSelfSignedCerts: [],
   type: [],
   customEndpoint: [],
+  customChunkEndpoint: [],
   chunckedUpload: [],
 });
 

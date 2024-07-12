@@ -13,5 +13,6 @@ export interface WebdavConfig {
   webdavEndpoint: {
     type: WebdavEndpointType;
     customEndpoint?: string;
+    customChunkEndpoint?: string;
   };
 }
