@@ -129,4 +129,3 @@ const { save, loading } = useConfigForm(
 );
 defineExpose({ save });
 </script>
-@/store/backupConfig

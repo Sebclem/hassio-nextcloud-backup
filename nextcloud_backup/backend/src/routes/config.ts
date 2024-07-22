@@ -24,12 +24,10 @@ configRouter.put("/backup", (req, res) => {
   validateBackupConfig(req.body as BackupConfig)
     .then(() => {
       saveBackupConfig(req.body as BackupConfig);
-      res.status(204);
-      res.send();
+      res.status(204).send();
     })
     .catch((error: ValidationError) => {
-      res.status(400);
-      res.json(error.details);
+      res.status(400).json(error.details);
     });
 });
 
@@ -44,8 +42,7 @@ configRouter.put("/webdav", (req, res) => {
     })
     .then(() => {
       saveWebdavConfig(req.body as WebdavConfig);
-      res.status(204);
-      res.send();
+      res.status(204).send();
     })
     .catch((error: ValidationError) => {
       res.status(400);

@@ -13,8 +13,7 @@ actionRouter.post("/backup", (req, res) => {
     .catch(() => {
       logger.error("Something wrong !");
     });
-  res.statusCode = 200;
-  res.send();
+  res.sendStatus(202);
 });
 
 export default actionRouter;

@@ -11,7 +11,7 @@ messageRouter.patch("/:messageId/readed", (req, res) => {
   if (messageManager.markReaded(req.params.messageId)) {
     res.json(messageManager.get());
   } else {
-    res.status(404).send();
+    res.sendStatus(404);
   }
 });
 

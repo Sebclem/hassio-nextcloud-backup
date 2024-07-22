@@ -14,8 +14,7 @@ homeAssistantRouter.get("/backups/", (req, res) => {
       );
     })
     .catch((reason) => {
-      res.status(500);
-      res.json(reason);
+      res.status(500).json(reason);
     });
 });
 
@@ -26,8 +25,7 @@ homeAssistantRouter.get("/backup/:slug", (req, res) => {
       res.json(value.body.data);
     })
     .catch((reason) => {
-      res.status(500);
-      res.json(reason);
+      res.status(500).json(reason);
     });
 });
 
@@ -38,8 +36,7 @@ homeAssistantRouter.get("/addons", (req, res) => {
       res.json(value.body.data);
     })
     .catch((reason) => {
-      res.status(500);
-      res.json(reason);
+      res.status(500).json(reason);
     });
 });
 
