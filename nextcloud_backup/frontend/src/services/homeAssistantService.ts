@@ -21,3 +21,7 @@ export function getBackups() {
 export function getBackupDetail(slug: string) {
   return kyClient.get(`homeAssistant/backup/${slug}`).json<BackupDetailModel>();
 }
+
+export function uploadHomeAssistantBackup(slug: string) {
+  return kyClient.post(`homeAssistant/backup/${slug}/upload`);
+}

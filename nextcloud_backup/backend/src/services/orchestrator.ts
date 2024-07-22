@@ -4,7 +4,10 @@ import logger from "../config/winston.js";
 import messageManager from "../tools/messageManager.js";
 import * as statusTools from "../tools/status.js";
 import { BackupType } from "../types/services/backupConfig.js";
-import type { AddonModel } from "../types/services/ha_os_response.js";
+import type {
+  AddonModel,
+  BackupDetailModel,
+} from "../types/services/ha_os_response.js";
 import { WorkflowType } from "../types/services/orchecstrator.js";
 import * as backupConfigService from "./backupConfigService.js";
 import * as homeAssistantService from "./homeAssistantService.js";
@@ -89,7 +92,10 @@ export function doBackupWorkflow(type: WorkflowType) {
     })
     .then(() => {
       logger.info("Backup workflow finished successfully !");
-      messageManager.info("Backup workflow finished successfully !");
+      messageManager.info(
+        "Backup workflow finished successfully !",
+        `name: ${name}`
+      );
       const status = statusTools.getStatus();
       status.last_backup.success = true;
       status.last_backup.last_try = DateTime.now();
@@ -98,6 +104,55 @@ export function doBackupWorkflow(type: WorkflowType) {
     })
     .catch(() => {
       backupFail();
+      if (tmpBackupFile != "") {
+        unlinkSync(tmpBackupFile);
+      }
+      return Promise.reject(new Error());
+    });
+}
+
+export function uploadToCloud(slug: string) {
+  const webdavConfig = getWebdavConfig();
+  let tmpBackupFile = "";
+  let backupInfo = {} as BackupDetailModel;
+
+  return webDavService
+    .checkWebdavLogin(webdavConfig)
+    .then(() => {
+      return homeAssistantService.getBackupInfo(slug);
+    })
+    .then((response) => {
+      backupInfo = response.body.data;
+      return homeAssistantService.downloadSnapshot(slug);
+    })
+    .then((tmpFile) => {
+      tmpBackupFile = tmpFile;
+      if (webdavConfig.chunckedUpload) {
+        return webDavService.chunkedUpload(
+          tmpFile,
+          getBackupFolder(WorkflowType.MANUAL, webdavConfig) +
+            backupInfo.name +
+            ".tar",
+          webdavConfig
+        );
+      } else {
+        return webDavService.webdavUploadFile(
+          tmpFile,
+          getBackupFolder(WorkflowType.MANUAL, webdavConfig) +
+            backupInfo.name +
+            ".tar",
+          webdavConfig
+        );
+      }
+    })
+    .then(() => {
+      logger.info(`Successfully uploaded ${backupInfo.name} to cloud.`);
+      messageManager.info(
+        "Successfully uploaded backup to cloud.",
+        `Name: ${backupInfo.name}`
+      );
+    })
+    .catch(() => {
       if (tmpBackupFile != "") {
         unlinkSync(tmpBackupFile);
       }

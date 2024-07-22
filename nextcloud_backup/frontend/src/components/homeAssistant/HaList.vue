@@ -37,6 +37,7 @@
                     :key="item.slug"
                     :item="item"
                     :index="index"
+                    @upload="upload"
                   >
                   </ha-list-item>
                 </v-list>
@@ -52,11 +53,17 @@
 <script lang="ts" setup>
 import type { BackupModel } from "@/types/homeAssistant";
 import { ref, onBeforeUnmount } from "vue";
-import { getBackups } from "@/services/homeAssistantService";
+import {
+  getBackups,
+  uploadHomeAssistantBackup,
+} from "@/services/homeAssistantService";
 import HaListItem from "./HaListItem.vue";
+import { useAlertStore } from "@/store/alert";
 
 const backups = ref<BackupModel[]>([]);
 const loading = ref<boolean>(true);
+
+const alertStore = useAlertStore();
 
 function refreshBackup() {
   loading.value = true;
@@ -67,6 +74,16 @@ function refreshBackup() {
     })
     .catch(() => {
       loading.value = false;
+    });
+}
+
+function upload(item: BackupModel) {
+  uploadHomeAssistantBackup(item.slug)
+    .then(() => {
+      alertStore.add("success", "Backup upload as started.");
+    })
+    .catch(() => {
+      alertStore.add("error", "Fail to start backup upload !");
     });
 }
 

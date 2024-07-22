@@ -156,7 +156,12 @@
       <v-card-actions class="justify-center">
         <v-tooltip text="Upload to Cloud" location="bottom">
           <template v-slot:activator="{ props }">
-            <v-btn variant="outlined" color="success" v-bind="props">
+            <v-btn
+              variant="outlined"
+              color="success"
+              v-bind="props"
+              @click="emits('upload', item)"
+            >
               <v-icon>mdi-cloud-upload</v-icon>
             </v-btn>
           </template>
@@ -193,5 +198,6 @@ watch(detail, (value) => {
 
 const emits = defineEmits<{
   (e: "delete", item: BackupModel): void;
+  (e: "upload", item: BackupModel): void;
 }>();
 </script>
