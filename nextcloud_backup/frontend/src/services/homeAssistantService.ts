@@ -25,3 +25,7 @@ export function getBackupDetail(slug: string) {
 export function uploadHomeAssistantBackup(slug: string) {
   return kyClient.post(`homeAssistant/backup/${slug}/upload`);
 }
+
+export function deleteHomeAssistantBackup(slug: string) {
+  return kyClient.delete(`homeAssistant/backup/${slug}`);
+}

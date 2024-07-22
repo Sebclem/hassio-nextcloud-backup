@@ -22,6 +22,7 @@ declare module 'vue' {
     CloudList: typeof import('./src/components/cloud/CloudList.vue')['default']
     CloudListItem: typeof import('./src/components/cloud/CloudListItem.vue')['default']
     ConnectionStatus: typeof import('./src/components/statusBar/ConnectionStatus.vue')['default']
+    HaDeleteDialog: typeof import('./src/components/homeAssistant/HaDeleteDialog.vue')['default']
     HaList: typeof import('./src/components/homeAssistant/HaList.vue')['default']
     HaListItem: typeof import('./src/components/homeAssistant/HaListItem.vue')['default']
     HaListItemContent: typeof import('./src/components/homeAssistant/HaListItemContent.vue')['default']

@@ -38,6 +38,7 @@
                     :item="item"
                     :index="index"
                     @upload="upload"
+                    @delete="deleteBackup"
                   >
                   </ha-list-item>
                 </v-list>
@@ -48,6 +49,10 @@
       </v-card-text>
     </v-card>
   </div>
+  <ha-delete-dialog
+    ref="deleteDialog"
+    @deleted="refreshBackup"
+  ></ha-delete-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -59,8 +64,13 @@ import {
 } from "@/services/homeAssistantService";
 import HaListItem from "./HaListItem.vue";
 import { useAlertStore } from "@/store/alert";
+import HaDeleteDialog from "./HaDeleteDialog.vue";
 
+const deleteDialog = ref<InstanceType<typeof HaDeleteDialog> | null>(null);
 const backups = ref<BackupModel[]>([]);
+
+const deleteItem = ref<BackupModel | null>(null);
+
 const loading = ref<boolean>(true);
 
 const alertStore = useAlertStore();
@@ -87,9 +97,12 @@ function upload(item: BackupModel) {
     });
 }
 
+function deleteBackup(item: BackupModel) {
+  deleteItem.value = item;
+  deleteDialog.value?.open(item);
+}
+
 refreshBackup();
 
 defineExpose({ refreshBackup });
-
-// TODO Manage delete
 </script>

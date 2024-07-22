@@ -162,6 +162,7 @@ function downloadSnapshot(id: string): Promise<string> {
 }
 
 function delSnap(id: string) {
+  logger.info(`Deleting Home Assistant backup ${id}`);
   const option = {
     headers: { authorization: `Bearer ${token}` },
   };
@@ -540,4 +541,5 @@ export {
   startAddons,
   stopAddons,
   uploadSnapshot,
+  delSnap,
 };

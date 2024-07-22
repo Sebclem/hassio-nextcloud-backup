@@ -31,6 +31,17 @@ homeAssistantRouter.get("/backup/:slug", (req, res) => {
     });
 });
 
+homeAssistantRouter.delete("/backup/:slug", (req, res) => {
+  haOsService
+    .delSnap(req.params.slug)
+    .then((value) => {
+      res.json(value.body);
+    })
+    .catch((reason) => {
+      res.status(500).json(reason);
+    });
+});
+
 homeAssistantRouter.post("/backup/:slug/upload", (req, res) => {
   uploadToCloud(req.params.slug)
     .then(() => {
