@@ -7,6 +7,8 @@ import { BackupType } from "../types/services/backupConfig.js";
 import type {
   AddonModel,
   BackupDetailModel,
+  BackupUpload,
+  SupervisorResponse,
 } from "../types/services/ha_os_response.js";
 import { WorkflowType } from "../types/services/orchecstrator.js";
 import * as backupConfigService from "./backupConfigService.js";
@@ -194,4 +196,27 @@ function backupFail() {
   status.last_backup.last_try = DateTime.now();
   statusTools.setStatus(status);
   messageManager.error("Last backup as failed !");
+}
+
+export function restoreToHA(webdavPath: string, filename: string) {
+  const webdavConfig = getWebdavConfig();
+  return webDavService
+    .checkWebdavLogin(webdavConfig)
+    .then(() => {
+      return webDavService.downloadFile(webdavPath, filename, webdavConfig);
+    })
+    .then((tmpFile) => {
+      return homeAssistantService.uploadSnapshot(tmpFile);
+    })
+    .then((res) => {
+      if (res) {
+        const body = JSON.parse(res.body) as SupervisorResponse<BackupUpload>;
+        logger.info(`Successfully uploaded ${filename} to Home Assistant.`);
+        messageManager.info(
+          "Successfully uploaded backup to Home Assistant.",
+          `Name: ${filename} slug: ${body.data.slug}
+          `
+        );
+      }
+    });
 }

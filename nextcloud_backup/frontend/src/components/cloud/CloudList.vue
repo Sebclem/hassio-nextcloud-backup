@@ -39,6 +39,7 @@
                     :item="item"
                     :index="index"
                     @delete="deleteBackup"
+                    @upload="restore"
                   >
                   </cloud-list-item>
                 </v-list>
@@ -67,6 +68,7 @@
                     :item="item"
                     :index="index"
                     @delete="deleteBackup"
+                    @upload="restore"
                   >
                   </cloud-list-item>
                 </v-list>
@@ -89,9 +91,11 @@ import type { WebdavBackup } from "@/types/webdav";
 import {
   getAutoBackupList,
   getManualBackupList,
+  restoreWebdavBackup,
 } from "@/services/webdavService";
 import CloudDeleteDialog from "./CloudDeleteDialog.vue";
 import CloudListItem from "./CloudListItem.vue";
+import { useAlertStore } from "@/store/alert";
 
 const deleteDialog = ref<InstanceType<typeof CloudDeleteDialog> | null>(null);
 const deleteItem = ref<WebdavBackup | null>(null);
@@ -99,7 +103,7 @@ const autoBackups = ref<WebdavBackup[]>([]);
 const manualBackups = ref<WebdavBackup[]>([]);
 
 const loading = ref<boolean>(true);
-
+const alertStore = useAlertStore();
 function refreshBackup() {
   loading.value = true;
   getAutoBackupList()
@@ -119,6 +123,16 @@ function refreshBackup() {
 function deleteBackup(item: WebdavBackup) {
   deleteItem.value = item;
   deleteDialog.value?.open(item);
+}
+
+function restore(item: WebdavBackup) {
+  restoreWebdavBackup(item.path)
+    .then(() => {
+      alertStore.add("success", "Backup upload as started.");
+    })
+    .catch(() => {
+      alertStore.add("error", "Fail to start backup upload !");
+    });
 }
 refreshBackup();
 defineExpose({ refreshBackup });

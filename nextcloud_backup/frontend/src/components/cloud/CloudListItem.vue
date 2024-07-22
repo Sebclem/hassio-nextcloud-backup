@@ -94,7 +94,12 @@
       <v-card-actions class="justify-center">
         <v-tooltip text="Upload to Home Assitant" location="bottom">
           <template v-slot:activator="{ props }">
-            <v-btn variant="outlined" color="success" v-bind="props">
+            <v-btn
+              variant="outlined"
+              color="success"
+              v-bind="props"
+              @click="emits('upload', item)"
+            >
               <v-icon>mdi-upload</v-icon>
             </v-btn>
           </template>
@@ -108,18 +113,20 @@
 </template>
 
 <script setup lang="ts">
+import { restoreWebdavBackup } from "@/services/webdavService";
 import type { WebdavBackup } from "@/types/webdav";
 import { DateTime } from "luxon";
 import prettyBytes from "pretty-bytes";
 import { ref } from "vue";
 
 const detail = ref(false);
-defineProps<{
+const props = defineProps<{
   item: WebdavBackup;
   index: number;
 }>();
 
 const emits = defineEmits<{
   (e: "delete", item: WebdavBackup): void;
+  (e: "upload", item: WebdavBackup): void;
 }>();
 </script>

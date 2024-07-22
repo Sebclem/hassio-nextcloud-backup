@@ -7,8 +7,11 @@ import {
 } from "../services/webdavConfigService.js";
 import * as webdavService from "../services/webdavService.js";
 import * as pathTools from "../tools/pathTools.js";
-import type { WebdavDelete } from "../types/services/webdav.js";
+import type { WebdavGenericPath } from "../types/services/webdav.js";
 import { WebdavDeleteValidation } from "../types/services/webdavValidation.js";
+import { restoreToHA } from "../services/orchestrator.js";
+import path from "path";
+import logger from "../config/winston.js";
 
 const webdavRouter = express.Router();
 
@@ -55,7 +58,7 @@ webdavRouter.get("/backup/manual", (req, res) => {
 });
 
 webdavRouter.delete("/", (req, res) => {
-  const body = req.body as WebdavDelete;
+  const body = req.body as WebdavGenericPath;
   const validator = Joi.object(WebdavDeleteValidation);
   const config = getWebdavConfig();
   validateWebdavConfig(config)
@@ -78,6 +81,23 @@ webdavRouter.delete("/", (req, res) => {
     .catch((reason) => {
       res.status(400).json(reason);
     });
+});
+
+webdavRouter.post("/restore", (req, res) => {
+  const body = req.body as WebdavGenericPath;
+  const validator = Joi.object(WebdavDeleteValidation);
+  validator
+    .validateAsync(body)
+    .then(() => {
+      return restoreToHA(body.path, path.basename(body.path));
+    })
+    .then(() => {
+      logger.info("All good !");
+    })
+    .catch(() => {
+      logger.error("Something wrong !");
+    });
+  res.sendStatus(202);
 });
 
 export default webdavRouter;

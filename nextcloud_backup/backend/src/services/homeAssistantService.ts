@@ -4,7 +4,6 @@ import FormData from "form-data";
 import got, {
   RequestError,
   type OptionsOfJSONResponseBody,
-  type PlainResponse,
   type Progress,
   type Response,
 } from "got";
@@ -296,54 +295,42 @@ function clean(backups: BackupModel[], numberToKeep: number) {
 }
 
 function uploadSnapshot(path: string) {
-  return new Promise((resolve, reject) => {
-    const status = statusTools.getStatus();
-    status.status = States.BKUP_UPLOAD_HA;
-    status.progress = 0;
-    statusTools.setStatus(status);
-    logger.info("Uploading backup...");
-    const stream = fs.createReadStream(path);
-    const form = new FormData();
-    form.append("file", stream);
+  const status = statusTools.getStatus();
+  status.status = States.BKUP_UPLOAD_HA;
+  status.progress = 0;
+  statusTools.setStatus(status);
+  logger.info("Uploading backup...");
+  const stream = fs.createReadStream(path);
+  const form = new FormData();
+  form.append("file", stream);
 
-    const options = {
-      body: form,
-      headers: { authorization: `Bearer ${token}` },
-    };
-    got.stream
-      .post(`http://hassio/backups/new/upload`, options)
-      .on("uploadProgress", (e: Progress) => {
-        const percent = e.percent;
-        if (status.progress !== percent) {
-          status.progress = percent;
-          statusTools.setStatus(status);
-        }
-        if (percent >= 1) {
-          logger.info("Upload done...");
-        }
-      })
-      .on("response", (res: PlainResponse) => {
-        if (res.statusCode !== 200) {
-          messageManager.error(
-            "Fail to upload backup to Home Assistant",
-            `Code: ${res.statusCode} Body: ${res.body as string}`
-          );
-          logger.error("Fail to upload backup to Home Assistant");
-          logger.error(`Code: ${res.statusCode}`);
-          logger.error(`Body: ${res.body as string}`);
-          fs.unlinkSync(path);
-          reject(new Error(res.statusCode.toString()));
-        } else {
-          logger.info(`...Upload finish ! (status: ${res.statusCode})`);
-          const status = statusTools.getStatus();
-          status.status = States.IDLE;
-          status.progress = undefined;
-          statusTools.setStatus(status);
-          fs.unlinkSync(path);
-          resolve(res);
-        }
-      })
-      .on("error", (err: RequestError) => {
+  const options = {
+    body: form,
+    headers: { authorization: `Bearer ${token}` },
+  };
+  return got
+    .post(`http://hassio/backups/new/upload`, options)
+    .on("uploadProgress", (e: Progress) => {
+      const percent = e.percent;
+      if (status.progress !== percent) {
+        status.progress = percent;
+        statusTools.setStatus(status);
+      }
+      if (percent >= 1) {
+        logger.info("Upload done...");
+      }
+    })
+    .then(
+      (res) => {
+        logger.info(`...Upload finish ! (status: ${res.statusCode})`);
+        const status = statusTools.getStatus();
+        status.status = States.IDLE;
+        status.progress = undefined;
+        statusTools.setStatus(status);
+        fs.unlinkSync(path);
+        return res;
+      },
+      (err: RequestError) => {
         const status = statusTools.getStatus();
         status.status = States.IDLE;
         status.progress = undefined;
@@ -355,9 +342,9 @@ function uploadSnapshot(path: string) {
         );
         logger.error("Fail to upload backup to Home Assistant");
         logger.error(err);
-        reject(err);
-      });
-  });
+        logger.error(`Body: ${err.response?.body as string}`);
+      }
+    );
 }
 
 function stopAddons(addonSlugs: string[]) {
@@ -532,6 +519,7 @@ function publish_state() {
 export {
   clean,
   createNewBackup,
+  delSnap,
   downloadSnapshot,
   getAddonList,
   getBackupInfo,
@@ -541,5 +529,4 @@ export {
   startAddons,
   stopAddons,
   uploadSnapshot,
-  delSnap,
 };

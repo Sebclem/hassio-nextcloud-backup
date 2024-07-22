@@ -10,7 +10,6 @@ export interface WebdavBackup {
   creationDate?: DateTime;
 }
 
-
-export interface WebdavDelete {
+export interface WebdavGenericPath {
   path: string;
 }

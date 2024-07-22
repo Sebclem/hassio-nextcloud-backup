@@ -1,4 +1,3 @@
-
 export interface SupervisorResponse<T> {
   result: string;
   data: T;
@@ -25,7 +24,6 @@ export interface AddonData {
   addons: AddonModel[];
 }
 
-
 export interface AddonModel {
   name: string;
   slug: string;
@@ -43,9 +41,8 @@ export interface AddonModel {
 }
 
 export interface BackupData {
-  backups: BackupModel[]
+  backups: BackupModel[];
 }
-
 
 export interface BackupModel {
   slug: string;
@@ -79,4 +76,9 @@ export interface BackupDetailModel {
   }[];
   repositories: string[];
   folders: string[];
+}
+
+export interface BackupUpload {
+  slug: string;
+  job_id: string;
 }

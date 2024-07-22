@@ -18,3 +18,13 @@ export function deleteWebdabBackup(path: string) {
     })
     .text();
 }
+
+export function restoreWebdavBackup(path: string) {
+  return kyClient
+    .post("webdav/restore", {
+      json: {
+        path: path,
+      },
+    })
+    .text();
+}
