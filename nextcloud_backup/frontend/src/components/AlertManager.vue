@@ -53,8 +53,10 @@ const alertVisible = computed(() => alertList.value.length > 0);
   right: 20px;
   z-index: 99999;
   height: 100vh;
+  pointer-events: none;
   #alertContainer {
     position: sticky;
+    pointer-events: all;
     top: 80px;
     right: 20px;
   }
