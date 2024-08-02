@@ -3,8 +3,28 @@
     <v-card-title class="text-center">Action</v-card-title>
     <v-divider class="border-opacity-25"></v-divider>
     <v-card-text>
-      <v-btn color="success" @click="launchBackup">Backup Now</v-btn>
-      <v-btn color="success" @click="launchClean">Clean</v-btn>
+      <v-row>
+        <v-col class="d-flex justify-center">
+          <v-btn
+            block
+            color="success"
+            @click="launchBackup"
+            prepend-icon="mdi-cloud-plus"
+          >
+            Backup Now
+          </v-btn>
+        </v-col>
+        <v-col class="d-flex justify-center">
+          <v-btn
+            block
+            color="orange-darken-3"
+            @click="launchClean"
+            prepend-icon="mdi-broom"
+          >
+            Clean
+          </v-btn>
+        </v-col>
+      </v-row>
     </v-card-text>
   </v-card>
 </template>

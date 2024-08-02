@@ -9,7 +9,7 @@
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
-    "@mdi/font": "7.0.96",
+    "@mdi/font": "7.4.47",
     "core-js": "^3.34.0",
     "ky": "^1.2.0",
     "luxon": "^3.4.4",
