@@ -50,10 +50,10 @@
           </div>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row v-if="status?.status != States.IDLE">
         <v-divider class="border-opacity-25 mx-n1"></v-divider>
       </v-row>
-      <v-row>
+      <v-row v-if="status?.status != States.IDLE">
         <v-col>
           <v-progress-linear
             height="25"
