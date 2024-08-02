@@ -9,6 +9,8 @@ export enum States {
   BKUP_UPLOAD_CLOUD = "BKUP_UPLOAD_CLOUD",
   STOP_ADDON = "STOP_ADDON",
   START_ADDON = "START_ADDON",
+  CLEAN_CLOUD = "CLEAN_CLOUD",
+  CLEAN_HA = "CLEAN_HA",
 }
 
 export interface Status {

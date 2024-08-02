@@ -23,6 +23,7 @@ import { templateToRegexp } from "./backupConfigService.js";
 import { getChunkEndpoint, getEndpoint } from "./webdavConfigService.js";
 import { pipeline } from "stream/promises";
 import { humanFileSize } from "../tools/toolbox.js";
+import type { BackupConfig } from "../types/services/backupConfig.js";
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MiB Same as desktop client
 const CHUNK_NUMBER_SIZE = 5; // To add landing "0"
@@ -201,6 +202,7 @@ function extractBackupInfo(backups: WebdavBackup[], template: string) {
 }
 
 export function deleteBackup(path: string, config: WebdavConfig) {
+  logger.debug(`Deleting Cloud backup ${path}`);
   const endpoint = getEndpoint(config);
   return got
     .delete(config.url + endpoint + path, {
@@ -589,6 +591,7 @@ export function downloadFile(
     },
     (reason: RequestError) => {
       if (fs.existsSync(tmp_file)) fs.unlinkSync(tmp_file);
+      logger.error("Fail to download Cloud backup", reason.message);
       messageManager.error("Fail to download Cloud backup", reason.message);
       const status = statusTools.getStatus();
       status.status = States.IDLE;
@@ -599,39 +602,59 @@ export function downloadFile(
   );
 }
 
-//   clean() {
-//     let limit = settingsTools.getSettings().auto_clean_backup_keep;
-//     if (limit == null) limit = 5;
-//     return new Promise((resolve, reject) => {
-//       this.getFolderContent(this.getConf()?.back_dir + pathTools.auto)
-//         .then(async (contents: any) => {
-//           if (contents.length < limit) {
-//             resolve(undefined);
-//             return;
-//           }
-//           contents.sort((a: any, b: any) => {
-//             return a.date < b.date ? 1 : -1;
-//           });
+export function clean(backupConfig: BackupConfig, webdavConfig: WebdavConfig) {
+  if (!backupConfig.autoClean.webdav.enabled) {
+    logger.debug("Clean disabled for Cloud");
+    return Promise.resolve();
+  }
+  logger.info("Clean for cloud");
+  const status = statusTools.getStatus();
+  status.status = States.CLEAN_CLOUD;
+  status.progress = -1;
+  statusTools.setStatus(status);
+  const limit = backupConfig.autoClean.homeAssistant.nbrToKeep || 5;
+  return getBackups(pathTools.auto, webdavConfig, backupConfig.nameTemplate)
+    .then((backups) => {
+      if (backups.length > limit) {
+        const toDel = backups.splice(limit);
+        logger.debug(`Number of backup to clean: ${toDel.length}`);
+        const promises = toDel.map((value) =>
+          deleteBackup(value.path, webdavConfig)
+        );
+        return Promise.allSettled(promises);
+      } else {
+        logger.debug("Nothing to clean");
+      }
+    })
+    .then(
+      (values) => {
+        const status = statusTools.getStatus();
+        status.status = States.IDLE;
+        status.progress = undefined;
+        statusTools.setStatus(status);
 
-//           const toDel = contents.slice(limit);
-//           for (const i in toDel) {
-//             await this.client?.deleteFile(toDel[i].filename);
-//           }
-//           logger.info("Cloud clean done.");
-//           resolve(undefined);
-//         })
-//         .catch((error) => {
-//           const status = statusTools.getStatus();
-//           status.status = "error";
-//           status.error_code = 6;
-//           status.message = "Fail to clean Nexcloud (" + error + ") !";
-//           statusTools.setStatus(status);
-//           logger.error(status.message);
-//           reject(status.message);
-//         });
-//     });
-//   }
-// }
+        let errors = false;
+        for (const val of values || []) {
+          if (val.status == "rejected") {
+            messageManager.error("Fail to delete backup", val.reason);
+            logger.error("Fail to delete backup");
+            logger.error(val.reason);
+            errors = true;
+          }
+        }
 
-// const INSTANCE = new WebdavTools();
-// export default INSTANCE;
+        if (errors) {
+          messageManager.error("Fail to clean backups in Cloud");
+          logger.error("Fail to clean backups in Cloud");
+          return Promise.reject(new Error());
+        }
+
+        return Promise.resolve();
+      },
+      (reason: RequestError) => {
+        logger.error("Fail to clean cloud backup", reason.message);
+        messageManager.error("Fail to clean cloud backup", reason.message);
+        return Promise.reject(reason);
+      }
+    );
+}

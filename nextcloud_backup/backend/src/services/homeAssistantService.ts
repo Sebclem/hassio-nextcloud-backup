@@ -13,13 +13,15 @@ import { promisify } from "util";
 import logger from "../config/winston.js";
 import messageManager from "../tools/messageManager.js";
 import * as statusTools from "../tools/status.js";
-import { BackupType } from "../types/services/backupConfig.js";
+import {
+  BackupType,
+  type BackupConfig,
+} from "../types/services/backupConfig.js";
 import type { NewBackupPayload } from "../types/services/ha_os_payload.js";
 import type {
   AddonData,
   BackupData,
   BackupDetailModel,
-  BackupModel,
   CoreInfoBody,
   SupervisorResponse,
 } from "../types/services/ha_os_response.js";
@@ -161,7 +163,7 @@ function downloadSnapshot(id: string): Promise<string> {
 }
 
 function delSnap(id: string) {
-  logger.info(`Deleting Home Assistant backup ${id}`);
+  logger.debug(`Deleting Home Assistant backup ${id}`);
   const option = {
     headers: { authorization: `Bearer ${token}` },
   };
@@ -262,36 +264,66 @@ function createNewBackup(
   );
 }
 
-function clean(backups: BackupModel[], numberToKeep: number) {
-  const promises = [];
-  if (backups.length < numberToKeep) {
-    return;
+function clean(backupConfig: BackupConfig) {
+  if (!backupConfig.autoClean.homeAssistant.enabled) {
+    logger.debug("Clean disabled for Home Assistant");
+    return Promise.resolve();
   }
-  backups.sort((a, b) => {
-    return Date.parse(b.date) - Date.parse(a.date);
-  });
-  const toDel = backups.slice(numberToKeep);
-  for (const i of toDel) {
-    promises.push(delSnap(i.slug));
-  }
-  logger.info("Local clean done.");
-  return Promise.allSettled(promises).then((values) => {
-    let errors = false;
-    for (const val of values) {
-      if (val.status == "rejected") {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        messageManager.error("Fail to delete backup", val.reason);
-        logger.error("Fail to delete backup");
-        logger.error(val.reason);
-        errors = true;
+  logger.info("Clean for Home Assistant");
+  const status = statusTools.getStatus();
+  status.status = States.CLEAN_HA;
+  status.progress = -1;
+  statusTools.setStatus(status);
+
+  const numberToKeep = backupConfig.autoClean.homeAssistant.nbrToKeep || 5;
+  return getBackups()
+    .then((response) => {
+      const backups = response.body.data.backups;
+      if (backups.length > numberToKeep) {
+        backups.sort((a, b) => {
+          return Date.parse(b.date) - Date.parse(a.date);
+        });
+        const toDel = backups.slice(numberToKeep);
+        logger.debug(`Number of backup to clean: ${toDel.length}`);
+        const promises = toDel.map((value) => delSnap(value.slug));
+        logger.info("Home Assistant clean done.");
+        return Promise.allSettled(promises);
+      } else {
+        logger.debug("Nothing to clean");
       }
-    }
-    if (errors) {
-      messageManager.error("Fail to clean backups in Home Assistant");
-      logger.error("Fail to clean backups in Home Assistant");
-      return Promise.reject(new Error());
-    }
-  });
+    })
+    .then(
+      (values) => {
+        const status = statusTools.getStatus();
+        status.status = States.IDLE;
+        status.progress = undefined;
+        statusTools.setStatus(status);
+
+        let errors = false;
+        for (const val of values || []) {
+          if (val.status == "rejected") {
+            messageManager.error("Fail to delete backup", val.reason as string);
+            logger.error("Fail to delete backup");
+            logger.error(val.reason);
+            errors = true;
+          }
+        }
+        if (errors) {
+          messageManager.error("Fail to clean backups in Home Assistant");
+          logger.error("Fail to clean backups in Home Assistant");
+          return Promise.reject(new Error());
+        }
+        return Promise.resolve();
+      },
+      (reason: RequestError) => {
+        logger.error("Fail to clean Home Assistant backup", reason.message);
+        messageManager.error(
+          "Fail to clean Home Assistant backup",
+          reason.message
+        );
+        return Promise.reject(reason);
+      }
+    );
 }
 
 function uploadSnapshot(path: string) {

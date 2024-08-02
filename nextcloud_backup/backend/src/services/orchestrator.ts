@@ -93,6 +93,12 @@ export function doBackupWorkflow(type: WorkflowType) {
       return homeAssistantService.startAddons(addonsToStartStop);
     })
     .then(() => {
+      return homeAssistantService.clean(backupConfig);
+    })
+    .then(() => {
+      return webDavService.clean(backupConfig, webdavConfig);
+    })
+    .then(() => {
       logger.info("Backup workflow finished successfully !");
       messageManager.info(
         "Backup workflow finished successfully !",
