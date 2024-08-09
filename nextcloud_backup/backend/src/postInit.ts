@@ -12,6 +12,8 @@ import {
   validateWebdavConfig,
 } from "./services/webdavConfigService.js";
 import messageManager from "./tools/messageManager.js";
+import { initCron } from "./services/cronService.js";
+import { getBackupConfig } from "./services/backupConfigService.js";
 
 function postInit() {
   logger.info(`Log level: ${process.env.LOG_LEVEL}`);
@@ -39,34 +41,46 @@ function postInit() {
   );
 
   const webdavConf = getWebdavConfig();
-  validateWebdavConfig(webdavConf).then(
-    () => {
-      logger.info("Webdav config: " + kleur.green().bold("Go !"));
-      checkWebdavLogin(webdavConf).then(
-        () => {
-          logger.info("Webdav : " + kleur.green().bold("Go !"));
-          createBackupFolder(webdavConf).then(
-            () => {
-              logger.info("Webdav fodlers: " + kleur.green().bold("Go !"));
-            },
-            (reason) => {
-              logger.error("Webdav folders: " + kleur.red().bold("FAIL !"));
-              logger.error(reason);
-            }
-          );
-        },
-        (reason) => {
-          logger.error("Webdav : " + kleur.red().bold("FAIL !"));
-          logger.error(reason);
-        }
-      );
-    },
-    (reason: Error) => {
-      logger.error("Webdav config: " + kleur.red().bold("FAIL !"));
-      logger.error(reason);
-      messageManager.error("Invalid webdav config", reason.message);
-    }
-  );
+  validateWebdavConfig(webdavConf)
+    .then(
+      () => {
+        logger.info("Webdav config: " + kleur.green().bold("Go !"));
+        return checkWebdavLogin(webdavConf);
+      },
+      (reason: Error) => {
+        logger.error("Webdav config: " + kleur.red().bold("FAIL !"));
+        logger.error(reason);
+        messageManager.error("Invalid webdav config", reason.message);
+      }
+    )
+    .then(
+      () => {
+        logger.info("Webdav : " + kleur.green().bold("Go !"));
+        return createBackupFolder(webdavConf);
+      },
+      (reason) => {
+        logger.error("Webdav : " + kleur.red().bold("FAIL !"));
+        logger.error(reason);
+      }
+    )
+    .then(
+      () => {
+        logger.info("Webdav fodlers: " + kleur.green().bold("Go !"));
+        return initCron(getBackupConfig());
+      },
+      (reason) => {
+        logger.error("Webdav folders: " + kleur.red().bold("FAIL !"));
+        logger.error(reason);
+      }
+    )
+    .then(
+      () => {
+        logger.info("Cron: " + kleur.green().bold("Go !"));
+      },
+      (reason) => {
+        logger.info("Cron: " + kleur.red().bold("FAIL !"));
+      }
+    );
 
   // settingsTools.check(settingsTools.getSettings(), true);
   // cronTools.init();

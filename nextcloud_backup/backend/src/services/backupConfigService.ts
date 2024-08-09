@@ -8,6 +8,7 @@ import {
 import backupConfigValidation from "../types/services/backupConfigValidation.js";
 import { DateTime } from "luxon";
 import { WorkflowType } from "../types/services/orchecstrator.js";
+import { initCron } from "./cronService.js";
 
 const backupConfigPath = "/data/backupConfigV2.json";
 
@@ -20,13 +21,14 @@ export function validateBackupConfig(config: BackupConfig) {
 
 export function saveBackupConfig(config: BackupConfig) {
   fs.writeFileSync(backupConfigPath, JSON.stringify(config, undefined, 2));
+  return initCron(config);
 }
 
 export function getBackupConfig(): BackupConfig {
   if (!fs.existsSync(backupConfigPath)) {
     logger.warn("Config file not found, creating default one !");
     const defaultConfig = getBackupDefaultConfig();
-    saveBackupConfig(defaultConfig);
+    saveBackupConfig(defaultConfig).catch(() => {});
     return defaultConfig;
   } else {
     return JSON.parse(

@@ -22,13 +22,24 @@ configRouter.get("/backup", (req, res) => {
 
 configRouter.put("/backup", (req, res) => {
   validateBackupConfig(req.body as BackupConfig)
-    .then(() => {
-      saveBackupConfig(req.body as BackupConfig);
-      res.status(204).send();
-    })
-    .catch((error: ValidationError) => {
-      res.status(400).json(error.details);
-    });
+    .then(
+      () => {
+        return saveBackupConfig(req.body as BackupConfig);
+      },
+      (error: ValidationError) => {
+        res.status(400).json(error.details);
+      }
+    )
+    .then(
+      () => {
+        res.status(204).send();
+      },
+      () => {
+        res.status(400).json({
+          message: "Fail to init cron, please check cron config",
+        });
+      }
+    );
 });
 
 configRouter.get("/webdav", (req, res) => {

@@ -21,7 +21,7 @@ export interface Status {
     last_success?: DateTime;
     last_try?: DateTime;
   };
-  next_backup?: string;
+  next_backup?: DateTime;
   webdav: {
     logged_in: boolean;
     folder_created: boolean;

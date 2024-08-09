@@ -47,6 +47,19 @@
         <v-col xl="6" lg="12" sm="6" cols="12">
           <div class="h-100 d-flex align-center">
             <span class="me-auto">Next</span>
+            <v-chip
+              variant="elevated"
+              color="success"
+              prepend-icon="mdi-update"
+            >
+              {{
+                status?.next_backup
+                  ? DateTime.fromISO(status?.next_backup).toLocaleString(
+                      DateTime.DATETIME_MED
+                    )
+                  : "Unknown"
+              }}
+            </v-chip>
           </div>
         </v-col>
       </v-row>
