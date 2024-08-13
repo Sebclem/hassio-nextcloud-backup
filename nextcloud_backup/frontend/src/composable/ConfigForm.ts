@@ -26,11 +26,16 @@ export function useConfigForm(
       .catch(async (reason) => {
         if (reason instanceof HTTPError) {
           const response = await reason.response.json();
-          if (Array.isArray(response)) {
-            for (const elem of response) {
+          if (response["type"] == "validation") {
+            for (const elem of response["errors"]) {
               errorsRef.value[
                 elem.context.key as keyof typeof errorsRef.value
               ] = elem.message;
+            }
+          }
+          else if (response["type"] == "cron") {
+            for (const elem of response["errors"]) {
+              errorsRef.value["cron"].push(elem)
             }
           }
         }

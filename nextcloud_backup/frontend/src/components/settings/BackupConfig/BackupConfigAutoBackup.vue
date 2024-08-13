@@ -27,6 +27,14 @@
               <v-spacer></v-spacer>
               <v-fade-transition>
                 <v-chip
+                v-if="errors.includes(cron.id)"
+                color="error"
+                variant="flat"
+                prepend-icon="mdi-alert"
+                >
+                  INVALID
+                </v-chip>
+                <v-chip
                   v-if="!expanded && cron.monthDay != undefined"
                   append-icon="mdi-calendar"
                   size="small"
@@ -186,7 +194,7 @@ import { ref } from "vue";
 
 const expansionPanelModel = ref(undefined);
 
-defineProps<{ loading: boolean }>();
+defineProps<{ loading: boolean, errors: string[] }>();
 const backupConfigStore = useBackupConfigStore();
 
 function removeCron(id: string) {

@@ -41,6 +41,8 @@
           density="compact"
           variant="outlined"
           color="orange"
+          :loading="loading"
+          :error-messages="errors.backupType"
         >
         </v-select>
       </v-col>
@@ -65,12 +67,12 @@
     </v-row>
     <v-row dense>
       <v-col>
-        <BackupConfigAutoBackup :loading="loading"></BackupConfigAutoBackup>
+        <BackupConfigAutoBackup :loading="loading" :errors="errors.cron"></BackupConfigAutoBackup>
       </v-col>
     </v-row>
     <v-row dense>
       <v-col>
-        <BackupConfigAutoClean :loading="loading"></BackupConfigAutoClean>
+        <BackupConfigAutoClean :loading="loading" :errors=errors></BackupConfigAutoClean>
       </v-col>
     </v-row>
     <v-row dense>
@@ -105,12 +107,13 @@ const backupConfigStore = useBackupConfigStore();
 const { data } = storeToRefs(backupConfigStore);
 const errors = ref({
   nameTemplate: [],
-  username: [],
-  password: [],
+  backupType: [],
+  nbrToKeep: [],
   backupDir: [],
   allowSelfSignedCerts: [],
   type: [],
   customEndpoint: [],
+  cron: []
 });
 
 const emit = defineEmits<{

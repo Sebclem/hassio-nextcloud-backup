@@ -33,6 +33,8 @@
                   variant="outlined"
                   color="orange"
                   min="1"
+                  :loading="loading"
+                  :error-messages="errors.nbrToKeep"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -66,6 +68,8 @@
                   variant="outlined"
                   color="orange"
                   min="1"
+                  :loading="loading"
+                  :error-messages="errors.nbrToKeep"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -79,7 +83,7 @@
 import { useBackupConfigStore } from "@/store/backupConfig";
 import { storeToRefs } from "pinia";
 
-defineProps<{ loading: boolean }>();
+defineProps<{ loading: boolean, errors: any }>();
 const backupConfigStore = useBackupConfigStore();
 const { data } = storeToRefs(backupConfigStore);
 </script>
