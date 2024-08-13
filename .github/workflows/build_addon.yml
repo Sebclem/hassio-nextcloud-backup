@@ -103,25 +103,6 @@ jobs:
       - name: Set up Docker Buildx ${{matrix.arch}}
         uses: docker/setup-buildx-action@v2
 
-      - name: Set Version Prod ${{matrix.arch}}
-        if: github.event_name != 'workflow_dispatch' && github.event_name != 'push'
-        run: |
-          version=${GITHUB_REF/refs\/tags\//}
-          if [ -n "$version" ];then
-            tmp=$(mktemp)
-            jq --arg version "$version" '.version=$version' ${{env.TARGET}}/config.json > "$tmp" && mv "$tmp" ${{env.TARGET}}/config.json
-          fi
-          echo "version_type=prod" >> $GITHUB_ENV
-      - name: Set Version Test ${{matrix.arch}}
-        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
-        run: |
-          version=dev_${GITHUB_RUN_ID}
-          if [ -n "$version" ];then
-            tmp=$(mktemp)
-            jq --arg version "$version" '.version=$version' ${{env.TARGET}}/config.json > "$tmp" && mv "$tmp" ${{env.TARGET}}/config.json
-          fi
-          echo "version_type=dev" >> $GITHUB_ENV
-
       - name: Get build option ${{matrix.arch}}
         run: |
           echo "NAME=$(jq --raw-output '.name // empty' "${{env.TARGET}}/config.json" | sed "s/'//g")" >> $GITHUB_ENV
@@ -130,18 +111,29 @@ jobs:
           echo "VERSION=$(jq --raw-output '.version' "${{env.TARGET}}/config.json")" >> $GITHUB_ENV
           echo "BUILD_FROM=ghcr.io/home-assistant/${{matrix.arch}}-base:$(cat nextcloud_backup/.base_version)" >> $GITHUB_ENV
 
-      - name: Set Tags ${{matrix.arch}}
-        run: |
-          if [ "${{env.version_type}}" != "dev" ]; then
-            echo "TAGS=${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}:latest, ${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}:$(jq --raw-output '.version' "${{env.TARGET}}/config.json")" >> $GITHUB_ENV
-          else
-            echo "TAGS=${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}:dev, ${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}:$(jq --raw-output '.version' "${{env.TARGET}}/config.json")" >> $GITHUB_ENV
-          fi
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{env.REPOSITORY}}/${{env.IMAGE}}                      
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}} 
+          labels: |
+             io.hass.name=${{env.NAME}}
+             io.hass.description=${{env.DESCRIPTION}}
+             io.hass.url=${{env.URL}}
+             io.hass.arch=${{matrix.arch}}
+             io.hass.version={{version}}
+             io.hass.type=addon
 
       - name: Debug Env
         run: |
-          echo ${{env.VERSION}}
-          echo ${{env.TAGS}}
+          echo ${{ steps.meta.outputs.tags }}
+          echo ${{ steps.meta.outputs.labels }}
 
       - name: Login to ghcr.io
         uses: docker/login-action@v2
@@ -154,12 +146,10 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{env.TAGS}}
-          labels: io.hass.name=${{env.NAME}}, io.hass.description=${{env.DESCRIPTION}}, io.hass.url=${{env.URL}}, io.hass.arch=${{matrix.arch}}, io.hass.version=${{env.VERSION}}, io.hass.type=addon
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             BUILD_FROM=${{env.BUILD_FROM}}
-            BUILD_VERSION=${{env.VERSION}}
-            IMAGE_SOURCE=${{env.IMAGE_SOURCE}}
           file: ./${{env.TARGET}}/Dockerfile
           cache-from: type=registry,ref=${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}:latest
           cache-to: type=inline
