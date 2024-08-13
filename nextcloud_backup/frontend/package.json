@@ -6,7 +6,8 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "lint": "eslint . --fix --ignore-path .gitignore",
-    "type-check": "vue-tsc --noEmit"
+    "type-check": "vue-tsc --noEmit",
+    "build-to-back": "vue-tsc --noEmit && vite build --outDir ../backend/dist/public --emptyOutDir true"
   },
   "dependencies": {
     "@mdi/font": "7.4.47",

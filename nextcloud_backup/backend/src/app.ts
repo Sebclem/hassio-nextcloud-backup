@@ -30,6 +30,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/v2/api/", apiV2Router);
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/index.html"));
+});
 /*
 -----------------------------------------------------------
         Error handler
