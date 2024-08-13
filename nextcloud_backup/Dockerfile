@@ -1,6 +1,6 @@
 ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base:3.18
 
-FROM node:22-alpine AS frontend-builder
+FROM node:20 AS frontend-builder
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY frontend/ .
 
 RUN pnpm build
 
-FROM node:22-alpine AS backend-builder
+FROM node:20 AS backend-builder
 
 WORKDIR /app
 
