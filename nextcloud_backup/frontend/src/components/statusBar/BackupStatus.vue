@@ -71,9 +71,7 @@
           <v-progress-linear
             height="25"
             :model-value="percent"
-            :indeterminate="
-              status?.progress == -1 && status.status != States.IDLE
-            "
+            :indeterminate="indeterminate"
             class=""
             color="success"
             rounded
@@ -112,4 +110,8 @@ const lastBackupProps = computed(() => {
     return { icon: "mdi-alert", text: "Fail", color: "red" };
   }
 });
+
+const indeterminate = computed(()=> {
+  return props.status?.progress == -1 && props.status.status != States.IDLE
+})
 </script>
