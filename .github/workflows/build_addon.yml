@@ -146,7 +146,9 @@ jobs:
         with:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          labels: |
+            ${{ steps.meta.outputs.labels }}
+            io.hass.version=${{steps.meta.outputs.version}}
           build-args: |
             BUILD_FROM=${{env.BUILD_FROM}}
           file: ./${{env.TARGET}}/Dockerfile
