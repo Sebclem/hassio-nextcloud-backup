@@ -132,8 +132,8 @@ jobs:
 
       - name: Debug Env
         run: |
-          echo ${{ steps.meta.outputs.tags }}
-          echo ${{ steps.meta.outputs.labels }}
+          echo "${{ steps.meta.outputs.tags }}"
+          echo "${{ steps.meta.outputs.labels }}"
 
       - name: Login to ghcr.io
         uses: docker/login-action@v2
