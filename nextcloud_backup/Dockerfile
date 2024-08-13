@@ -1,5 +1,28 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/base/amd64:12.2.2
-FROM ${BUILD_FROM}
+FROM node:20 AS frontend-builder
+
+WORKDIR /app
+
+COPY frontend/package.json frontend/pnpm-lock.yaml ./
+RUN corepack enable
+RUN pnpm install
+
+COPY frontend/ .
+
+RUN pnpm build
+
+FROM node:20 AS backend-builder
+
+WORKDIR /app
+
+COPY backend/package.json backend/pnpm-lock.yaml ./
+RUN corepack enable
+RUN pnpm install
+
+COPY backend/ .
+
+RUN pnpm build
+
+FROM ghcr.io/hassio-addons/base/amd64:16.2.1
 
 # Copy root filesystem
 COPY rootfs/etc /etc/
@@ -12,21 +35,17 @@ RUN apk add --no-cache nodejs-current
 RUN mkdir -p  /usr/local/sbin/
 RUN ln -s /usr/bin/node /usr/local/sbin/node
 
-# Copy only package*.json
-COPY rootfs/opt/nextcloud_backup/package*.json /opt/nextcloud_backup/
-COPY rootfs/opt/nextcloud_backup/.yarnrc.yml /opt/nextcloud_backup/
-COPY rootfs/opt/nextcloud_backup/.yarn/releases/* /opt/nextcloud_backup/.yarn/releases/
 
 WORKDIR /opt/nextcloud_backup/
 
-# Enable Yarn
+COPY backend/package.json backend/pnpm-lock.yaml ./
 RUN corepack enable
-
-# Install packages
-RUN yarn install
+RUN pnpm install
 
 # Copy all source code
-COPY rootfs/opt/ /opt/
+
+COPY --from=backend-builder /app/dist .
+COPY --from=frontend-builder /app/dist ./public
 
 # Build arguments
 ARG BUILD_ARCH
@@ -48,8 +67,8 @@ LABEL \
     org.label-schema.name="Nextcloud Backup" \
     org.label-schema.schema-version="1.0" \
     org.label-schema.url="https://addons.community" \
-    org.label-schema.usage="https://github.com/hassio-addons/addon-example/tree/master/README.md" \
+    org.label-schema.usage="https://github.com/Sebclem/hassio-nextcloud-backup/tree/master/README.md" \
     org.label-schema.vcs-ref=${BUILD_REF} \
-    org.label-schema.vcs-url="https://github.com/hassio-addons/addon-example" \
+    org.label-schema.vcs-url="https://github.com/Sebclem/hassio-nextcloud-backup" \
     org.label-schema.vendor="Sebclem"\
     org.opencontainers.image.source=${IMAGE_SOURCE}

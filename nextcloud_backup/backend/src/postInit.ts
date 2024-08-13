@@ -77,7 +77,7 @@ function postInit() {
       () => {
         logger.info("Cron: " + kleur.green().bold("Go !"));
       },
-      (reason) => {
+      () => {
         logger.info("Cron: " + kleur.red().bold("FAIL !"));
       }
     );

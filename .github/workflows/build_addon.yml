@@ -13,7 +13,7 @@ env:
   IMAGE_SOURCE: https://github.com/Sebclem/hassio-nextcloud-backup
 
 jobs:
-  build-font:
+  build-front:
     name: Build Front
     runs-on: ubuntu-latest
     steps:
@@ -43,6 +43,41 @@ jobs:
         with:
           name: front_dist
           path: nextcloud_backup/frontend/dist/
+
+  build-back:
+    name: Build Front
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: nextcloud_backup/backend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm i
+        working-directory: nextcloud_backup/backend
+
+      - name: Lint
+        run: pnpm lint
+        working-directory: nextcloud_backup/backend
+
+      - name: Build
+        run: pnpm build
+        working-directory: nextcloud_backup/backend
+
+      - name: Upload production-ready build files
+        uses: actions/upload-artifact@v4
+        with:
+          name: front_dist
+          path: nextcloud_backup/backend/dist/
 
   # build-dockers:
   #   runs-on: ubuntu-latest
