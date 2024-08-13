@@ -41,12 +41,9 @@ RUN ln -s /usr/bin/node /usr/local/sbin/node
 WORKDIR /opt/nextcloud_backup/
 
 COPY backend/package.json backend/pnpm-lock.yaml ./
-RUN corepack enable
-RUN pnpm install
-
-# Copy all source code
 
 COPY --from=backend-builder /app/dist .
+COPY --from=backend-builder /app/node_modules ./node_modules
 COPY --from=frontend-builder /app/dist ./public
 
 # Build arguments
