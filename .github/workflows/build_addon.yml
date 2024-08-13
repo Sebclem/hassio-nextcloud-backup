@@ -92,10 +92,7 @@ jobs:
             arch_value: linux/amd64
           - arch: armv7
             arch_value: linux/arm/v7
-          - arch: i386
-            arch_value: linux/386
-          - arch: armhf
-            arch_value: linux/arm/v6
+
     steps:
 
       - uses: actions/checkout@v3
