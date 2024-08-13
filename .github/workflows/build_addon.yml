@@ -45,7 +45,7 @@ jobs:
           path: nextcloud_backup/frontend/dist/
 
   build-back:
-    name: Build Front
+    name: Build back
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -76,7 +76,7 @@ jobs:
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v4
         with:
-          name: front_dist
+          name: back_dist
           path: nextcloud_backup/backend/dist/
 
   # build-dockers:
