@@ -1,3 +1,5 @@
+ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base:3.18
+
 FROM node:20 AS frontend-builder
 
 WORKDIR /app
@@ -22,7 +24,6 @@ COPY backend/ .
 
 RUN pnpm build
 
-ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base:3.18
 FROM $BUILD_FROM
 
 # Copy root filesystem
