@@ -103,7 +103,6 @@ dist
 
 # TernJS port file
 .tern-port
-.vscode
 status.json
 conf.json
 webdav_conf.json

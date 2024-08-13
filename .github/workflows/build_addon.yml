@@ -2,7 +2,7 @@ name: Build addon
 
 on:
   release:
-    types: [ published ]
+    types: [published]
   push:
   workflow_dispatch:
 
@@ -10,57 +10,98 @@ env:
   TARGET: nextcloud_backup
   IMAGE: "hassio-nextcloud-backup"
   REPOSITORY: ghcr.io/sebclem
-  IMAGE_SOURCE : https://github.com/Sebclem/hassio-nextcloud-backup
-
-
+  IMAGE_SOURCE: https://github.com/Sebclem/hassio-nextcloud-backup
 
 jobs:
+  build-front:
+    name: Build Front
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: nextcloud_backup/frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm i
+        working-directory: nextcloud_backup/frontend
+
+      - name: Build
+        run: pnpm build
+        working-directory: nextcloud_backup/frontend
+
+      - name: Upload production-ready build files
+        uses: actions/upload-artifact@v4
+        with:
+          name: front_dist
+          path: nextcloud_backup/frontend/dist/
+
+  build-back:
+    name: Build back
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+          cache-dependency-path: nextcloud_backup/backend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm i
+        working-directory: nextcloud_backup/backend
+
+      - name: Lint
+        run: pnpm lint
+        working-directory: nextcloud_backup/backend
+
+      - name: Build
+        run: pnpm build
+        working-directory: nextcloud_backup/backend
+
+      - name: Upload production-ready build files
+        uses: actions/upload-artifact@v4
+        with:
+          name: back_dist
+          path: nextcloud_backup/backend/dist/
+
   build-dockers:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        arch: [ aarch64, amd64, armv7, i386, armhf ]
+        arch: [ aarch64, amd64, armv7 ]
         include:
           - arch: aarch64
             arch_value: linux/arm64/v8
           - arch: amd64
-            arch_value: linux/amd64  
+            arch_value: linux/amd64
           - arch: armv7
             arch_value: linux/arm/v7
-          - arch: i386
-            arch_value: linux/386 
-          - arch: armhf
-            arch_value: linux/arm/v6 
+
     steps:
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx ${{matrix.arch}}
-        uses: docker/setup-buildx-action@v2
-
-      - name: Set Version Prod ${{matrix.arch}}
-        if: github.event_name != 'workflow_dispatch' && github.event_name != 'push'
-        run: |
-          version=${GITHUB_REF/refs\/tags\//}
-          if [ -n "$version" ];then
-            tmp=$(mktemp)
-            jq --arg version "$version" '.version=$version' ${{env.TARGET}}/config.json > "$tmp" && mv "$tmp" ${{env.TARGET}}/config.json
-          fi
-          echo "version_type=prod" >> $GITHUB_ENV
-      - name: Set Version Test ${{matrix.arch}}
-        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
-        run: |
-          version=dev_${GITHUB_RUN_ID}
-          if [ -n "$version" ];then
-            tmp=$(mktemp)
-            jq --arg version "$version" '.version=$version' ${{env.TARGET}}/config.json > "$tmp" && mv "$tmp" ${{env.TARGET}}/config.json
-          fi
-          echo "version_type=dev" >> $GITHUB_ENV
-
+        uses: docker/setup-buildx-action@v3
 
       - name: Get build option ${{matrix.arch}}
         run: |
@@ -68,38 +109,48 @@ jobs:
           echo "DESCRIPTION=$(jq --raw-output '.description // empty' "${{env.TARGET}}/config.json" | sed "s/'//g")" >> $GITHUB_ENV
           echo "URL=$(jq --raw-output '.url // empty' "${{env.TARGET}}/config.json")" >> $GITHUB_ENV
           echo "VERSION=$(jq --raw-output '.version' "${{env.TARGET}}/config.json")" >> $GITHUB_ENV
-          echo "BUILD_FROM=ghcr.io/hassio-addons/base/${{matrix.arch}}:$(cat nextcloud_backup/.base_version)" >> $GITHUB_ENV
+          echo "BUILD_FROM=ghcr.io/home-assistant/${{matrix.arch}}-base:$(cat nextcloud_backup/.base_version)" >> $GITHUB_ENV
 
-      - name: Set Tags ${{matrix.arch}}
-        run: |
-          if [ "${{env.version_type}}" != "dev" ]; then
-            echo "TAGS=${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}:latest, ${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}:$(jq --raw-output '.version' "${{env.TARGET}}/config.json")" >> $GITHUB_ENV
-          else
-            echo "TAGS=${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}:dev, ${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}:$(jq --raw-output '.version' "${{env.TARGET}}/config.json")" >> $GITHUB_ENV
-          fi
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}                  
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}} 
+          labels: |
+             io.hass.name=${{env.NAME}}
+             io.hass.description=${{env.DESCRIPTION}}
+             io.hass.url=${{env.URL}}
+             io.hass.arch=${{matrix.arch}}
+             io.hass.type=addon
 
       - name: Debug Env
         run: |
-          echo ${{env.VERSION}}
-          echo ${{env.TAGS}}
+          echo "${{ steps.meta.outputs.tags }}"
+          echo "${{ steps.meta.outputs.labels }}"
 
       - name: Login to ghcr.io
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push ${{matrix.arch}}
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v6
         with:
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{env.TAGS}}
-          labels: io.hass.name=${{env.NAME}}, io.hass.description=${{env.DESCRIPTION}}, io.hass.url=${{env.URL}}, io.hass.arch=${{matrix.arch}}, io.hass.version=${{env.VERSION}}, io.hass.type=addon
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: |
+            ${{ steps.meta.outputs.labels }}
+            io.hass.version=${{steps.meta.outputs.version}}
           build-args: |
             BUILD_FROM=${{env.BUILD_FROM}}
-            BUILD_VERSION=${{env.VERSION}}
-            IMAGE_SOURCE=${{env.IMAGE_SOURCE}}
           file: ./${{env.TARGET}}/Dockerfile
           cache-from: type=registry,ref=${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}:latest
           cache-to: type=inline
