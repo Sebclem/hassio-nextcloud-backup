@@ -81,9 +81,6 @@ function postInit() {
         logger.info("Cron: " + kleur.red().bold("FAIL !"));
       }
     );
-
-  // settingsTools.check(settingsTools.getSettings(), true);
-  // cronTools.init();
 }
 
 export default postInit;
