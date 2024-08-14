@@ -72,9 +72,6 @@ importers:
       eslint-plugin-n:
         specifier: ^16.6.2
         version: 16.6.2(eslint@8.57.0)
-      eslint-plugin-node:
-        specifier: ^11.1.0
-        version: 11.1.0(eslint@8.57.0)
       eslint-plugin-promise:
         specifier: ^6.4.0
         version: 6.6.0(eslint@8.57.0)
