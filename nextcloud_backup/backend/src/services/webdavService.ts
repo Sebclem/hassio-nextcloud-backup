@@ -10,6 +10,7 @@ import got, {
   RequestError,
   type Method,
   type PlainResponse,
+  type Progress,
 } from "got";
 import { DateTime } from "luxon";
 import logger from "../config/winston.js";
@@ -25,6 +26,7 @@ import { pipeline } from "stream/promises";
 import { humanFileSize } from "../tools/toolbox.js";
 import type { BackupConfig } from "../types/services/backupConfig.js";
 import path from "path";
+import urlJoin from "url-join";
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MiB Same as desktop client
 const CHUNK_NUMBER_SIZE = 5; // To add landing "0"
@@ -130,7 +132,7 @@ export async function createBackupFolder(conf: WebdavConfig) {
 
 function createDirectory(pathToCreate: string, config: WebdavConfig) {
   const endpoint = getEndpoint(config);
-  return got(path.join(config.url, endpoint, pathToCreate), {
+  return got(urlJoin(config.url, endpoint, pathToCreate), {
     method: "MKCOL" as Method,
     headers: {
       authorization:
@@ -150,7 +152,7 @@ export function getBackups(
     return Promise.reject(new Error("Not logged in"));
   }
   const endpoint = getEndpoint(config);
-  return got(path.join(config.url, endpoint, config.backupDir, folder), {
+  return got(urlJoin(config.url, endpoint, config.backupDir, folder), {
     method: "PROPFIND" as Method,
     headers: {
       authorization:
@@ -206,7 +208,7 @@ export function deleteBackup(pathToDelete: string, config: WebdavConfig) {
   logger.debug(`Deleting Cloud backup ${pathToDelete}`);
   const endpoint = getEndpoint(config);
   return got
-    .delete(path.join(config.url, endpoint, pathToDelete), {
+    .delete(urlJoin(config.url, endpoint, pathToDelete), {
       headers: {
         authorization:
           "Basic " +
@@ -280,7 +282,7 @@ export function webdavUploadFile(
       },
       https: { rejectUnauthorized: !config.allowSelfSignedCerts },
     };
-    const url = path.join(config.url, getEndpoint(config), webdavPath);
+    const url = urlJoin(config.url, getEndpoint(config), webdavPath);
 
     logger.debug(`...URI: ${encodeURI(url)}`);
     logger.debug(`...rejectUnauthorized: ${options.https?.rejectUnauthorized}`);
@@ -290,7 +292,7 @@ export function webdavUploadFile(
     statusTools.setStatus(status);
     got.stream
       .put(encodeURI(url), options)
-      .on("uploadProgress", (e) => {
+      .on("uploadProgress", (e: Progress) => {
         const percent = e.percent;
         if (status.progress !== percent) {
           status.progress = percent;
@@ -344,12 +346,8 @@ export async function chunkedUpload(
   const fileSize = fs.statSync(localPath).size;
 
   const chunkEndpoint = getChunkEndpoint(config);
-  const chunkedUrl = path.join(config.url, chunkEndpoint, uuid);
-  const finalDestination = path.join(
-    config.url,
-    getEndpoint(config),
-    webdavPath
-  );
+  const chunkedUrl = urlJoin(config.url, chunkEndpoint, uuid);
+  const finalDestination = urlJoin(config.url, getEndpoint(config), webdavPath);
   const status = statusTools.getStatus();
   status.status = States.BKUP_UPLOAD_CLOUD;
   status.progress = -1;
@@ -385,7 +383,10 @@ export async function chunkedUpload(
   let end = Math.min(CHUNK_SIZE - 1, fileSize - 1);
 
   let current_size = end + 1;
-  // const uploadedBytes = 0;
+  const progress = {
+    before_bytes: 0,
+    current_bytes: 0,
+  };
 
   let i = 1;
   while (start < fileSize - 1) {
@@ -393,13 +394,16 @@ export async function chunkedUpload(
     try {
       const chunckNumber = i.toString().padStart(CHUNK_NUMBER_SIZE, "0");
       await uploadChunk(
-        path.join(chunkedUrl, chunckNumber),
+        urlJoin(chunkedUrl, chunckNumber),
         finalDestination,
         chunk,
         current_size,
         fileSize,
-        config
+        config,
+        progress
       );
+      progress.before_bytes = progress.before_bytes + current_size;
+      progress.current_bytes = 0;
       start = end + 1;
       end = Math.min(start + CHUNK_SIZE - 1, fileSize - 1);
       current_size = end - start + 1;
@@ -467,7 +471,8 @@ function uploadChunk(
   body: fs.ReadStream,
   contentLength: number,
   totalLength: number,
-  config: WebdavConfig
+  config: WebdavConfig,
+  progress: { before_bytes: number; current_bytes: number }
 ) {
   return new Promise<PlainResponse>((resolve, reject) => {
     logger.debug(`Uploading chunck.`);
@@ -490,6 +495,10 @@ function uploadChunk(
         https: { rejectUnauthorized: !config.allowSelfSignedCerts },
         body: body,
       })
+      .on("uploadProgress", (e: Progress) => {
+        progress.current_bytes = e.transferred;
+        chunckedUploadProgress(progress, totalLength);
+      })
       .on("response", (res: PlainResponse) => {
         if (res.ok) {
           logger.debug("Chunk upload done.");
@@ -504,6 +513,16 @@ function uploadChunk(
         reject(err);
       });
   });
+}
+
+function chunckedUploadProgress(
+  progress: { before_bytes: number; current_bytes: number },
+  totalLength: number
+) {
+  const current = progress.before_bytes + progress.current_bytes;
+  const status = statusTools.getStatus();
+  status.progress = current / totalLength;
+  statusTools.setStatus(status);
 }
 
 function initChunkedUpload(
@@ -532,7 +551,7 @@ function assembleChunkedUpload(
   totalLength: number,
   config: WebdavConfig
 ) {
-  const chunckFile = path.join(url, ".file");
+  const chunckFile = urlJoin(url, ".file");
   logger.info(`Assemble chuncked upload.`);
   logger.debug(`...URI: ${encodeURI(chunckFile)}`);
   logger.debug(`...Final destination: ${encodeURI(finalDestination)}`);
@@ -568,7 +587,7 @@ export function downloadFile(
     },
     https: { rejectUnauthorized: !config.allowSelfSignedCerts },
   };
-  const url = path.join(config.url, getEndpoint(config), webdavPath);
+  const url = urlJoin(config.url, getEndpoint(config), webdavPath);
   logger.debug(`...URI: ${encodeURI(url)}`);
   logger.debug(`...rejectUnauthorized: ${options.https?.rejectUnauthorized}`);
   const status = statusTools.getStatus();

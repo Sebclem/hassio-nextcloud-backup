@@ -59,6 +59,9 @@ importers:
       morgan:
         specifier: 1.10.0
         version: 1.10.0
+      url-join:
+        specifier: ^5.0.0
+        version: 5.0.0
       webdav:
         specifier: 5.7.1
         version: 5.7.1
