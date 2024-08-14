@@ -81,6 +81,9 @@ jobs:
 
   build-dockers:
     runs-on: ubuntu-latest
+    needs:
+      - build-back
+      - build-front
     strategy:
       fail-fast: false
       matrix:
