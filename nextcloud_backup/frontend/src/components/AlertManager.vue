@@ -25,6 +25,7 @@
               </v-col>
             </v-row>
 
+            <!-- @vue-ignore -->
             <v-progress-linear
               :max="alertStore.timeOutValue"
               :model-value="alert.timeOut"
@@ -62,4 +63,3 @@ const alertVisible = computed(() => alertList.value.length > 0);
   }
 }
 </style>
-@/store/alert

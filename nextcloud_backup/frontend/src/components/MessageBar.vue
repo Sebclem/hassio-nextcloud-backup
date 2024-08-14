@@ -1,5 +1,5 @@
 <template>
-  <v-menu activator="#message-btn" :close-on-content-click="false">
+  <v-menu activator="parent" :close-on-content-click="false">
     <v-sheet width="500" border rounded>
       <v-toolbar color="surface" density="comfortable" border>
         <v-toolbar-title>Messages</v-toolbar-title>

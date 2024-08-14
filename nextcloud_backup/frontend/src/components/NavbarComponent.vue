@@ -18,6 +18,7 @@
         <v-icon class="shake">mdi-bell</v-icon>
       </v-badge>
       <v-icon v-else>mdi-bell</v-icon>
+      <message-bar></message-bar>
     </v-btn>
     <v-menu width="210px">
       <template v-slot:activator="{ props }">
@@ -46,6 +47,7 @@ import { useDialogStatusStore } from "@/store/dialogStatus";
 import { useMessageStore } from "@/store/message";
 import { storeToRefs } from "pinia";
 import logoUrl from "../assets/logo.svg";
+import MessageBar from "./MessageBar.vue";
 
 const dialogStatusStore = useDialogStatusStore();
 const messagesStore = useMessageStore();
