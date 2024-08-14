@@ -24,6 +24,7 @@ import { getChunkEndpoint, getEndpoint } from "./webdavConfigService.js";
 import { pipeline } from "stream/promises";
 import { humanFileSize } from "../tools/toolbox.js";
 import type { BackupConfig } from "../types/services/backupConfig.js";
+import path from "path";
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MiB Same as desktop client
 const CHUNK_NUMBER_SIZE = 5; // To add landing "0"
@@ -79,16 +80,16 @@ export function checkWebdavLogin(
 
 export async function createBackupFolder(conf: WebdavConfig) {
   const root_splited = conf.backupDir.split("/").splice(1);
-  let path = "/";
+  let thiPath = "/";
   for (const elem of root_splited) {
     if (elem != "") {
-      path = path + elem + "/";
+      thiPath = path.join(thiPath, elem);
       try {
-        await createDirectory(path, conf);
-        logger.debug(`Path ${path} created.`);
+        await createDirectory(thiPath, conf);
+        logger.debug(`Path ${thiPath} created.`);
       } catch (error) {
         if (error instanceof HTTPError && error.response.statusCode == 405)
-          logger.debug(`Path ${path} already exist.`);
+          logger.debug(`Path ${thiPath} already exist.`);
         else {
           messageManager.error("Fail to create webdav root folder");
           logger.error("Fail to create webdav root folder");
@@ -104,11 +105,11 @@ export async function createBackupFolder(conf: WebdavConfig) {
   }
   for (const elem of [pathTools.auto, pathTools.manual]) {
     try {
-      await createDirectory(conf.backupDir + elem, conf);
-      logger.debug(`Path ${conf.backupDir + elem} created.`);
+      await createDirectory(path.join(conf.backupDir, elem), conf);
+      logger.debug(`Path ${path.join(conf.backupDir, elem)} created.`);
     } catch (error) {
       if (error instanceof HTTPError && error.response.statusCode == 405) {
-        logger.debug(`Path ${conf.backupDir + elem} already exist.`);
+        logger.debug(`Path ${path.join(conf.backupDir, elem)} already exist.`);
       } else {
         messageManager.error("Fail to create webdav root folder");
         logger.error("Fail to create webdav root folder");
@@ -127,9 +128,9 @@ export async function createBackupFolder(conf: WebdavConfig) {
   statusTools.setStatus(status);
 }
 
-function createDirectory(path: string, config: WebdavConfig) {
+function createDirectory(pathToCreate: string, config: WebdavConfig) {
   const endpoint = getEndpoint(config);
-  return got(config.url + endpoint + path, {
+  return got(path.join(config.url, endpoint, pathToCreate), {
     method: "MKCOL" as Method,
     headers: {
       authorization:
@@ -149,7 +150,7 @@ export function getBackups(
     return Promise.reject(new Error("Not logged in"));
   }
   const endpoint = getEndpoint(config);
-  return got(config.url + endpoint + config.backupDir + folder, {
+  return got(path.join(config.url, endpoint, config.backupDir, folder), {
     method: "PROPFIND" as Method,
     headers: {
       authorization:
@@ -201,11 +202,11 @@ function extractBackupInfo(backups: WebdavBackup[], template: string) {
   return backups;
 }
 
-export function deleteBackup(path: string, config: WebdavConfig) {
-  logger.debug(`Deleting Cloud backup ${path}`);
+export function deleteBackup(pathToDelete: string, config: WebdavConfig) {
+  logger.debug(`Deleting Cloud backup ${pathToDelete}`);
   const endpoint = getEndpoint(config);
   return got
-    .delete(config.url + endpoint + path, {
+    .delete(path.join(config.url, endpoint, pathToDelete), {
       headers: {
         authorization:
           "Basic " +
@@ -279,7 +280,7 @@ export function webdavUploadFile(
       },
       https: { rejectUnauthorized: !config.allowSelfSignedCerts },
     };
-    const url = config.url + getEndpoint(config) + webdavPath;
+    const url = path.join(config.url, getEndpoint(config), webdavPath);
 
     logger.debug(`...URI: ${encodeURI(url)}`);
     logger.debug(`...rejectUnauthorized: ${options.https?.rejectUnauthorized}`);
@@ -343,8 +344,12 @@ export async function chunkedUpload(
   const fileSize = fs.statSync(localPath).size;
 
   const chunkEndpoint = getChunkEndpoint(config);
-  const chunkedUrl = config.url + chunkEndpoint + uuid;
-  const finalDestination = config.url + getEndpoint(config) + webdavPath;
+  const chunkedUrl = path.join(config.url, chunkEndpoint, uuid);
+  const finalDestination = path.join(
+    config.url,
+    getEndpoint(config),
+    webdavPath
+  );
   const status = statusTools.getStatus();
   status.status = States.BKUP_UPLOAD_CLOUD;
   status.progress = -1;
@@ -388,7 +393,7 @@ export async function chunkedUpload(
     try {
       const chunckNumber = i.toString().padStart(CHUNK_NUMBER_SIZE, "0");
       await uploadChunk(
-        chunkedUrl + `/${chunckNumber}`,
+        path.join(chunkedUrl, chunckNumber),
         finalDestination,
         chunk,
         current_size,
@@ -527,7 +532,7 @@ function assembleChunkedUpload(
   totalLength: number,
   config: WebdavConfig
 ) {
-  const chunckFile = `${url}/.file`;
+  const chunckFile = path.join(url, ".file");
   logger.info(`Assemble chuncked upload.`);
   logger.debug(`...URI: ${encodeURI(chunckFile)}`);
   logger.debug(`...Final destination: ${encodeURI(finalDestination)}`);
@@ -563,7 +568,7 @@ export function downloadFile(
     },
     https: { rejectUnauthorized: !config.allowSelfSignedCerts },
   };
-  const url = config.url + getEndpoint(config) + webdavPath;
+  const url = path.join(config.url, getEndpoint(config), webdavPath);
   logger.debug(`...URI: ${encodeURI(url)}`);
   logger.debug(`...rejectUnauthorized: ${options.https?.rejectUnauthorized}`);
   const status = statusTools.getStatus();
