@@ -12,7 +12,7 @@
       "matchStrings": [
         "(?<currentValue>.*)\\s"
       ],
-      "depNameTemplate": "ghcr.io/hassio-addons/base/amd64",
+      "depNameTemplate": "ghcr.io/home-assistant/amd64-base",
       "datasourceTemplate": "docker",
       "versioningTemplate": "semver"
     }
