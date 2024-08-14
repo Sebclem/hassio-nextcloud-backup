@@ -43,7 +43,7 @@
             </v-tooltip>
           </div>
         </v-col>
-        <v-divider vertical class="border-opacity-25 mt-n1"></v-divider>
+        <v-divider vertical :class="dividerClass"></v-divider>
         <v-col xl="6" lg="12" sm="6" cols="12">
           <div class="h-100 d-flex align-center">
             <span class="me-auto">Next</span>
@@ -118,6 +118,10 @@ const nextBackupProps = computed(() => {
     return { icon: "mdi-update", color: "green" };
   } 
 });
+
+const dividerClass = computed(() => {
+  return `border-opacity-25 ${props.status?.status != States.IDLE ? "mt-n1" : "my-n1"  } d-xl-inline-flex d-sm-inline-flex d-lg-none d-none`
+})
 
 const indeterminate = computed(()=> {
   return props.status?.progress == -1 && props.status.status != States.IDLE
