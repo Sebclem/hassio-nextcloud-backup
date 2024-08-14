@@ -15,8 +15,7 @@
 <script setup lang="ts">
 import { getStatus } from "@/services/statusService";
 import { States, Status } from "@/types/status";
-import { computed, ref, onBeforeUnmount } from "vue";
-import { DateTime } from "luxon";
+import { ref, onBeforeUnmount } from "vue";
 import ConnectionStatus from "./ConnectionStatus.vue";
 import BackupStatus from "./BackupStatus.vue";
 import ActionComponent from "./ActionComponent.vue";

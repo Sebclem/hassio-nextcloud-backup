@@ -113,14 +113,13 @@
 </template>
 
 <script setup lang="ts">
-import { restoreWebdavBackup } from "@/services/webdavService";
 import type { WebdavBackup } from "@/types/webdav";
 import { DateTime } from "luxon";
 import prettyBytes from "pretty-bytes";
 import { ref } from "vue";
 
 const detail = ref(false);
-const props = defineProps<{
+defineProps<{
   item: WebdavBackup;
   index: number;
 }>();

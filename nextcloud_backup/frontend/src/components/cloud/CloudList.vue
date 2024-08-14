@@ -86,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, ref } from "vue";
+import { ref } from "vue";
 import type { WebdavBackup } from "@/types/webdav";
 import {
   getAutoBackupList,

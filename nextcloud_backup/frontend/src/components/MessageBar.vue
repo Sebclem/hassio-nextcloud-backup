@@ -94,7 +94,7 @@ import { useMessageStore } from "@/store/message";
 import { MessageType } from "@/types/messages";
 import { DateTime } from "luxon";
 import { storeToRefs } from "pinia";
-import { onBeforeUnmount, ref } from "vue";
+import { onBeforeUnmount } from "vue";
 
 const messagesStore = useMessageStore();
 const { messages } = storeToRefs(messagesStore);
@@ -162,7 +162,6 @@ function getTimeDelta(time: string) {
     } as any);
   }
 }
-const show = ref<boolean[]>([]);
 refreshMessages();
 
 function markReaded(id: string) {

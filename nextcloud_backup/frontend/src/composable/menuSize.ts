@@ -1,5 +1,5 @@
 import { computed } from "vue";
-import { useDisplay } from "vuetify/lib/framework.mjs";
+import { useDisplay } from "vuetify";
 
 export function useMenuSize() {
   const { xs, mdAndDown } = useDisplay();

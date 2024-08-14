@@ -57,7 +57,7 @@
 
 <script lang="ts" setup>
 import type { BackupModel } from "@/types/homeAssistant";
-import { ref, onBeforeUnmount } from "vue";
+import { ref } from "vue";
 import {
   getBackups,
   uploadHomeAssistantBackup,

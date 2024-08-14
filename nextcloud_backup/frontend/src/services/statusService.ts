@@ -1,4 +1,3 @@
-import type { WebdavBackup } from "@/types/webdav";
 import kyClient from "./kyClient";
 import { Status } from "@/types/status";
 

@@ -25,7 +25,7 @@ export function useConfigForm(
       })
       .catch(async (reason) => {
         if (reason instanceof HTTPError) {
-          const response = await reason.response.json();
+          const response: any = await reason.response.json();
           if (response["type"] == "validation") {
             for (const elem of response["errors"]) {
               errorsRef.value[

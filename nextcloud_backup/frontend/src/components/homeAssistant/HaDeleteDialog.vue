@@ -33,7 +33,6 @@
 <script setup lang="ts">
 import { useMenuSize } from "@/composable/menuSize";
 import { deleteHomeAssistantBackup } from "@/services/homeAssistantService";
-import { deleteWebdabBackup } from "@/services/webdavService";
 import { useAlertStore } from "@/store/alert";
 import { BackupModel } from "@/types/homeAssistant";
 import { ref } from "vue";
