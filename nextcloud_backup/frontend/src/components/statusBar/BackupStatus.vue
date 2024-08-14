@@ -49,8 +49,8 @@
             <span class="me-auto">Next</span>
             <v-chip
               variant="elevated"
-              color="success"
-              prepend-icon="mdi-update"
+              :color="nextBackupProps.color"
+              :prepend-icon="nextBackupProps.icon"
             >
               {{
                 status?.next_backup
@@ -109,6 +109,14 @@ const lastBackupProps = computed(() => {
   } else {
     return { icon: "mdi-alert", text: "Fail", color: "red" };
   }
+});
+
+const nextBackupProps = computed(() => {
+  if (props.status?.next_backup == undefined) {
+    return { icon: "mdi-help-circle", color: "" };
+  } else {
+    return { icon: "mdi-update", color: "green" };
+  } 
 });
 
 const indeterminate = computed(()=> {
