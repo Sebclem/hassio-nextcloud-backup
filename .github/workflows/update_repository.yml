@@ -36,7 +36,7 @@ jobs:
 
       - name: Move other files
         run: |
-          cp addon/nextcloud_backup/Docs.md repository/nextcloud_backup/
+          cp addon/nextcloud_backup/DOCS.md repository/nextcloud_backup/
           cp addon/nextcloud_backup/icon.png repository/nextcloud_backup/
           cp addon/nextcloud_backup/logo.png repository/nextcloud_backup/
           cp addon/nextcloud_backup/config.yml repository/nextcloud_backup/
