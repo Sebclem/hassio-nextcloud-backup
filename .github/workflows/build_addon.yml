@@ -97,7 +97,6 @@ jobs:
             arch_value: linux/arm/v7
 
     steps:
-
       - uses: actions/checkout@v4
 
       - name: Set up QEMU

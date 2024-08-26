@@ -1,0 +1,32 @@
+name: Nextcloud Backup
+version: dev
+slug: nextcloud_backup
+description: Easily upload your Home Assistant backups to Nextcloud
+url: https://github.com/Sebclem/hassio-nextcloud-backup
+webui: "[PROTO:ssl]://[HOST]:[PORT:3000]/"
+ingress: true
+ingress_port: 3000
+panel_icon: mdi:cloud-upload
+panel_title: NC Backup
+panel_admin: true
+startup: application
+stage: experimental
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armv7
+boot: auto
+hassio_api: true
+hassio_role: admin
+homeassistant_api: true
+options:
+  log_level: info
+  create_backup_timeout: 5400000
+schema:
+  log_level: list(trace|debug|info|notice|warning|error|fatal)
+  create_backup_timeout: int
+ports:
+  3000/tcp: null
+ports_description:
+  3000/tcp: Web interface (Not required for Home Assistant Ingress)
