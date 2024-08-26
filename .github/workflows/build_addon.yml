@@ -120,7 +120,7 @@ jobs:
           images: |
             ${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}                  
           tags: |
-            type=ref,event=branch
+            type=ref,event=branch,suffix=.${{ github.run_number }}
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}} 
