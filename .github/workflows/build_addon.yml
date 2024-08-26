@@ -120,6 +120,7 @@ jobs:
           images: |
             ${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}                  
           tags: |
+            type=ref,event=branch
             type=ref,event=branch,suffix=.${{ github.run_number }}
             type=ref,event=pr
             type=semver,pattern={{version}}
@@ -159,8 +160,8 @@ jobs:
           context: ./${{env.TARGET}}/
           platforms: ${{ matrix.arch_value }}
 
-  publish-main:
-    name: Publish main
+  update_ha_repository:
+    name: Update HA addon repository
     runs-on: ubuntu-latest
     needs: 
       - build-dockers
@@ -200,6 +201,14 @@ jobs:
           valueFile: 'repository/nextcloud_backup/config.yml'
           propertyPath: 'version'
           value: ${{ steps.branch-names.outputs.current_branch }}.${{ github.run_number}}
+          commitChange: false
+
+      - name: Add image propertie 
+        uses: fjogeleit/yaml-update-action@main
+        with:
+          valueFile: 'repository/nextcloud_backup/config.yml'
+          propertyPath: 'image'
+          value: "ghcr.io/sebclem/hassio-nextcloud-backup/{arch}"
           commitChange: false
       
       - name: Create pull request
