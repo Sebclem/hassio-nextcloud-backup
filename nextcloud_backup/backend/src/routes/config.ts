@@ -9,7 +9,10 @@ import {
   saveWebdavConfig,
   validateWebdavConfig,
 } from "../services/webdavConfigService.js";
-import { checkWebdavLogin } from "../services/webdavService.js";
+import {
+  checkWebdavLogin,
+  createBackupFolder,
+} from "../services/webdavService.js";
 import type { BackupConfig } from "../types/services/backupConfig.js";
 import type { ValidationError } from "joi";
 import type { WebdavConfig } from "../types/services/webdavConfig.js";
@@ -45,6 +48,9 @@ configRouter.put("/webdav", (req, res) => {
   validateWebdavConfig(req.body as WebdavConfig)
     .then(() => {
       return checkWebdavLogin(req.body as WebdavConfig, true);
+    })
+    .then(() => {
+      return createBackupFolder(req.body as WebdavConfig);
     })
     .then(() => {
       saveWebdavConfig(req.body as WebdavConfig);
