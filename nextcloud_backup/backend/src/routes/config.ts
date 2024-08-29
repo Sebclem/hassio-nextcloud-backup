@@ -57,11 +57,10 @@ configRouter.put("/webdav", (req, res) => {
       res.status(204).send();
     })
     .catch((error: ValidationError) => {
-      res.status(400);
       if (error.details) {
-        res.json({ type: "validation", errors: error.details });
+        res.status(400).json({ type: "validation", errors: error.details });
       } else {
-        res.json({ type: "validation", errors: error });
+        res.status(400).json({ type: "validation", errors: error });
       }
     });
 });

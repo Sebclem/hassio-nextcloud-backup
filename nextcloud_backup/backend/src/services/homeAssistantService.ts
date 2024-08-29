@@ -37,6 +37,7 @@ const create_snap_timeout = process.env.CREATE_BACKUP_TIMEOUT
   : 90 * 60 * 1000;
 
 function getVersion(): Promise<Response<SupervisorResponse<CoreInfoBody>>> {
+  logger.info("Getting Home Assistant info");
   return got<SupervisorResponse<CoreInfoBody>>("http://hassio/core/info", {
     headers: { authorization: `Bearer ${token}` },
     responseType: "json",
@@ -57,6 +58,7 @@ function getVersion(): Promise<Response<SupervisorResponse<CoreInfoBody>>> {
 }
 
 function getAddonList(): Promise<Response<SupervisorResponse<AddonData>>> {
+  logger.info("Getting Addon list");
   const option: OptionsOfJSONResponseBody = {
     headers: { authorization: `Bearer ${token}` },
     responseType: "json",

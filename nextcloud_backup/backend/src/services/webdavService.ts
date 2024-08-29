@@ -46,6 +46,7 @@ export function checkWebdavLogin(
   config: WebdavConfig,
   silent: boolean = false
 ) {
+  logger.info("Checking webdab login");
   const endpoint = getEndpoint(config);
   return got(config.url + endpoint, {
     method: "OPTIONS",
@@ -64,7 +65,10 @@ export function checkWebdavLogin(
     },
     (reason: RequestError) => {
       if (!silent) {
-        messageManager.error("Fail to connect to Webdav", reason.message);
+        messageManager.error(
+          "Fail to connect to Webdav",
+          reason?.message ? reason.message : reason.code
+        );
       }
       const status = statusTools.getStatus();
       status.webdav = {
@@ -74,7 +78,7 @@ export function checkWebdavLogin(
       };
       statusTools.setStatus(status);
       logger.error(`Fail to connect to Webdav`);
-      logger.error(reason);
+      logger.error(reason?.message ? reason.message : reason.code);
       return Promise.reject(reason);
     }
   );
