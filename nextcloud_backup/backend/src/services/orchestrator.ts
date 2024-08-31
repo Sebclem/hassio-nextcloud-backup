@@ -115,7 +115,6 @@ export function doBackupWorkflow(type: WorkflowType) {
       if (tmpBackupFile != "") {
         unlinkSync(tmpBackupFile);
       }
-      return Promise.reject(new Error());
     });
 }
 
