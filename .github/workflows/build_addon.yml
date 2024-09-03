@@ -213,7 +213,7 @@ jobs:
           commitChange: false
       
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.PAT_PR }}
           path: "repository"
