@@ -28,7 +28,7 @@
             <!-- @vue-ignore -->
             <v-progress-linear
               :max="alertStore.timeOutValue"
-              :model-value="alert.timeOut"
+              :model-value="alert.timeOut as any"
             ></v-progress-linear>
           </v-alert>
         </v-slide-x-transition>
