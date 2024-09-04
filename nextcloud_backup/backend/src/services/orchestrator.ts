@@ -1,4 +1,4 @@
-import { unlinkSync } from "fs";
+import { existsSync, unlinkSync } from "fs";
 import { DateTime } from "luxon";
 import logger from "../config/winston.js";
 import messageManager from "../tools/messageManager.js";
@@ -112,9 +112,10 @@ export function doBackupWorkflow(type: WorkflowType) {
     })
     .catch(() => {
       backupFail();
-      if (tmpBackupFile != "") {
+      if (tmpBackupFile != "" && existsSync(tmpBackupFile)) {
         unlinkSync(tmpBackupFile);
       }
+      homeAssistantService.startAddons(addonsToStartStop).catch(() => {});
     });
 }
 
