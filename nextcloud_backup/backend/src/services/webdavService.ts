@@ -46,7 +46,7 @@ export function checkWebdavLogin(
   config: WebdavConfig,
   silent: boolean = false
 ) {
-  logger.info("Checking webdab login");
+  logger.debug("Checking webdab login");
   const endpoint = getEndpoint(config);
   return got(config.url + endpoint, {
     method: "OPTIONS",
@@ -61,6 +61,7 @@ export function checkWebdavLogin(
       const status = statusTools.getStatus();
       status.webdav.logged_in = true;
       status.webdav.last_check = DateTime.now();
+      logger.debug("Webdab login OK");
       return response;
     },
     (reason: RequestError) => {
@@ -151,6 +152,7 @@ export function getBackups(
   config: WebdavConfig,
   nameTemplate: string
 ) {
+  logger.info("Download backup form webdav");
   const status = statusTools.getStatus();
   if (!status.webdav.logged_in && !status.webdav.folder_created) {
     return Promise.reject(new Error("Not logged in"));
@@ -171,6 +173,7 @@ export function getBackups(
       const data = parseXmlBackupData(value.body, config).sort(
         (a, b) => b.lastEdit.toMillis() - a.lastEdit.toMillis()
       );
+      logger.info("Download success");
       return extractBackupInfo(data, nameTemplate);
     },
     (reason: RequestError) => {
@@ -209,7 +212,7 @@ function extractBackupInfo(backups: WebdavBackup[], template: string) {
 }
 
 export function deleteBackup(pathToDelete: string, config: WebdavConfig) {
-  logger.debug(`Deleting Cloud backup ${pathToDelete}`);
+  logger.info(`Deleting Cloud backup ${pathToDelete}`);
   const endpoint = getEndpoint(config);
   return got
     .delete(urlJoin(config.url, endpoint, pathToDelete), {
@@ -224,6 +227,7 @@ export function deleteBackup(pathToDelete: string, config: WebdavConfig) {
     })
     .then(
       (response) => {
+        logger.info("Delete success");
         return response;
       },
       (reason: RequestError) => {
@@ -348,7 +352,7 @@ export async function chunkedUpload(
 ) {
   const uuid = randomUUID();
   const fileSize = fs.statSync(localPath).size;
-
+  logger.info("Uploading backup to webdav (Chunked)");
   const chunkEndpoint = getChunkEndpoint(config);
   const chunkedUrl = urlJoin(config.url, chunkEndpoint, uuid);
   const finalDestination = urlJoin(config.url, getEndpoint(config), webdavPath);
@@ -393,6 +397,7 @@ export async function chunkedUpload(
   };
 
   let i = 1;
+  logger.debug("Starting chunck upload");
   while (start < fileSize - 1) {
     const chunk = fs.createReadStream(localPath, { start, end });
     try {
@@ -437,14 +442,14 @@ export async function chunkedUpload(
       throw error;
     }
   }
-  logger.debug("Chunked upload funished, assembling chunks.");
+  logger.debug("Chunks upload funished, assembling chunks.");
   try {
     await assembleChunkedUpload(chunkedUrl, finalDestination, fileSize, config);
     const status = statusTools.getStatus();
     status.status = States.IDLE;
     status.progress = undefined;
     statusTools.setStatus(status);
-    logger.info(`...Upload finish !`);
+    logger.info(`...Upload finished !`);
     fs.unlinkSync(localPath);
   } catch (err) {
     if (err instanceof RequestError) {
@@ -534,7 +539,7 @@ function initChunkedUpload(
   finalDestination: string,
   config: WebdavConfig
 ) {
-  logger.info(`Init chuncked upload.`);
+  logger.debug(`Init chuncked upload.`);
   logger.debug(`...URI: ${encodeURI(url)}`);
   logger.debug(`...Final destination: ${encodeURI(finalDestination)}`);
   return got(encodeURI(url), {

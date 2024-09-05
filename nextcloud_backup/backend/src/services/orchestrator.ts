@@ -25,6 +25,8 @@ export function doBackupWorkflow(type: WorkflowType) {
   const backupConfig = backupConfigService.getBackupConfig();
   const webdavConfig = getWebdavConfig();
 
+  logger.info(`Stating backup workflow, type: ${type}`);
+
   return homeAssistantService
     .getVersion()
     .then((value) => {
