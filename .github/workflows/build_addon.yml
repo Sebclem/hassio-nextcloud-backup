@@ -173,16 +173,18 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: "addon"
+
+      - name: Get branch names
+        id: branch-names
+        uses: tj-actions/branch-names@v8
+
       - name: Checkout Hass repo
         uses: actions/checkout@v4
         with:
           repository: Sebclem/sebclem-hassio-addon-repository
           path: "repository"
           token: ${{ secrets.PAT_PR }}
-
-      - name: Get branch names
-        id: branch-names
-        uses: tj-actions/branch-names@v8
+          ref: ${{ steps.branch-names.outputs.current_branch }}
 
       - name: Generate readme
         uses: cuchi/jinja2-action@v1.2.2
