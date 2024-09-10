@@ -14,6 +14,8 @@ env:
   REPOSITORY: ghcr.io/sebclem
   IMAGE_SOURCE: https://github.com/Sebclem/hassio-nextcloud-backup
 
+permissions: write-all
+
 jobs:
   build-front:
     name: Build Front
@@ -176,7 +178,7 @@ jobs:
           for tag in ${TAGS}; do
             images+="${tag}@${DIGEST} "
           done
-          cosign sign --yes ${images} --oidc-issuer=https://token.actions.githubusercontent.com --oidc-provider=github-actions
+          cosign sign --yes ${images}
 
   update_main_ha_repository:
     name: Update HA addon repository
