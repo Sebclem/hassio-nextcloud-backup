@@ -178,6 +178,7 @@ jobs:
         with:
           repository: Sebclem/sebclem-hassio-addon-repository
           path: "repository"
+          token: ${{ secrets.PAT_PR }}
 
       - name: Get branch names
         id: branch-names
@@ -214,10 +215,10 @@ jobs:
           commitChange: false
 
       - name: Commit and push
-        uses: actions-js/push@v1.5
-        with:
-          github_token: ${{ secrets.PAT_PR }}
-          directory: "repository"
-          message: "Update Nextcloud Backup to ${{ steps.branch-names.outputs.current_branch }}.${{ github.run_number }}"
-          branch: "${{ steps.branch-names.outputs.current_branch }}"
-          repository: "Sebclem/sebclem-hassio-addon-repository"
+        run: |
+          cd repository
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Update Nextcloud Backup to ${{ steps.branch-names.outputs.current_branch }}.${{ github.run_number }}"
+          git push
