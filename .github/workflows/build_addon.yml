@@ -176,7 +176,7 @@ jobs:
           for tag in ${TAGS}; do
             images+="${tag}@${DIGEST} "
           done
-          cosign sign --yes ${images}
+          cosign sign --yes ${images} --oidc-issuer=https://token.actions.githubusercontent.com --oidc-provider=github-actions
 
   update_main_ha_repository:
     name: Update HA addon repository
