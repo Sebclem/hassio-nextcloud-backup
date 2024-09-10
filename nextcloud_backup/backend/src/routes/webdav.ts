@@ -12,6 +12,7 @@ import { WebdavDeleteValidation } from "../types/services/webdavValidation.js";
 import { restoreToHA } from "../services/orchestrator.js";
 import path from "path";
 import logger from "../config/winston.js";
+import { getStatus } from "../tools/status.js";
 
 const webdavRouter = express.Router();
 
@@ -21,6 +22,13 @@ webdavRouter.get("/backup/auto", (req, res) => {
   validateWebdavConfig(config)
     .then(() => {
       return webdavService.checkWebdavLogin(config);
+    })
+    .then(() => {
+      if (!getStatus().webdav.folder_created) {
+        return webdavService.createBackupFolder(config);
+      } else {
+        return Promise.resolve();
+      }
     })
     .then(async () => {
       const value = await webdavService.getBackups(
@@ -42,6 +50,13 @@ webdavRouter.get("/backup/manual", (req, res) => {
   validateWebdavConfig(config)
     .then(() => {
       return webdavService.checkWebdavLogin(config);
+    })
+    .then(() => {
+      if (!getStatus().webdav.folder_created) {
+        return webdavService.createBackupFolder(config);
+      } else {
+        return Promise.resolve();
+      }
     })
     .then(async () => {
       const value = await webdavService.getBackups(
@@ -67,6 +82,13 @@ webdavRouter.delete("/", (req, res) => {
     })
     .then(() => {
       return webdavService.checkWebdavLogin(config);
+    })
+    .then(() => {
+      if (!getStatus().webdav.folder_created) {
+        return webdavService.createBackupFolder(config);
+      } else {
+        return Promise.resolve();
+      }
     })
     .then(() => {
       webdavService

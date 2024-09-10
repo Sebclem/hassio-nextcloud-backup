@@ -43,6 +43,13 @@ export function doBackupWorkflow(type: WorkflowType) {
       return webDavService.checkWebdavLogin(webdavConfig);
     })
     .then(() => {
+      if (!statusTools.getStatus().webdav.folder_created) {
+        return webDavService.createBackupFolder(webdavConfig);
+      } else {
+        return Promise.resolve();
+      }
+    })
+    .then(() => {
       return homeAssistantService.stopAddons(addonsToStartStop);
     })
     .then(() => {
@@ -129,6 +136,13 @@ export function uploadToCloud(slug: string) {
   return webDavService
     .checkWebdavLogin(webdavConfig)
     .then(() => {
+      if (!statusTools.getStatus().webdav.folder_created) {
+        return webDavService.createBackupFolder(webdavConfig);
+      } else {
+        return Promise.resolve();
+      }
+    })
+    .then(() => {
       return homeAssistantService.getBackupInfo(slug);
     })
     .then((response) => {
@@ -210,6 +224,13 @@ export function restoreToHA(webdavPath: string, filename: string) {
   const webdavConfig = getWebdavConfig();
   return webDavService
     .checkWebdavLogin(webdavConfig)
+    .then(() => {
+      if (!statusTools.getStatus().webdav.folder_created) {
+        return webDavService.createBackupFolder(webdavConfig);
+      } else {
+        return Promise.resolve();
+      }
+    })
     .then(() => {
       return webDavService.downloadFile(webdavPath, filename, webdavConfig);
     })
