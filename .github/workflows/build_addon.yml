@@ -198,7 +198,7 @@ jobs:
           cp addon/nextcloud_backup/config.yml repository/nextcloud_backup/
 
       - name: Change version in config file
-        uses: fjogeleit/yaml-update-action@V0.15.0
+        uses: fjogeleit/yaml-update-action@v0.15.0
         with:
           valueFile: "repository/nextcloud_backup/config.yml"
           propertyPath: "version"
@@ -206,7 +206,7 @@ jobs:
           commitChange: false
 
       - name: Add image propertie
-        uses: fjogeleit/yaml-update-action@V0.15.0
+        uses: fjogeleit/yaml-update-action@v0.15.0
         with:
           valueFile: "repository/nextcloud_backup/config.yml"
           propertyPath: "image"
