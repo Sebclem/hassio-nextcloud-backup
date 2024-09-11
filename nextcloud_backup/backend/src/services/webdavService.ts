@@ -152,7 +152,7 @@ export function getBackups(
   config: WebdavConfig,
   nameTemplate: string
 ) {
-  logger.info("Download backup form webdav");
+  logger.debug("Getting backup list form webdav");
   const status = statusTools.getStatus();
   if (!status.webdav.logged_in && !status.webdav.folder_created) {
     return Promise.reject(new Error("Not logged in"));
@@ -173,7 +173,6 @@ export function getBackups(
       const data = parseXmlBackupData(value.body, config).sort(
         (a, b) => b.lastEdit.toMillis() - a.lastEdit.toMillis()
       );
-      logger.info("Download success");
       return extractBackupInfo(data, nameTemplate);
     },
     (reason: RequestError) => {
@@ -212,7 +211,7 @@ function extractBackupInfo(backups: WebdavBackup[], template: string) {
 }
 
 export function deleteBackup(pathToDelete: string, config: WebdavConfig) {
-  logger.info(`Deleting Cloud backup ${pathToDelete}`);
+  logger.debug(`Deleting Cloud backup ${pathToDelete}`);
   const endpoint = getEndpoint(config);
   return got
     .delete(urlJoin(config.url, endpoint, pathToDelete), {
@@ -227,7 +226,7 @@ export function deleteBackup(pathToDelete: string, config: WebdavConfig) {
     })
     .then(
       (response) => {
-        logger.info("Delete success");
+        logger.debug("...Ok");
         return response;
       },
       (reason: RequestError) => {
@@ -307,7 +306,7 @@ export function webdavUploadFile(
           statusTools.setStatus(status);
         }
         if (percent >= 1) {
-          logger.info("Upload done...");
+          logger.info("Upload done");
         }
       })
       .on("response", (res: PlainResponse) => {
