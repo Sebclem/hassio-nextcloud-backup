@@ -1,5 +1,4 @@
 {
   "template": ".github/changlog_template.hbs",
-  "unreleased": true,
   "commitLimit": false
 }
