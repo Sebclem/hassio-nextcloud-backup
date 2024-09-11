@@ -223,8 +223,8 @@ jobs:
 
       - name: Update config.yml
         run: |
-          yq -i 'version = "${{ steps.branch-names.outputs.current_branch }}.${{ github.run_number}}"' repository/nextcloud_backup/config.yml
-          yq -i 'image = "ghcr.io/sebclem/hassio-nextcloud-backup/{arch}"' repository/nextcloud_backup/config.yml
+          yq -i '.version = "${{ steps.branch-names.outputs.current_branch }}.${{ github.run_number}}"' repository/nextcloud_backup/config.yml
+          yq -i '.image = "ghcr.io/sebclem/hassio-nextcloud-backup/{arch}"' repository/nextcloud_backup/config.yml
 
       - name: Commit and push
         run: |
