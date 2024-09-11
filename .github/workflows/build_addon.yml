@@ -45,7 +45,7 @@ jobs:
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v4
         with:
-          name: front_dist
+          name: frontend
           path: nextcloud_backup/frontend/dist/
 
   build-back:
@@ -80,7 +80,7 @@ jobs:
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v4
         with:
-          name: back_dist
+          name: backend
           path: nextcloud_backup/backend/dist/
 
   build-dockers:
@@ -112,15 +112,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Read addon config
-        uses: pietrobolcato/action-read-yaml@1.1.0
-        id: addon_conf
-        with:
-          config: ${{ env.TARGET }}/config.yml
-
-      - name: Get build_from
-        id: build_from
+      - name: Get build parameters
+        id: build_param
         run: |
+          echo "name=$(yq .name nextcloud_backup/config.yml)" >> $GITHUB_OUTPUT
+          echo "description=$(yq .description nextcloud_backup/config.yml)" >> $GITHUB_OUTPUT
+          echo "url=$(yq .url nextcloud_backup/config.yml)" >> $GITHUB_OUTPUT
           echo "build_from=ghcr.io/home-assistant/${{ matrix.arch }}-base:$(cat nextcloud_backup/.base_version)" >> $GITHUB_OUTPUT
 
       - name: Docker meta
@@ -136,9 +133,9 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
           labels: |
-            io.hass.name=${{ steps.addon_conf.outputs['name'] }}
-            io.hass.description=${{ steps.addon_conf.outputs['description'] }}
-            io.hass.url=${{ steps.addon_conf.outputs['url'] }}
+            io.hass.name=${{ steps.build_param.outputs['name'] }}
+            io.hass.description=${{ steps.build_param.outputs['description'] }}
+            io.hass.url=${{ steps.build_param.outputs['url'] }}
             io.hass.arch=${{ matrix.arch }}
             io.hass.type=addon
 
@@ -167,7 +164,7 @@ jobs:
             ${{ steps.meta.outputs.labels }}
             io.hass.version=${{steps.meta.outputs.version}}
           build-args: |
-            BUILD_FROM=${{ steps.build_from.outputs['build_from'] }}
+            BUILD_FROM=${{ steps.build_param.outputs['build_from'] }}
           file: ./${{ env.TARGET }}/Dockerfile
           cache-from: type=registry,ref=${{ env.REPOSITORY }}/${{ env.IMAGE }}/${{ matrix.arch }}:latest
           cache-to: type=inline
@@ -224,21 +221,10 @@ jobs:
           cp addon/nextcloud_backup/logo.png repository/nextcloud_backup/
           cp addon/nextcloud_backup/config.yml repository/nextcloud_backup/
 
-      - name: Change version in config file
-        uses: fjogeleit/yaml-update-action@v0.15.0
-        with:
-          valueFile: "repository/nextcloud_backup/config.yml"
-          propertyPath: "version"
-          value: ${{ steps.branch-names.outputs.current_branch }}.${{ github.run_number}}
-          commitChange: false
-
-      - name: Add image propertie
-        uses: fjogeleit/yaml-update-action@v0.15.0
-        with:
-          valueFile: "repository/nextcloud_backup/config.yml"
-          propertyPath: "image"
-          value: "ghcr.io/sebclem/hassio-nextcloud-backup/{arch}"
-          commitChange: false
+      - name: Update config.yml
+        run: |
+          yq -i 'version = "${{ steps.branch-names.outputs.current_branch }}.${{ github.run_number}}"' repository/nextcloud_backup/config.yml
+          yq -i 'image = "ghcr.io/sebclem/hassio-nextcloud-backup/{arch}"' repository/nextcloud_backup/config.yml
 
       - name: Commit and push
         run: |
