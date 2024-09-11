@@ -109,23 +109,26 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - name: Set up Docker Buildx ${{matrix.arch}}
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Get build option ${{matrix.arch}}
+      - name: Read addon config
+        uses: pietrobolcato/action-read-yaml@1.0.0
+        id: addon_conf
+        with:
+          config: ${{ env.TARGET }}/config.yml
+
+      - name: Get build_from
+        id: build_from
         run: |
-          echo "NAME=$(jq --raw-output '.name // empty' "${{env.TARGET}}/config.json" | sed "s/'//g")" >> $GITHUB_ENV
-          echo "DESCRIPTION=$(jq --raw-output '.description // empty' "${{env.TARGET}}/config.json" | sed "s/'//g")" >> $GITHUB_ENV
-          echo "URL=$(jq --raw-output '.url // empty' "${{env.TARGET}}/config.json")" >> $GITHUB_ENV
-          echo "VERSION=$(jq --raw-output '.version' "${{env.TARGET}}/config.json")" >> $GITHUB_ENV
-          echo "BUILD_FROM=ghcr.io/home-assistant/${{matrix.arch}}-base:$(cat nextcloud_backup/.base_version)" >> $GITHUB_ENV
+          echo "build_from=ghcr.io/home-assistant/${{ matrix.arch }}-base:$(cat nextcloud_backup/.base_version)" >> $GITHUB_OUTPUT
 
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}
+            ${{ env.REPOSITORY }}/${{ env.IMAGE }}/${{ matrix.arch }}
           tags: |
             type=ref,event=branch
             type=ref,event=branch,suffix=.${{ github.run_number }}
@@ -133,16 +136,19 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
           labels: |
-            io.hass.name=${{env.NAME}}
-            io.hass.description=${{env.DESCRIPTION}}
-            io.hass.url=${{env.URL}}
-            io.hass.arch=${{matrix.arch}}
+            io.hass.name=${{ steps.addon_conf.outputs['name'] }}
+            io.hass.description=${{ steps.addon_conf.outputs['description'] }}
+            io.hass.url=${{ steps.addon_conf.outputs['url'] }}
+            io.hass.arch=${{ matrix.arch }}
             io.hass.type=addon
 
-      - name: Debug Env
-        run: |
-          echo "${{ steps.meta.outputs.tags }}"
-          echo "${{ steps.meta.outputs.labels }}"
+      - name: Change version in config file
+        uses: fjogeleit/yaml-update-action@v0.15.0
+        with:
+          valueFile: "nextcloud_backup/config.yml"
+          propertyPath: "version"
+          value: ${{ steps.meta.outputs.version }}.${{ github.run_number}}
+          commitChange: false
 
       - name: Login to ghcr.io
         uses: docker/login-action@v3
@@ -161,11 +167,11 @@ jobs:
             ${{ steps.meta.outputs.labels }}
             io.hass.version=${{steps.meta.outputs.version}}
           build-args: |
-            BUILD_FROM=${{env.BUILD_FROM}}
-          file: ./${{env.TARGET}}/Dockerfile
-          cache-from: type=registry,ref=${{env.REPOSITORY}}/${{env.IMAGE}}/${{matrix.arch}}:latest
+            BUILD_FROM=${{ steps.build_from.outputs['build_from'] }}
+          file: ./${{ env.TARGET }}/Dockerfile
+          cache-from: type=registry,ref=${{ env.REPOSITORY }}/${{ env.IMAGE }}/${{ matrix.arch }}:latest
           cache-to: type=inline
-          context: ./${{env.TARGET}}/
+          context: ./${{ env.TARGET }}/
           platforms: ${{ matrix.arch_value }}
 
       - name: Sign the images with GitHub OIDC Token
