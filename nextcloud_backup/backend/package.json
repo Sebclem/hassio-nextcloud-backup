@@ -18,7 +18,7 @@
     "cron": "3.1.7",
     "debug": "4.3.6",
     "errorhandler": "^1.5.1",
-    "express": "4.19.2",
+    "express": "4.20.0",
     "fast-xml-parser": "^4.4.1",
     "figlet": "^1.7.0",
     "form-data": "4.0.0",
