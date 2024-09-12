@@ -13,6 +13,8 @@ env:
   IMAGE: "hassio-nextcloud-backup"
   REPOSITORY: ghcr.io/sebclem
   IMAGE_SOURCE: https://github.com/Sebclem/hassio-nextcloud-backup
+  BASE_ISSUER: https://token.actions.githubusercontent.com
+  BASE_IDENTITY: https://github.com/home-assistant/docker-base/.*
 
 permissions: write-all
 
@@ -119,6 +121,9 @@ jobs:
           echo "description=$(yq .description nextcloud_backup/config.yml)" >> $GITHUB_OUTPUT
           echo "url=$(yq .url nextcloud_backup/config.yml)" >> $GITHUB_OUTPUT
           echo "build_from=ghcr.io/home-assistant/${{ matrix.arch }}-base:$(cat nextcloud_backup/.base_version)" >> $GITHUB_OUTPUT
+
+      - name: Check base image signature
+        run: cosign verify --certificate-oidc-issuer-regexp "${{ env.BASE_ISSUER }}" --certificate-identity-regexp "${{ env.BASE_IDENTITY }}" "${{ steps.build_param.outputs['build_from'] }}"
 
       - name: Docker meta
         id: meta
