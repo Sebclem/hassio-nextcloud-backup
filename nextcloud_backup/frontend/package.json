@@ -16,7 +16,7 @@
     "luxon": "^3.5.0",
     "pretty-bytes": "^6.1.1",
     "roboto-fontface": "^0.10.0",
-    "uuid": "^10.0.0",
+    "uuid": "^11.0.0",
     "vue": "^3.4.37",
     "vuetify": "3.6.14"
   },
