@@ -644,7 +644,7 @@ export function clean(backupConfig: BackupConfig, webdavConfig: WebdavConfig) {
   status.status = States.CLEAN_CLOUD;
   status.progress = -1;
   statusTools.setStatus(status);
-  const limit = backupConfig.autoClean.homeAssistant.nbrToKeep || 5;
+  const limit = backupConfig.autoClean.webdav.nbrToKeep || 5;
   return getBackups(pathTools.auto, webdavConfig, backupConfig.nameTemplate)
     .then((backups) => {
       if (backups.length > limit) {

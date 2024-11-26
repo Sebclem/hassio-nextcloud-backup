@@ -28,6 +28,9 @@ actionRouter.post("/clean", (req, res) => {
       return clean(backupConfig);
     })
     .then(() => {
+      return webdavClean(backupConfig, webdavConfig);
+    })
+    .then(() => {
       logger.info("All good !");
     })
     .catch(() => {
