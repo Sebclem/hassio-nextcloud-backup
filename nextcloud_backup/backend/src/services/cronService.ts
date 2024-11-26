@@ -36,7 +36,7 @@ export function initCron(backupConfig: BackupConfig) {
         rej(Error(cronItem.id));
       }
     }
-    const nextDate = getNextDate(cronList);
+    const nextDate = getNextDate();
     const status = getStatus();
     status.next_backup = nextDate;
     setStatus(status);
@@ -44,7 +44,7 @@ export function initCron(backupConfig: BackupConfig) {
   });
 }
 
-function getNextDate(cronList: Map<string, CronJob>) {
+export function getNextDate() {
   let nextDate: DateTime | undefined = undefined;
   for (const item of cronList) {
     const thisDate = item[1].nextDate();

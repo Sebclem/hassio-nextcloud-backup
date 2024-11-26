@@ -15,6 +15,7 @@ import * as backupConfigService from "./backupConfigService.js";
 import * as homeAssistantService from "./homeAssistantService.js";
 import { getBackupFolder, getWebdavConfig } from "./webdavConfigService.js";
 import * as webDavService from "./webdavService.js";
+import { getNextDate } from "./cronService.js";
 
 export function doBackupWorkflow(type: WorkflowType) {
   let name = "";
@@ -117,6 +118,7 @@ export function doBackupWorkflow(type: WorkflowType) {
       status.last_backup.success = true;
       status.last_backup.last_try = DateTime.now();
       status.last_backup.last_success = DateTime.now();
+      status.next_backup = getNextDate();
       statusTools.setStatus(status);
     })
     .catch(() => {
@@ -216,6 +218,7 @@ function backupFail() {
   const status = statusTools.getStatus();
   status.last_backup.success = false;
   status.last_backup.last_try = DateTime.now();
+  status.next_backup = getNextDate();
   statusTools.setStatus(status);
   messageManager.error("Last backup as failed !");
 }
