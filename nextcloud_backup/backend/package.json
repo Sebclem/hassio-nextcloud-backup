@@ -13,16 +13,16 @@
   },
   "dependencies": {
     "app-root-path": "3.1.0",
-    "cookie-parser": "1.4.6",
+    "cookie-parser": "1.4.7",
     "cors": "^2.8.5",
-    "cron": "3.1.7",
-    "debug": "4.3.6",
+    "cron": "3.3.0",
+    "debug": "4.4.0",
     "errorhandler": "^1.5.1",
-    "express": "4.20.0",
+    "express": "4.21.2",
     "fast-xml-parser": "^4.4.1",
     "figlet": "^1.7.0",
-    "form-data": "4.0.0",
-    "got": "14.4.2",
+    "form-data": "4.0.1",
+    "got": "14.4.5",
     "http-errors": "2.0.0",
     "joi": "^17.13.3",
     "jquery": "3.7.1",
@@ -31,9 +31,9 @@
     "morgan": "1.10.0",
     "url-join": "^5.0.0",
     "webdav": "5.7.1",
-    "winston": "3.14.1"
+    "winston": "3.17.0"
   },
-  "packageManager": "pnpm@9.7.0",
+  "packageManager": "pnpm@9.15.0",
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@tsconfig/recommended": "^1.0.7",
@@ -47,12 +47,12 @@
     "@types/luxon": "^3.4.2",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.3.0",
-    "concurrently": "9.0.1",
+    "concurrently": "9.1.0",
     "dotenv": "^16.4.5",
     "eslint": "^9.9.0",
     "nodemon": "^3.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4",
-    "typescript-eslint": "8.1.0"
+    "typescript-eslint": "8.18.0"
   }
 }

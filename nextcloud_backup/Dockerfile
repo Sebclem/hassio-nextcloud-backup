@@ -1,4 +1,4 @@
-ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base:3.20
+ARG BUILD_FROM=ghcr.io/home-assistant/amd64-base:3.21
 
 FROM node:20 AS frontend-builder
 
