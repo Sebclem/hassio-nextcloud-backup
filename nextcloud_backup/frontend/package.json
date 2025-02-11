@@ -35,7 +35,7 @@
     "eslint-plugin-n": "^17.0.0",
     "eslint-plugin-promise": "^7.0.0",
     "eslint-plugin-vue": "^9.27.0",
-    "pinia": "^2.2.1",
+    "pinia": "^3.0.0",
     "sass": "^1.77.8",
     "typescript": "^5.5.4",
     "unplugin-auto-import": "^0.18.0",
