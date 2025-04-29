@@ -14,7 +14,7 @@
     "core-js": "^3.38.0",
     "ky": "^1.6.0",
     "luxon": "^3.5.0",
-    "pretty-bytes": "^6.1.1",
+    "pretty-bytes": "^7.0.0",
     "roboto-fontface": "^0.10.0",
     "uuid": "^10.0.0",
     "vue": "^3.4.37",
