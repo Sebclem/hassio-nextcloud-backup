@@ -33,7 +33,7 @@
     "webdav": "5.7.1",
     "winston": "3.14.1"
   },
-  "packageManager": "pnpm@9.7.0",
+  "packageManager": "pnpm@10.11.1",
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@tsconfig/recommended": "^1.0.7",

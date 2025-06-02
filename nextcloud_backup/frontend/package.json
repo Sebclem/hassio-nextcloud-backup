@@ -48,5 +48,5 @@
     "vue-router": "^4.4.3",
     "vue-tsc": "^2.0.26"
   },
-  "packageManager": "pnpm@9.7.0"
+  "packageManager": "pnpm@10.11.1"
 }
