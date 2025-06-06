@@ -1,5 +1,9 @@
 # Home Assistant Add-ons: Nextcloud Backup
 
+> [!WARNING]
+> # THIS PROJECT IS DEPRECATED
+> Please use the [WebDAV integration](https://www.home-assistant.io/integrations/webdav/) compatible with the built-in backup system.
+
 [![GitHub Release][releases-shield]][releases]
 ![Project Stage][project-stage-shield]
 [![License][license-shield]](LICENSE)
