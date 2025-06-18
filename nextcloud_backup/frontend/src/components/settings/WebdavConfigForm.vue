@@ -4,7 +4,7 @@
       <v-col>
         <div class="text-subtitle-1 text-medium-emphasis">URL</div>
         <v-text-field
-          placeholder="https://exemple.com"
+          placeholder="https://example.com"
           variant="outlined"
           density="compact"
           prepend-inner-icon="mdi-web"
