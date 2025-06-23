@@ -21,8 +21,8 @@ importers:
         specifier: ^3.5.0
         version: 3.5.0
       pretty-bytes:
-        specifier: ^6.1.1
-        version: 6.1.1
+        specifier: ^7.0.0
+        version: 7.0.0
       roboto-fontface:
         specifier: ^0.10.0
         version: 0.10.0
@@ -1009,6 +1009,7 @@ packages:
   eslint@8.57.0:
     resolution: {integrity: sha512-dZ6+mexnaTIbSBZWgou51U6OmzIhYM2VcNdtiTtI7qPNZm35Akpr0f6vtw3w1Kmn5PYo+tZVfh13WrhpS6oLqQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
 
   espree@9.6.1:
@@ -1515,9 +1516,9 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  pretty-bytes@6.1.1:
-    resolution: {integrity: sha512-mQUvGU6aUFQ+rNvTIAcZuWGRT9a6f6Yrg9bHs4ImKF+HZCEK+plBvnAZYSIQztknZF2qnzNtr6F8s0+IuptdlQ==}
-    engines: {node: ^14.13.1 || >=16.0.0}
+  pretty-bytes@7.0.0:
+    resolution: {integrity: sha512-U5otLYPR3L0SVjHGrkEUx5mf7MxV2ceXeE7VwWPk+hyzC5drNohsOGNPDZqxCqyX1lkbEN4kl1LiI8QFd7r0ZA==}
+    engines: {node: '>=20'}
 
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
@@ -3456,7 +3457,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  pretty-bytes@6.1.1: {}
+  pretty-bytes@7.0.0: {}
 
   punycode@2.3.1: {}
 
